@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         profile: [debug, release]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
@@ -45,8 +45,7 @@ jobs:
         env:
           LIM_BIN: ./compiler/target/${{ matrix.profile == 'release' && 'release' || 'debug' }}/lim${{ runner.os == 'Windows' && '.exe' || '' }}
         run: |
-          python tools/test_agent_cli.py
-          python tools/test_limits_lsp.py
+          python -m unittest discover -s tools -p "test_*.py"
   authenticated-encryption:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -64,4 +63,4 @@ jobs:
         env:
           LIMITS_AGE_BINARY: /usr/bin/age
           LIMITS_AGE_KEYGEN: /usr/bin/age-keygen
-        run: cargo test --manifest-path compiler/Cargo.toml --test sealed -- --ignored
+        run: cargo test --manifest-path compiler/Cargo.toml -- --ignored

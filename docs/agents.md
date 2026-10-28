@@ -96,6 +96,7 @@ the response reports truncation where relevant.
 
 Semantic positions use **1-based Unicode scalar** line/column pairs and
 end-exclusive ranges. They are not UTF-8 byte offsets or editor UTF-16 positions.
+LF, CRLF and CR each count as one line break.
 The index gives binding IDs, declarations, scopes, references, function parameters
 and conservative captures. Definition and reference results include possible
 lexical fallback bindings: a later declaration may be uninitialized when an earlier
@@ -152,7 +153,8 @@ of an active index request. In incomplete/invalid source, diagnostics remain
 available but local queries are empty; completion falls back to keywords/builtins
 instead of inventing bindings from a stale index.
 
-Bounds: 16 MiB per transport message, 32 open documents, 16 MiB aggregate open
+Bounds: 16 MiB per transport message, at most 128 nested JSON objects/arrays in
+editor messages and backend responses before decoding, 32 open documents, 16 MiB aggregate open
 source, 8 MiB serialized index per document and 32 MiB aggregate serialized index
 cache. Document URIs and string request IDs are capped at 4 KiB. Each query returns
 at most 1,024 results; completion marks truncated results as incomplete. Definition,

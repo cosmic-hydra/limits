@@ -1,6 +1,6 @@
 # Limits language spec (v0.1)
 
-Limits is a small, explicit, dynamically typed language for AI agents. Source files use the `.lim` extension. The defining feature is **enforced execution limits**: every program runs under a step budget and a call-depth cap, so a runaway agent-written program stops with an error instead of hanging or crashing the host.
+Limits is a small, explicit, dynamically typed language for AI agents. Source files use the `.lim` extension. The defining feature is **enforced execution limits**: a step budget and a call-depth cap stop runaway language loops and recursion with an error. They do not impose a hard memory limit, wall-clock deadline or bound on blocking host I/O; see [production guidance](docs/production.md).
 
 ## Running
 
@@ -9,12 +9,20 @@ cargo build --release --manifest-path compiler/Cargo.toml
 compiler/target/release/lim run examples/fib.lim
 compiler/target/release/lim run examples/fib.lim --engine vm
 compiler/target/release/lim run examples/runaway.lim --max-steps 1000
-compiler/target/release/lim check file.lim     # lex + parse only
+compiler/target/release/lim check file.lim     # lex, parse and static checks; no execution
 ```
 
 Engines: `--engine tree|vm` (default `tree`). Both engines enforce the same execution limits.
 
-Defaults: `--max-steps 10000000`, `--max-depth 256`. Exit codes: 0 success, 1 program error, 2 usage error.
+Defaults: `--max-steps 10000000`, `--max-depth 256`. Exit codes: 0 success, 1 program/static error, 2 usage or host error (including file access).
+
+Each executed statement, attempted call after argument evaluation (including a
+builtin call), and entered loop iteration costs one step. Ordinary expression
+operations do not each consume a step. The call-depth cap counts active user
+function calls. A range is materialized only if its length is at most the
+configured total step cap; its elements are not individually charged as steps.
+See [work guards](docs/production.md#work-guards-beyond-statement-steps) for source,
+nesting, rendering and helper-operation bounds.
 
 ## Lexical structure
 
@@ -75,7 +83,10 @@ overflow. Both inspect at most 1,000,000 elements; joined output is capped at
 
 ## Errors
 
-Every error reports a kind (`lex`, `parse`, `check`, `runtime`) and `line:col`. There is no exception handling yet.
+Language errors report a kind (`lex`, `parse`, `check`, `runtime`) and `line:col`.
+Locations use 1-based Unicode scalar columns; LF, CRLF and CR each count as one
+line break. CLI host/usage failures have no source position in JSON responses.
+There is no exception handling yet.
 
 Before running, `lim run` and `lim check` perform static checks and report **all** problems at once: undefined names, assignment to a name never declared with `let`, `break`/`continue` outside a loop (a loop outside a function does not count inside it), and duplicate parameters. Names declared anywhere in a block are visible throughout that block and in nested functions, so mutual recursion works; straight-line use-before-definition is caught at runtime instead.
 

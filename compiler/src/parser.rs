@@ -13,6 +13,18 @@ pub fn parse(tokens: Vec<Token>) -> Result<Program, LimError> {
             tokens.last().map_or(Span { line: 1, col: 1 }, |t| t.span),
         ));
     }
+    // An EOF sentinel is meaningful only at the end. Otherwise a caller-built
+    // token stream could silently discard everything after its first sentinel.
+    if let Some(token) = tokens[..tokens.len() - 1]
+        .iter()
+        .find(|token| token.tok == Tok::Eof)
+    {
+        return Err(LimError::new(
+            Kind::Parse,
+            "unexpected end-of-file token",
+            token.span,
+        ));
+    }
     let mut p = Parser {
         toks: tokens,
         pos: 0,
@@ -118,7 +130,10 @@ impl Parser {
         match self.bump() {
             Tok::Ident(s) => Ok(s),
             other => {
-                self.pos -= 1;
+                // bump deliberately leaves the EOF sentinel in place.
+                if other != Tok::Eof {
+                    self.pos -= 1;
+                }
                 self.err(format!("expected identifier, found {:?}", other))
             }
         }

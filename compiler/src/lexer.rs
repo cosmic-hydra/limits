@@ -72,8 +72,13 @@ pub fn lex(src: &str) -> Result<Vec<Token>, LimError> {
 
     macro_rules! adv {
         () => {{
-            if chars[i] == '\n' {
+            if chars[i] == '\r' {
                 line += 1;
+                col = 1;
+            } else if chars[i] == '\n' {
+                if i == 0 || chars[i - 1] != '\r' {
+                    line += 1;
+                }
                 col = 1;
             } else {
                 col += 1;
@@ -90,7 +95,7 @@ pub fn lex(src: &str) -> Result<Vec<Token>, LimError> {
             continue;
         }
         if c == '#' {
-            while i < chars.len() && chars[i] != '\n' {
+            while i < chars.len() && !matches!(chars[i], '\n' | '\r') {
                 adv!();
             }
             continue;

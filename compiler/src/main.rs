@@ -10,8 +10,8 @@ use limits::protocol::{self, quote};
 use limits::sandbox::SandboxPolicy;
 use limits::{codegen, lexer, parser, resolve, semantic, Engine};
 
-const USAGE: &str = "usage: lim run|check <file.lim|file.lim.age|-> [--json] [--engine vm|tree]
-       lim run <source> [--max-steps N] [--max-depth N]
+const USAGE: &str = "usage: lim run|check <file.lim|file.lim.age|-> [--json]
+       lim run <source> [--engine vm|tree] [--max-steps N] [--max-depth N]
            [--sandbox unrestricted|restricted|pure] [--allow-builtin NAME] [--deny-builtin NAME]
            [--max-output-bytes N] [--timeout-ms N]
        lim index <source> [--json]
@@ -388,6 +388,10 @@ fn write_stdout(value: &str) -> Result<(), String> {
         .and_then(|_| out.flush())
         .map_err(|_| "cannot write response".into())
 }
+fn write_stderr(value: &str) {
+    // A failed diagnostic sink must not turn a program/host error into a panic.
+    let _ = writeln!(std::io::stderr().lock(), "{value}");
+}
 fn generic_error(command: &str, source: Option<&str>, message: &str, kind: &str, json: bool) -> u8 {
     if json {
         let mut end = message.len().min(protocol::MAX_DIAGNOSTIC_MESSAGE_BYTES);
@@ -401,10 +405,10 @@ fn generic_error(command: &str, source: Option<&str>, message: &str, kind: &str,
         };
         let encoded=format!("{{\"schema_version\":1,\"command\":{},\"ok\":false,\"source\":{},\"data\":null,\"diagnostic_count\":1,\"diagnostics_truncated\":false,\"diagnostics\":[{{\"code\":{},\"kind\":{},\"severity\":\"error\",\"message\":{},\"line\":null,\"col\":null,\"hint\":\"Inspect invocation and host configuration.\",\"message_truncated\":{},\"original_message_bytes\":{}}}]{run_fields}}}",quote(command),source.map_or_else(||"null".into(),quote),quote(if kind=="usage"{"LIM_USAGE"}else{"LIM_HOST"}),quote(kind),quote(&message[..end]),end<message.len(),message.len());
         if write_stdout(&encoded).is_err() {
-            eprintln!("error: cannot write response");
+            write_stderr("error: cannot write response");
         }
     } else {
-        eprintln!("error: {message}");
+        write_stderr(&format!("error: {message}"));
     }
     2
 }
@@ -422,7 +426,10 @@ fn program_errors(options: &Options, errors: Vec<LimError>) -> u8 {
         }
     } else {
         for e in errors {
-            eprintln!("{}: {e}", options.source.as_deref().unwrap_or("-"));
+            write_stderr(&format!(
+                "{}: {e}",
+                options.source.as_deref().unwrap_or("-")
+            ));
         }
     }
     1
@@ -602,24 +609,40 @@ fn execute(options: Options) -> u8 {
         }) {
             Ok(()) => 0,
             Err(e) => {
-                eprintln!("{}: {e}", options.source.unwrap());
+                write_stderr(&format!("{}: {e}", options.source.unwrap()));
                 1
             }
         }
     }
 }
 fn main() -> ExitCode {
-    let args: Vec<String> = std::env::args().skip(1).collect();
+    // OS arguments may contain invalid Unicode. Reject them through the CLI
+    // error contract instead of letting std::env::args panic before dispatch.
+    let args: Vec<_> = std::env::args_os().skip(1).collect();
     let json = args.iter().any(|a| a == "--json")
         || args.first().is_some_and(|s| {
             matches!(
-                s.as_str(),
-                "capabilities" | "index" | "symbols" | "definition" | "references" | "complete"
+                s.to_str(),
+                Some(
+                    "capabilities" | "index" | "symbols" | "definition" | "references" | "complete"
+                )
             )
         });
+    if args.iter().any(|arg| arg.to_str().is_none()) {
+        return ExitCode::from(generic_error(
+            args.first().and_then(|s| s.to_str()).unwrap_or(""),
+            None,
+            "arguments must be valid UTF-8",
+            "usage",
+            json,
+        ));
+    }
+    let args: Vec<String> = args
+        .into_iter()
+        .map(|arg| arg.into_string().expect("validated UTF-8 argument"))
+        .collect();
     if args.first().is_some_and(|a| a == "--help" || a == "-h") {
-        println!("{USAGE}");
-        return ExitCode::SUCCESS;
+        return ExitCode::from(if write_stdout(USAGE).is_ok() { 0 } else { 2 });
     }
     match parse_options(&args) {
         Ok(options) => ExitCode::from(execute(options)),

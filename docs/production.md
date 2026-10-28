@@ -10,16 +10,21 @@ compiler/target/release/lim run file.lim --engine vm --max-steps 1000000 --max-d
 
 The CLI performs the existing static checks before execution for both engines.
 Exit codes are 0 for success, 1 for a program error, and 2 for invalid usage or
-file access errors. An execution error includes its kind and source line/column.
+host errors, including file access and JSON-response delivery failures. An
+execution error includes its kind and source line/column.
 Output written before an error remains visible. Output and flush failures are
-reported as runtime errors.
+reported as runtime errors for program stdout; failures delivering a JSON result
+use exit 2 and may leave an incomplete response.
 
 ## Execution and lifetime guarantees
 
 Both the tree interpreter and VM use explicit heap stacks for language calls,
-loops and expression evaluation. They charge the same statement, call and loop
-iteration steps and stop at the configured call-depth cap. A configured depth of
-100,000 is covered by tests on the normal Rust test-thread stack. Step counters
+loops and expression evaluation. They charge one step per executed statement,
+one per attempted call after argument evaluation (including builtins), and one
+per entered loop iteration. Ordinary expression operations do not each consume
+a step. Both engines stop at the configured call-depth cap, which counts active
+user-function calls, not builtin calls. A configured depth of 100,000 is covered
+by tests on the normal Rust test-thread stack. Step counters
 also handle the full u64 limit without arithmetic wraparound.
 
 Scopes and containers are tracked by each engine. The collector marks from
@@ -44,13 +49,22 @@ therefore apply these additional guards, reporting ordinary located errors:
 | Source size | 16 MiB of UTF-8 bytes | `lex` |
 | Recursive grammar nesting | 128 guarded grammar entries | `parse` |
 | Expression AST nesting | 128 nodes | `parse` |
-| Caller-built AST nesting | 256 nodes | `parse` |
+| Caller-built AST nesting | Depth 256 from a top-level statement at depth 0 | `parse` |
 | Value rendering/comparison | 1,000,000 work items per operation | `runtime` |
-| Rendered value or print call | 16 MiB | `runtime` |
+| Rendered value or print call | 16 MiB of UTF-8 bytes, including print separators/newline | `runtime` |
+| `join`/`sum` input | 1,000,000 elements per call | `runtime` |
+| `join` result | 16 MiB of UTF-8 bytes | `runtime` |
+| Materialized range | At most the configured `max_steps` elements per range | `runtime` |
 
 The CLI reads at most the source-size cap plus one byte before rejecting an
-oversized file. Long flat binary/call/index chains are checked while building the
-AST, before a deep tree can overflow recursive compilation or AST destruction.
+oversized plaintext file or stdin submission with a located `lex` error and exit
+1. Invalid UTF-8 and source I/O failures are host errors with exit 2; encrypted
+input/provider failures also use that host-error contract. Long flat
+binary/call/index chains are checked while building the AST, before a deep tree
+can overflow recursive compilation or AST destruction.
+Range length is checked against the configured total step cap, not the remaining
+budget; materialization does not charge one step per element. The helper and
+rendering guards likewise bound work separately from statement steps.
 
 Comparison is iterative and remembers container pairs, preserving finite-value
 and NaN behavior while allowing cyclic containers to be compared. Rendering is
@@ -82,10 +96,11 @@ The library does not flush the caller's writer.
 A compiled program can be cloned cheaply and executed repeatedly. Every
 `Vm::run` starts with fresh globals, a fresh step budget, and a fresh heap,
 including after a previous run failed. `Interpreter` retains its original
-stateful globals and cumulative budget across direct `run` calls. Construct a
-fresh interpreter, or use `run_with_engine`, for isolation. These types contain
-`Rc` and are not `Send`/`Sync`: create separate engines inside worker threads or
-processes instead of sharing an engine concurrently.
+stateful globals and cumulative step/output budgets across direct `run` calls,
+including after runtime errors; its cooperative deadline restarts on each run.
+Construct a fresh interpreter, or use `run_with_engine`, for isolation. These
+types contain `Rc` and are not `Send`/`Sync`: create separate engines inside worker
+threads or processes instead of sharing an engine concurrently.
 
 ## Host resource controls
 
@@ -104,9 +119,11 @@ its worker capacity, and distinguish program errors from worker termination.
 
 ## Verification and performance
 
-CI runs debug/release tests, clippy with warnings denied, and formatting checks
-on Linux and Windows. The repository includes differential tests of language
-programs and every `.lim` example, seeded generated programs, deep recursion and
+CI configures debug/release tests, clippy with warnings denied, formatting checks
+and Python protocol/LSP tests on Linux, Windows and macOS. A separate Linux job
+installs `age` and runs the real authenticated-encryption integration tests. The
+repository includes differential tests of language programs and every `.lim`
+example, seeded generated programs, deep recursion and
 container cleanup, GC root preservation, I/O failures, input guards, and a
 subprocess watchdog for runaway loops.
 

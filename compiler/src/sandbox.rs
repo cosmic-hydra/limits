@@ -233,4 +233,38 @@ mod tests {
         );
         assert_eq!(out, b"xy");
     }
+
+    #[test]
+    fn direct_deadlines_restart_without_refunding_cumulative_output() {
+        let hour = Duration::from_secs(60 * 60);
+        let mut state = State::new(SandboxPolicy {
+            max_output_bytes: Some(1),
+            timeout: Some(hour),
+            ..SandboxPolicy::default()
+        });
+        let span = Span { line: 3, col: 4 };
+        let mut out = Vec::new();
+        state.start().unwrap();
+        state.write(&mut out, b"a", span).unwrap();
+        // A zero timeout expires deterministically, without sleeps or a
+        // platform-dependent subtraction from Instant's unspecified epoch.
+        state.policy.timeout = Some(Duration::ZERO);
+        assert_eq!(
+            state.checkpoint(span).unwrap_err().msg,
+            "execution deadline exceeded"
+        );
+        state.policy.timeout = Some(hour);
+        let restart_boundary = Instant::now();
+        state.start().unwrap();
+        assert!(state.started.unwrap() >= restart_boundary);
+        state.checkpoint(span).unwrap();
+        assert_eq!(
+            state.write(&mut out, b"b", span).unwrap_err().msg,
+            "output limit exceeded (1 bytes)"
+        );
+        state.reset().unwrap();
+        state.checkpoint(span).unwrap();
+        state.write(&mut out, b"c", span).unwrap();
+        assert_eq!(out, b"ac");
+    }
 }
