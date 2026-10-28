@@ -1,0 +1,39 @@
+{
+ "id": "he_035",
+ "source": "HumanEval/35",
+ "description": "Return maximum element in the list.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `l`: a list of integers, written as one line with the integers separated by single spaces (an empty line for an empty list).\n\nOutput (stdout): the result, an integer, written as one line holding the integer in decimal (e.g. `-12`).\n\nExample 1\nstdin:\n```\n1 2 3\n```\nstdout:\n```\n3\n```\n\nExample 2\nstdin:\n```\n5 3 -5 2 -3 3 9 0 124 1 -10\n```\nstdout:\n```\n124\n```",
+ "params": [
+  {
+   "name": "l",
+   "type": "[int]"
+  }
+ ],
+ "output_type": "int",
+ "tests": [
+  {
+   "stdin": "1 2 3\n",
+   "stdout": "3\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "5 3 -5 2 -3 3 9 0 124 1 -10\n",
+   "stdout": "124\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "18 95 123 5 111 52 62 64\n",
+   "stdout": "123\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "104 18 109 40 85 -8 60\n",
+   "stdout": "109\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "21 89 60 -6 66 47 61\n",
+   "stdout": "89\n",
+   "origin": "generated"
+  }
+ ]
+}

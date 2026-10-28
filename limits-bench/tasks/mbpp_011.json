@@ -1,0 +1,43 @@
+{
+ "id": "mbpp_011",
+ "source": "MBPP/11",
+ "description": "Write a program to remove first and last occurrence of a given character from the string.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `s`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n- `ch`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nOutput (stdout): the result, a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nExample 1\nstdin:\n```\nhello\nl\n```\nstdout:\n```\nheo\n```\n\nExample 2\nstdin:\n```\nabcda\na\n```\nstdout:\n```\nbcd\n```\n\nExample 3\nstdin:\n```\nPHP\nP\n```\nstdout:\n```\nH\n```",
+ "params": [
+  {
+   "name": "s",
+   "type": "str"
+  },
+  {
+   "name": "ch",
+   "type": "str"
+  }
+ ],
+ "output_type": "str",
+ "tests": [
+  {
+   "stdin": "hello\nl\n",
+   "stdout": "heo\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "abcda\na\n",
+   "stdout": "bcd\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "PHP\nP\n",
+   "stdout": "H\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "HHab\na\n",
+   "stdout": "HHb\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "bhd\nP\n",
+   "stdout": "bhd\n",
+   "origin": "generated"
+  }
+ ]
+}

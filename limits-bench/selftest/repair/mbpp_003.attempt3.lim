@@ -1,0 +1,19 @@
+uses stdin;
+
+fn is_not_prime(n: int) -> bool {
+    if n < 2 {
+        return true;
+    }
+    let i = 2;
+    while i * i <= n {
+        if n % i == 0 {
+            return true;
+        }
+        i = i + 1;
+    }
+    return false;
+}
+
+fn main() {
+    print(is_not_prime(int(input_line())));
+}

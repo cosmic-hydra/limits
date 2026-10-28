@@ -1,0 +1,39 @@
+{
+ "id": "mbpp_019",
+ "source": "MBPP/19",
+ "description": "Write a program to find whether a given array of integers contains any duplicate element.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `arraynums`: a list of integers, written as one line with the integers separated by single spaces (an empty line for an empty list).\n\nOutput (stdout): the result, a boolean, written as one line, `true` or `false`.\n\nExample 1\nstdin:\n```\n1 2 3 4 5\n```\nstdout:\n```\nfalse\n```\n\nExample 2\nstdin:\n```\n1 2 3 4 4\n```\nstdout:\n```\ntrue\n```\n\nExample 3\nstdin:\n```\n1 1 2 2 3 3 4 4 5\n```\nstdout:\n```\ntrue\n```",
+ "params": [
+  {
+   "name": "arraynums",
+   "type": "[int]"
+  }
+ ],
+ "output_type": "bool",
+ "tests": [
+  {
+   "stdin": "1 2 3 4 5\n",
+   "stdout": "false\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "1 2 3 4 4\n",
+   "stdout": "true\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "1 1 2 2 3 3 4 4 5\n",
+   "stdout": "true\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "2 5 1 1 5 4 3 2\n",
+   "stdout": "true\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "1 3 5 4 2 3\n",
+   "stdout": "true\n",
+   "origin": "generated"
+  }
+ ]
+}

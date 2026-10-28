@@ -1,0 +1,39 @@
+{
+ "id": "mbpp_008",
+ "source": "MBPP/8",
+ "description": "Write a program to find squares of individual elements in a list.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `nums`: a list of integers, written as one line with the integers separated by single spaces (an empty line for an empty list).\n\nOutput (stdout): the result, a list of integers, written as one line with the integers separated by single spaces (an empty line for an empty list).\nPrint an empty line for an empty list.\n\nExample 1\nstdin:\n```\n1 2 3 4 5 6 7 8 9 10\n```\nstdout:\n```\n1 4 9 16 25 36 49 64 81 100\n```\n\nExample 2\nstdin:\n```\n10 20 30\n```\nstdout:\n```\n100 400 900\n```\n\nExample 3\nstdin:\n```\n12 15\n```\nstdout:\n```\n144 225\n```",
+ "params": [
+  {
+   "name": "nums",
+   "type": "[int]"
+  }
+ ],
+ "output_type": "[int]",
+ "tests": [
+  {
+   "stdin": "1 2 3 4 5 6 7 8 9 10\n",
+   "stdout": "1 4 9 16 25 36 49 64 81 100\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "10 20 30\n",
+   "stdout": "100 400 900\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "12 15\n",
+   "stdout": "144 225\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "28 6 27 16 15 12\n",
+   "stdout": "784 36 729 256 225 144\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "27 26 14 11 14 30 20\n",
+   "stdout": "729 676 196 121 196 900 400\n",
+   "origin": "generated"
+  }
+ ]
+}

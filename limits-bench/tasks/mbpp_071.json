@@ -1,0 +1,39 @@
+{
+ "id": "mbpp_071",
+ "source": "MBPP/71",
+ "description": "Write a program to sort a list of elements.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `nums`: a list of integers, written as one line with the integers separated by single spaces (an empty line for an empty list).\n\nOutput (stdout): the result, a list of integers, written as one line with the integers separated by single spaces (an empty line for an empty list).\nPrint an empty line for an empty list.\n\nExample 1\nstdin:\n```\n5 15 37 25 79\n```\nstdout:\n```\n5 15 25 37 79\n```\n\nExample 2\nstdin:\n```\n41 32 15 19 22\n```\nstdout:\n```\n15 19 22 32 41\n```\n\nExample 3\nstdin:\n```\n99 15 13 47\n```\nstdout:\n```\n13 15 47 99\n```",
+ "params": [
+  {
+   "name": "nums",
+   "type": "[int]"
+  }
+ ],
+ "output_type": "[int]",
+ "tests": [
+  {
+   "stdin": "5 15 37 25 79\n",
+   "stdout": "5 15 25 37 79\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "41 32 15 19 22\n",
+   "stdout": "15 19 22 32 41\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "99 15 13 47\n",
+   "stdout": "13 15 47 99\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "62 47 20 31\n",
+   "stdout": "20 31 47 62\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "55 63 46 89 74\n",
+   "stdout": "46 55 63 74 89\n",
+   "origin": "generated"
+  }
+ ]
+}

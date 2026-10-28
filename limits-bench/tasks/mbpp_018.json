@@ -1,0 +1,43 @@
+{
+ "id": "mbpp_018",
+ "source": "MBPP/18",
+ "description": "Write a program to remove characters from the first string which are present in the second string.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `string`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n- `second_string`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nOutput (stdout): the result, a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nExample 1\nstdin:\n```\nprobasscurve\npros\n```\nstdout:\n```\nbacuve\n```\n\nExample 2\nstdin:\n```\ndigitalindia\ntalent\n```\nstdout:\n```\ndigiidi\n```\n\nExample 3\nstdin:\n```\nexoticmiles\ntoxic\n```\nstdout:\n```\nemles\n```",
+ "params": [
+  {
+   "name": "string",
+   "type": "str"
+  },
+  {
+   "name": "second_string",
+   "type": "str"
+  }
+ ],
+ "output_type": "str",
+ "tests": [
+  {
+   "stdin": "probasscurve\npros\n",
+   "stdout": "bacuve\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "digitalindia\ntalent\n",
+   "stdout": "digiidi\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "exoticmiles\ntoxic\n",
+   "stdout": "emles\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "buagsmxundr\nsrancn\n",
+   "stdout": "bugmxud\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "dtploicpgmo\ninisor\n",
+   "stdout": "dtplcpgm\n",
+   "origin": "generated"
+  }
+ ]
+}

@@ -1,0 +1,4 @@
+fn main() {
+    let a = int(input_line());
+    print(a + "x");
+}

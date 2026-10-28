@@ -1,0 +1,39 @@
+{
+ "id": "he_046",
+ "source": "HumanEval/46",
+ "description": "The Fib4 number sequence is a sequence similar to the Fibbonacci sequnece that's defined as follows:\nfib4(0) -> 0\nfib4(1) -> 0\nfib4(2) -> 2\nfib4(3) -> 0\nfib4(n) -> fib4(n-1) + fib4(n-2) + fib4(n-3) + fib4(n-4).\nPlease write a program to efficiently compute the n-th element of the fib4 number sequence.  Do not use recursion.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `n`: an integer, written as one line holding the integer in decimal (e.g. `-12`).\n\nOutput (stdout): the result, an integer, written as one line holding the integer in decimal (e.g. `-12`).\n\nExample 1\nstdin:\n```\n5\n```\nstdout:\n```\n4\n```\n\nExample 2\nstdin:\n```\n8\n```\nstdout:\n```\n28\n```",
+ "params": [
+  {
+   "name": "n",
+   "type": "int"
+  }
+ ],
+ "output_type": "int",
+ "tests": [
+  {
+   "stdin": "5\n",
+   "stdout": "4\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "8\n",
+   "stdout": "28\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "10\n",
+   "stdout": "104\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "12\n",
+   "stdout": "386\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "6\n",
+   "stdout": "8\n",
+   "origin": "generated"
+  }
+ ]
+}

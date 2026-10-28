@@ -1,0 +1,44 @@
+{
+ "id": "he_006",
+ "source": "HumanEval/6",
+ "description": "Input to this program is a string represented multiple groups for nested parentheses separated by spaces.\nFor each of the group, output the deepest level of nesting of parentheses.\nE.g. (()()) has maximum two levels of nesting while ((())) has three.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `paren_string`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nOutput (stdout): the result, a list of integers, written as one line with the integers separated by single spaces (an empty line for an empty list).\nPrint an empty line for an empty list.\n\nExample 1\nstdin:\n```\n(()()) ((())) () ((())()())\n```\nstdout:\n```\n2 3 1 3\n```\n\nExample 2\nstdin:\n```\n() (()) ((())) (((())))\n```\nstdout:\n```\n1 2 3 4\n```",
+ "params": [
+  {
+   "name": "paren_string",
+   "type": "str"
+  }
+ ],
+ "output_type": "[int]",
+ "tests": [
+  {
+   "stdin": "(()()) ((())) () ((())()())\n",
+   "stdout": "2 3 1 3\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "() (()) ((())) (((())))\n",
+   "stdout": "1 2 3 4\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "(()(())((())))\n",
+   "stdout": "4\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "()\n",
+   "stdout": "1\n",
+   "origin": "hand"
+  },
+  {
+   "stdin": "((())) (()) ()\n",
+   "stdout": "3 2 1\n",
+   "origin": "hand"
+  },
+  {
+   "stdin": "(()()) ()()()\n",
+   "stdout": "2 1\n",
+   "origin": "hand"
+  }
+ ]
+}

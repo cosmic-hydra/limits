@@ -1,0 +1,39 @@
+{
+ "id": "mbpp_083",
+ "source": "MBPP/83",
+ "description": "Write a program to find the character made by adding the ASCII value of all the characters of the given string modulo 26.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `strr`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nOutput (stdout): the result, a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nExample 1\nstdin:\n```\nabc\n```\nstdout:\n```\nf\n```\n\nExample 2\nstdin:\n```\ngfg\n```\nstdout:\n```\nt\n```\n\nExample 3\nstdin:\n```\nab\n```\nstdout:\n```\nc\n```",
+ "params": [
+  {
+   "name": "strr",
+   "type": "str"
+  }
+ ],
+ "output_type": "str",
+ "tests": [
+  {
+   "stdin": "abc\n",
+   "stdout": "f\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "gfg\n",
+   "stdout": "t\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "ab\n",
+   "stdout": "c\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "af\n",
+   "stdout": "g\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "fcb\n",
+   "stdout": "k\n",
+   "origin": "generated"
+  }
+ ]
+}

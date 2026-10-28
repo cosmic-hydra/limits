@@ -1,0 +1,39 @@
+{
+ "id": "he_019",
+ "source": "HumanEval/19",
+ "description": "Input is a space-delimited string of numberals from 'zero' to 'nine'.\nValid choices are 'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight' and 'nine'.\nReturn the string with numbers sorted from smallest to largest\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `numbers`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nOutput (stdout): the result, a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nExample 1\nstdin:\n```\n\n```\nstdout:\n```\n\n```\n\nExample 2\nstdin:\n```\nthree\n```\nstdout:\n```\nthree\n```",
+ "params": [
+  {
+   "name": "numbers",
+   "type": "str"
+  }
+ ],
+ "output_type": "str",
+ "tests": [
+  {
+   "stdin": "\n",
+   "stdout": "\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "three\n",
+   "stdout": "three\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "three five nine\n",
+   "stdout": "three five nine\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "five zero four seven nine eight\n",
+   "stdout": "zero four five seven eight nine\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "six five four three two one zero\n",
+   "stdout": "zero one two three four five six\n",
+   "origin": "official"
+  }
+ ]
+}

@@ -1,0 +1,19 @@
+uses stdin;
+
+fn main() {
+    let line = input_line();
+    let out: [str] = [];
+    if line != "" {
+        let best = 0;
+        let first = true;
+        for p in split(line, " ") {
+            let v = int(p);
+            if first or v > best {
+                best = v;
+                first = false;
+            }
+            push(out, str(best));
+        }
+    }
+    print(join(out, " "));
+}

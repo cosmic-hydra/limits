@@ -1,0 +1,39 @@
+{
+ "id": "mbpp_009",
+ "source": "MBPP/9",
+ "description": "Write a program to find the minimum number of rotations (greater than 0) required to get the same string.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `str`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nOutput (stdout): the result, an integer, written as one line holding the integer in decimal (e.g. `-12`).\n\nExample 1\nstdin:\n```\naaaa\n```\nstdout:\n```\n1\n```\n\nExample 2\nstdin:\n```\nab\n```\nstdout:\n```\n2\n```\n\nExample 3\nstdin:\n```\nabc\n```\nstdout:\n```\n3\n```",
+ "params": [
+  {
+   "name": "str",
+   "type": "str"
+  }
+ ],
+ "output_type": "int",
+ "tests": [
+  {
+   "stdin": "aaaa\n",
+   "stdout": "1\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "ab\n",
+   "stdout": "2\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "abc\n",
+   "stdout": "3\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "ccaa\n",
+   "stdout": "4\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "bc\n",
+   "stdout": "2\n",
+   "origin": "generated"
+  }
+ ]
+}

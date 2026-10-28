@@ -1,0 +1,39 @@
+{
+ "id": "he_015",
+ "source": "HumanEval/15",
+ "description": "Return a string containing space-delimited numbers starting from 0 upto n inclusive.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `n`: an integer, written as one line holding the integer in decimal (e.g. `-12`).\n\nOutput (stdout): the result, a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nExample 1\nstdin:\n```\n0\n```\nstdout:\n```\n0\n```\n\nExample 2\nstdin:\n```\n3\n```\nstdout:\n```\n0 1 2 3\n```",
+ "params": [
+  {
+   "name": "n",
+   "type": "int"
+  }
+ ],
+ "output_type": "str",
+ "tests": [
+  {
+   "stdin": "0\n",
+   "stdout": "0\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "3\n",
+   "stdout": "0 1 2 3\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "10\n",
+   "stdout": "0 1 2 3 4 5 6 7 8 9 10\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "2\n",
+   "stdout": "0 1 2\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "5\n",
+   "stdout": "0 1 2 3 4 5\n",
+   "origin": "generated"
+  }
+ ]
+}

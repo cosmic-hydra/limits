@@ -1,0 +1,39 @@
+{
+ "id": "mbpp_061",
+ "source": "MBPP/61",
+ "description": "Write a program to count the number of substrings with the sum of digits equal to their length.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `s`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nOutput (stdout): the result, an integer, written as one line holding the integer in decimal (e.g. `-12`).\n\nExample 1\nstdin:\n```\n112112\n```\nstdout:\n```\n6\n```\n\nExample 2\nstdin:\n```\n111\n```\nstdout:\n```\n6\n```\n\nExample 3\nstdin:\n```\n1101112\n```\nstdout:\n```\n12\n```",
+ "params": [
+  {
+   "name": "s",
+   "type": "str"
+  }
+ ],
+ "output_type": "int",
+ "tests": [
+  {
+   "stdin": "112112\n",
+   "stdout": "6\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "111\n",
+   "stdout": "6\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "1101112\n",
+   "stdout": "12\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "000\n",
+   "stdout": "0\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "002100\n",
+   "stdout": "4\n",
+   "origin": "generated"
+  }
+ ]
+}

@@ -1,0 +1,39 @@
+{
+ "id": "mbpp_079",
+ "source": "MBPP/79",
+ "description": "Write a program to check whether the length of the word is odd or not.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `s`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nOutput (stdout): the result, a boolean, written as one line, `true` or `false`.\n\nExample 1\nstdin:\n```\nHadoop\n```\nstdout:\n```\nfalse\n```\n\nExample 2\nstdin:\n```\ngreat\n```\nstdout:\n```\ntrue\n```\n\nExample 3\nstdin:\n```\nstructure\n```\nstdout:\n```\ntrue\n```",
+ "params": [
+  {
+   "name": "s",
+   "type": "str"
+  }
+ ],
+ "output_type": "bool",
+ "tests": [
+  {
+   "stdin": "Hadoop\n",
+   "stdout": "false\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "great\n",
+   "stdout": "true\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "structure\n",
+   "stdout": "true\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "adaHoettc\n",
+   "stdout": "true\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "sudgtd\n",
+   "stdout": "false\n",
+   "origin": "generated"
+  }
+ ]
+}

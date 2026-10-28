@@ -1,0 +1,39 @@
+{
+ "id": "mbpp_089",
+ "source": "MBPP/89",
+ "description": "Write a program to find the closest smaller number than n.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `N`: an integer, written as one line holding the integer in decimal (e.g. `-12`).\n\nOutput (stdout): the result, an integer, written as one line holding the integer in decimal (e.g. `-12`).\n\nExample 1\nstdin:\n```\n11\n```\nstdout:\n```\n10\n```\n\nExample 2\nstdin:\n```\n7\n```\nstdout:\n```\n6\n```\n\nExample 3\nstdin:\n```\n12\n```\nstdout:\n```\n11\n```",
+ "params": [
+  {
+   "name": "N",
+   "type": "int"
+  }
+ ],
+ "output_type": "int",
+ "tests": [
+  {
+   "stdin": "11\n",
+   "stdout": "10\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "7\n",
+   "stdout": "6\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "12\n",
+   "stdout": "11\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "10\n",
+   "stdout": "9\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "8\n",
+   "stdout": "7\n",
+   "origin": "generated"
+  }
+ ]
+}

@@ -1,0 +1,32 @@
+uses stdin;
+
+struct Row { sum: int, idx: int, text: str }
+
+fn main() {
+    let n = int(input_line());
+    let rows: [Row] = [];
+    for i in 0..n {
+        let line = input_line();
+        let s = 0;
+        if line != "" {
+            for p in split(line, " ") {
+                s = s + int(p);
+            }
+        }
+        push(rows, Row { sum: s, idx: i, text: line });
+    }
+    # stable insertion sort by row sum
+    for i in 1..n {
+        let j = i;
+        while j > 0 and rows[j - 1].sum > rows[j].sum {
+            let t = rows[j - 1];
+            rows[j - 1] = rows[j];
+            rows[j] = t;
+            j = j - 1;
+        }
+    }
+    print(n);
+    for r in rows {
+        print(r.text);
+    }
+}

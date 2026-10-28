@@ -1,0 +1,4 @@
+uses stdin;
+fn main() {
+    print(0);
+}

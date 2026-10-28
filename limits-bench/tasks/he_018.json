@@ -1,0 +1,43 @@
+{
+ "id": "he_018",
+ "source": "HumanEval/18",
+ "description": "Find how many times a given substring can be found in the original string. Count overlaping cases.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `string`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n- `substring`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nOutput (stdout): the result, an integer, written as one line holding the integer in decimal (e.g. `-12`).\n\nExample 1\nstdin:\n```\n\nx\n```\nstdout:\n```\n0\n```\n\nExample 2\nstdin:\n```\nxyxyxyx\nx\n```\nstdout:\n```\n4\n```",
+ "params": [
+  {
+   "name": "string",
+   "type": "str"
+  },
+  {
+   "name": "substring",
+   "type": "str"
+  }
+ ],
+ "output_type": "int",
+ "tests": [
+  {
+   "stdin": "\nx\n",
+   "stdout": "0\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "xyxyxyx\nx\n",
+   "stdout": "4\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "cacacacac\ncac\n",
+   "stdout": "4\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "john doe\njohn\n",
+   "stdout": "1\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "h\nxjoa\n",
+   "stdout": "0\n",
+   "origin": "generated"
+  }
+ ]
+}

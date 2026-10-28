@@ -1,0 +1,39 @@
+{
+ "id": "mbpp_016",
+ "source": "MBPP/16",
+ "description": "Write a program to that returns true if the input string contains sequences of lowercase letters joined with an underscore and false otherwise.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `text`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nOutput (stdout): the result, a boolean, written as one line, `true` or `false`.\n\nExample 1\nstdin:\n```\naab_cbbbc\n```\nstdout:\n```\ntrue\n```\n\nExample 2\nstdin:\n```\naab_Abbbc\n```\nstdout:\n```\nfalse\n```\n\nExample 3\nstdin:\n```\nAaab_abbbc\n```\nstdout:\n```\nfalse\n```",
+ "params": [
+  {
+   "name": "text",
+   "type": "str"
+  }
+ ],
+ "output_type": "bool",
+ "tests": [
+  {
+   "stdin": "aab_cbbbc\n",
+   "stdout": "true\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "aab_Abbbc\n",
+   "stdout": "false\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "Aaab_abbbc\n",
+   "stdout": "false\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "c_bcaa__cb\n",
+   "stdout": "false\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "cAAbababbA\n",
+   "stdout": "false\n",
+   "origin": "generated"
+  }
+ ]
+}

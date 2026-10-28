@@ -1,0 +1,49 @@
+{
+ "id": "he_001",
+ "source": "HumanEval/1",
+ "description": "Input to this program is a string containing multiple groups of nested parentheses. Your goal is to\nseparate those group into separate strings and return the list of those.\nSeparate groups are balanced (each open brace is properly closed) and not nested within each other\nIgnore any spaces in the input string.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `paren_string`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nOutput (stdout): the result, a list of strings, written as one line with the count n, then n lines, one string per line.\n\nExample 1\nstdin:\n```\n(()()) ((())) () ((())()())\n```\nstdout:\n```\n4\n(()())\n((()))\n()\n((())()())\n```\n\nExample 2\nstdin:\n```\n() (()) ((())) (((())))\n```\nstdout:\n```\n4\n()\n(())\n((()))\n(((())))\n```",
+ "params": [
+  {
+   "name": "paren_string",
+   "type": "str"
+  }
+ ],
+ "output_type": "[str]",
+ "tests": [
+  {
+   "stdin": "(()()) ((())) () ((())()())\n",
+   "stdout": "4\n(()())\n((()))\n()\n((())()())\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "() (()) ((())) (((())))\n",
+   "stdout": "4\n()\n(())\n((()))\n(((())))\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "(()(())((())))\n",
+   "stdout": "1\n(()(())((())))\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "( ) (( )) (( )( ))\n",
+   "stdout": "3\n()\n(())\n(()())\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "()\n",
+   "stdout": "1\n()\n",
+   "origin": "hand"
+  },
+  {
+   "stdin": "(()) ((())) () ((())()())\n",
+   "stdout": "4\n(())\n((()))\n()\n((())()())\n",
+   "origin": "hand"
+  },
+  {
+   "stdin": "(()(())) () (())\n",
+   "stdout": "3\n(()(()))\n()\n(())\n",
+   "origin": "hand"
+  }
+ ]
+}
