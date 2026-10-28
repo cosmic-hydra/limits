@@ -1,0 +1,25 @@
+# Sieve of Eratosthenes.
+fn sieve(n: int) -> [int] {
+    let is: [bool] = [];
+    for i in 0..n + 1 {
+        push(is, true);
+    }
+    let out: [int] = [];
+    for i in 2..n + 1 {
+        if is[i] {
+            push(out, i);
+            let j = i * i;
+            while j <= n {
+                is[j] = false;
+                j = j + i;
+            }
+        }
+    }
+    return out;
+}
+
+fn main() {
+    let ps = sieve(100);
+    print(ps);
+    print("count below 1000000:", len(sieve(1000000)));
+}

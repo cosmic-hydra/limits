@@ -1,0 +1,9 @@
+import lib.left;
+import lib.right;
+import lib.shared;
+fn main() {
+  let c = shared.Counter { n: 0 };
+  left.bump(c);
+  right.bump(c);
+  print(c.n, shared.Counter { n: 5 });
+}

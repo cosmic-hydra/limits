@@ -1,0 +1,3 @@
+pub struct P { v: int }
+pub fn helper() -> str { return "b"; }
+pub fn make(n: int) -> P { return P { v: n * 10 }; }

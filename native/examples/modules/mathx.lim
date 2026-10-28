@@ -1,0 +1,11 @@
+pub struct Vec2 { x: float, y: float }
+
+fn sq(x: float) -> float { return x * x; }   # private helper
+
+pub fn newton_sqrt(x: float) -> float {
+  let g = x / 2.0;
+  for i in 0..30 { g = (g + x / g) / 2.0; }
+  return g;
+}
+
+pub fn length(v: Vec2) -> float { return newton_sqrt(sq(v.x) + sq(v.y)); }

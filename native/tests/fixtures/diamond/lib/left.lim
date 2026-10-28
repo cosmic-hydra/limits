@@ -1,0 +1,2 @@
+import shared;
+pub fn bump(c: shared.Counter) { c.n = c.n + 1; }

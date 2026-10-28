@@ -1,0 +1,82 @@
+struct Body { x: float, y: float, z: float, vx: float, vy: float, vz: float, m: float }
+
+fn energy(bs: [Body]) -> float {
+    let e = 0.0;
+    let n = len(bs);
+    for i in 0..n {
+        let b = bs[i];
+        e = e + 0.5 * b.m * (b.vx * b.vx + b.vy * b.vy + b.vz * b.vz);
+        for j in i + 1..n {
+            let c = bs[j];
+            let dx = b.x - c.x;
+            let dy = b.y - c.y;
+            let dz = b.z - c.z;
+            e = e - b.m * c.m / sqrt(dx * dx + dy * dy + dz * dz);
+        }
+    }
+    return e;
+}
+
+fn advance(bs: [Body], dt: float) {
+    let n = len(bs);
+    for i in 0..n {
+        let b = bs[i];
+        for j in i + 1..n {
+            let c = bs[j];
+            let dx = b.x - c.x;
+            let dy = b.y - c.y;
+            let dz = b.z - c.z;
+            let d2 = dx * dx + dy * dy + dz * dz;
+            let mag = dt / (d2 * sqrt(d2));
+            b.vx = b.vx - dx * c.m * mag;
+            b.vy = b.vy - dy * c.m * mag;
+            b.vz = b.vz - dz * c.m * mag;
+            c.vx = c.vx + dx * b.m * mag;
+            c.vy = c.vy + dy * b.m * mag;
+            c.vz = c.vz + dz * b.m * mag;
+        }
+    }
+    for b in bs {
+        b.x = b.x + dt * b.vx;
+        b.y = b.y + dt * b.vy;
+        b.z = b.z + dt * b.vz;
+    }
+}
+
+fn main() {
+    let pi = 3.141592653589793;
+    let sm = 4.0 * pi * pi;
+    let dp = 365.24;
+    let bs = [
+        Body { x: 0.0, y: 0.0, z: 0.0, vx: 0.0, vy: 0.0, vz: 0.0, m: sm },
+        Body { x: 4.84143144246472090, y: -1.16032004402742839, z: -0.103622044471123109,
+               vx: 0.00166007664274403694 * dp, vy: 0.00769901118419740425 * dp, vz: -0.0000690460016972063023 * dp,
+               m: 0.000954791938424326609 * sm },
+        Body { x: 8.34336671824457987, y: 4.12479856412430479, z: -0.403523417114321381,
+               vx: -0.00276742510726862411 * dp, vy: 0.00499852801234917238 * dp, vz: 0.0000230417297573763929 * dp,
+               m: 0.000285885980666130812 * sm },
+        Body { x: 12.8943695621391310, y: -15.1111514016986312, z: -0.223307578892655734,
+               vx: 0.00296460137564761618 * dp, vy: 0.00237847173959480950 * dp, vz: -0.0000296589568540237556 * dp,
+               m: 0.0000436624404335156298 * sm },
+        Body { x: 15.3796971148509165, y: -25.9193146099879641, z: 0.179258772950371181,
+               vx: 0.00268067772490389322 * dp, vy: 0.00162824170038242295 * dp, vz: -0.0000951592254519715870 * dp,
+               m: 0.0000515138902046611451 * sm }
+    ];
+    let px = 0.0;
+    let py = 0.0;
+    let pz = 0.0;
+    for b in bs {
+        px = px + b.vx * b.m;
+        py = py + b.vy * b.m;
+        pz = pz + b.vz * b.m;
+    }
+    let s = bs[0];
+    s.vx = 0.0 - px / sm;
+    s.vy = 0.0 - py / sm;
+    s.vz = 0.0 - pz / sm;
+    print(energy(bs));
+    for k in 0..5000000 {
+        advance(bs, 0.01);
+    }
+    print(energy(bs));
+}

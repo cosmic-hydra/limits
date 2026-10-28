@@ -1,0 +1,7 @@
+import lib;
+fn main() {
+  print(lib.shown());
+  print(lib.hidden());
+  let s = lib.Secret { x: 1 };
+  print(lib.nope(), other.f());
+}

@@ -1,0 +1,2 @@
+import m;
+fn main() { m.f(1); }
