@@ -293,3 +293,32 @@ fn full_width_range_with_full_width_budget_is_an_error_not_a_capacity_panic() {
     assert_eq!(e.kind, Kind::Runtime);
     assert_eq!(e.msg, "range allocation exceeds host capacity");
 }
+
+#[test]
+fn oversized_utf8_file_is_a_lex_error_even_when_read_cap_splits_codepoint() {
+    use std::process::Command;
+    struct Temp(std::path::PathBuf);
+    impl Drop for Temp {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_file(&self.0);
+        }
+    }
+    let file =
+        Temp(std::env::temp_dir().join(format!("limits-source-cap-{}.lim", std::process::id())));
+    let mut source = " ".repeat(lexer::MAX_SOURCE_BYTES);
+    source.push('é');
+    std::fs::write(&file.0, source).unwrap();
+    for engine in ["tree", "vm"] {
+        let output = Command::new(env!("CARGO_BIN_EXE_lim"))
+            .arg("run")
+            .arg(&file.0)
+            .args(["--engine", engine])
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(1));
+        assert!(output.stdout.is_empty());
+        assert!(String::from_utf8(output.stderr)
+            .unwrap()
+            .contains("lex error at 1:1: source size limit exceeded (16777216 bytes)"));
+    }
+}
