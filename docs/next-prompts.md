@@ -7,7 +7,7 @@ Two independent tasks that can run in parallel. Each prompt is self-contained: p
 ## Prompt A — Codex: bytecode compiler + VM
 
 ```
-You are working in the `limits` repo (github.com/cosmic-hydra/limits). It contains Limits, a small dynamically typed language for AI agents with `.lim` files. Read SPEC.md first, then compiler/src/*.rs: lexer.rs -> parser.rs (AST in ast.rs) -> interp.rs (tree-walking interpreter). The `lim` CLI is compiler/src/main.rs. Tests: `cargo test --manifest-path compiler/Cargo.toml` (11 must stay green).
+You are working in the `limits` repo (github.com/cosmic-hydra/limits). It contains Limits, a small dynamically typed language for AI agents with `.lim` files. Read SPEC.md first, then compiler/src/*.rs: lexer.rs -> parser.rs (AST in ast.rs) -> interp.rs (tree-walking interpreter). The `lim` CLI is compiler/src/main.rs. Static checks (undefined names, stray break/continue) live in compiler/src/resolve.rs and run before every `lim run`; any AST variant you add must be handled there too. Tests: `cargo test --manifest-path compiler/Cargo.toml` (all must stay green).
 
 The language's defining guarantee is enforced execution limits: a step budget (`Limits.max_steps`) and call-depth cap (`Limits.max_depth`). Runaway programs must stop with a `runtime` LimError carrying line:col, never hang or overflow the native stack.
 
@@ -30,7 +30,7 @@ Do not change language semantics or SPEC.md except to document `--engine`. If yo
 ## Prompt B — Kimi: error handling, modules, and a standard library
 
 ```
-You are working in the `limits` repo (github.com/cosmic-hydra/limits). It contains Limits, a small dynamically typed language for AI agents with `.lim` files. Read SPEC.md first, then compiler/src/*.rs: lexer.rs -> parser.rs (AST in ast.rs) -> interp.rs (tree-walking interpreter). The `lim` CLI is compiler/src/main.rs. Tests: `cargo test --manifest-path compiler/Cargo.toml` (11 must stay green).
+You are working in the `limits` repo (github.com/cosmic-hydra/limits). It contains Limits, a small dynamically typed language for AI agents with `.lim` files. Read SPEC.md first, then compiler/src/*.rs: lexer.rs -> parser.rs (AST in ast.rs) -> interp.rs (tree-walking interpreter). The `lim` CLI is compiler/src/main.rs. Static checks (undefined names, stray break/continue) live in compiler/src/resolve.rs and run before every `lim run`; any AST variant you add must be handled there too. Tests: `cargo test --manifest-path compiler/Cargo.toml` (all must stay green).
 
 The language's defining guarantee is enforced execution limits (step budget and call-depth cap); every feature you add must respect them, and every error must be a LimError with an accurate line:col.
 

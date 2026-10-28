@@ -2,7 +2,7 @@ use std::io::Write;
 use std::process::ExitCode;
 
 use limits::interp::{Interpreter, Limits};
-use limits::{lexer, parser};
+use limits::{lexer, parser, resolve};
 
 const USAGE: &str = "usage: lim run <file.lim> [--max-steps N] [--max-depth N]
        lim check <file.lim>";
@@ -43,22 +43,36 @@ fn main() -> ExitCode {
         }
     };
 
-    let result = lexer::lex(&src)
-        .and_then(parser::parse)
-        .and_then(|prog| match cmd {
-            "check" => Ok(()),
-            "run" => {
-                let stdout = std::io::stdout();
-                let mut out = stdout.lock();
-                let r = Interpreter::with_limits(&mut out, limits).run(&prog);
-                let _ = out.flush();
-                r
-            }
-            _ => {
-                eprintln!("{}", USAGE);
-                std::process::exit(2);
-            }
-        });
+    let prog = match lexer::lex(&src).and_then(parser::parse) {
+        Ok(p) => p,
+        Err(e) => {
+            eprintln!("{}: {}", path, e);
+            return ExitCode::FAILURE;
+        }
+    };
+    // Report every static problem at once, before anything runs.
+    let problems = resolve::check(&prog);
+    if !problems.is_empty() {
+        for e in &problems {
+            eprintln!("{}: {}", path, e);
+        }
+        return ExitCode::FAILURE;
+    }
+
+    let result = match cmd {
+        "check" => Ok(()),
+        "run" => {
+            let stdout = std::io::stdout();
+            let mut out = stdout.lock();
+            let r = Interpreter::with_limits(&mut out, limits).run(&prog);
+            let _ = out.flush();
+            r
+        }
+        _ => {
+            eprintln!("{}", USAGE);
+            return ExitCode::from(2);
+        }
+    };
 
     match result {
         Ok(()) => ExitCode::SUCCESS,

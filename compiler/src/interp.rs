@@ -180,7 +180,7 @@ enum Flow {
     Continue(Span),
 }
 
-const BUILTINS: &[&str] = &[
+pub const BUILTINS: &[&str] = &[
     "print", "len", "push", "pop", "str", "int", "float", "type", "keys", "assert",
 ];
 

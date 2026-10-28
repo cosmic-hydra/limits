@@ -6,6 +6,7 @@ pub mod error;
 pub mod interp;
 pub mod lexer;
 pub mod parser;
+pub mod resolve;
 
 use error::LimError;
 

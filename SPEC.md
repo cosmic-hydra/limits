@@ -66,7 +66,9 @@ fn name(a, b) { return a + b; }
 
 ## Errors
 
-Every error reports a kind (`lex`, `parse`, `runtime`) and `line:col`. There is no exception handling yet.
+Every error reports a kind (`lex`, `parse`, `check`, `runtime`) and `line:col`. There is no exception handling yet.
+
+Before running, `lim run` and `lim check` perform static checks and report **all** problems at once: undefined names, assignment to a name never declared with `let`, `break`/`continue` outside a loop (a loop outside a function does not count inside it), and duplicate parameters. Names declared anywhere in a block are visible throughout that block and in nested functions, so mutual recursion works; straight-line use-before-definition is caught at runtime instead.
 
 ## Not yet in v0.1
 

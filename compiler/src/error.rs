@@ -10,6 +10,7 @@ pub struct Span {
 pub enum Kind {
     Lex,
     Parse,
+    Check,
     Runtime,
 }
 
@@ -35,6 +36,7 @@ impl fmt::Display for LimError {
         let k = match self.kind {
             Kind::Lex => "lex",
             Kind::Parse => "parse",
+            Kind::Check => "check",
             Kind::Runtime => "runtime",
         };
         write!(
