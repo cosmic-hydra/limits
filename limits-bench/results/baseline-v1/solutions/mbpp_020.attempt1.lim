@@ -1,0 +1,15 @@
+uses stdin;
+fn read_int() -> int { return int(input_line()); }
+fn main() {
+  let x = read_int();
+  if x % 2 == 0 { print(false); return; }
+  if x == 1 { print(true); return; }
+  x = x + 1;
+  let p = 0;
+  while x % 2 == 0 and x != 0 {
+    x = x / 2;
+    p = p + 1;
+    if p == x { print(true); return; }
+  }
+  print(false);
+}

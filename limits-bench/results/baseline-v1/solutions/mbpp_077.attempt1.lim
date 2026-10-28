@@ -1,0 +1,3 @@
+uses stdin;
+fn read_int() -> int { return int(input_line()); }
+fn main() { print(read_int() % 11 == 0); }

@@ -1,0 +1,13 @@
+uses stdin;
+fn read_strs() -> [str] {
+  let n = int(input_line());
+  let out: [str] = [];
+  for i in 0..n { push(out, input_line()); }
+  return out;
+}
+fn show_strs(xs: [str]) {
+  print(len(xs));
+  for x in xs { print(x); }
+}
+
+fn main() { print(join(read_strs(), "")); }

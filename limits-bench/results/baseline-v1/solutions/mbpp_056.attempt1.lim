@@ -1,0 +1,9 @@
+uses stdin;
+fn read_int() -> int { return int(input_line()); }
+fn main() {
+  let n = read_int();
+  let m = n;
+  let r = 0;
+  while m > 0 { r = r * 10 + m % 10; m = m / 10; }
+  print(2 * r == n + 1);
+}

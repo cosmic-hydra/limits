@@ -1,0 +1,5 @@
+import sys
+L=sys.stdin.read().split("\n")
+def ints(s): return [int(x) for x in s.split()]
+def fmt(x): return " ".join(map(str,x))
+print(int(L[0])**2)

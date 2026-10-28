@@ -1,0 +1,14 @@
+uses stdin;
+fn read_ints(line: str) -> [int] {
+  let xs: [int] = [];
+  if line == "" { return xs; }
+  for p in split(line, " ") { push(xs, int(p)); }
+  return xs;
+}
+fn fmt(xs: [int]) -> str {
+  let ps: [str] = [];
+  for x in xs { push(ps, str(x)); }
+  return join(ps, " ");
+}
+fn low(c: str) -> bool { return c >= "a" and c <= "z"; }
+fn main() { let cs = split(input_line(), ""); let n = len(cs); let i = 0; let a = 0; while i < n and low(cs[i]) { i = i + 1; a = a + 1; } if a == 0 or i >= n or cs[i] != "_" { print(false); return; } i = i + 1; let b = 0; while i < n and low(cs[i]) { i = i + 1; b = b + 1; } print(b > 0 and i == n); }

@@ -1,0 +1,23 @@
+uses stdin;
+fn read_ints() -> [int] {
+  let line = input_line();
+  let out: [int] = [];
+  if line == "" { return out; }
+  for p in split(line, " ") { if p != "" { push(out, int(p)); } }
+  return out;
+}
+fn show_ints(xs: [int]) {
+  let parts: [str] = [];
+  for x in xs { push(parts, str(x)); }
+  print(join(parts, " "));
+}
+
+fn main() {
+  let out: [int] = [];
+  for w in split(input_line(), " ") {
+    if w == "o" { push(out, 4); }
+    else if w == "o|" { push(out, 2); }
+    else if w == ".|" { push(out, 1); }
+  }
+  show_ints(out);
+}

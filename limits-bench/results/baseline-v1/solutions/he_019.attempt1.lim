@@ -1,0 +1,12 @@
+uses stdin;
+fn main() {
+  let names = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+  let vals: [int] = [];
+  for w in split(input_line(), " ") {
+    for i in 0..10 { if names[i] == w { push(vals, i); } }
+  }
+  sort(vals);
+  let out: [str] = [];
+  for v in vals { push(out, names[v]); }
+  print(join(out, " "));
+}

@@ -1,0 +1,20 @@
+uses stdin;
+fn read_ints() -> [int] {
+  let line = input_line();
+  let out: [int] = [];
+  if line == "" { return out; }
+  for p in split(line, " ") { if p != "" { push(out, int(p)); } }
+  return out;
+}
+fn show_ints(xs: [int]) {
+  let parts: [str] = [];
+  for x in xs { push(parts, str(x)); }
+  print(join(parts, " "));
+}
+
+fn main() {
+  let b = 0;
+  let neg = false;
+  for x in read_ints() { b = b + x; if b < 0 { neg = true; } }
+  print(neg);
+}

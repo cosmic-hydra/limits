@@ -1,0 +1,16 @@
+uses stdin;
+fn pymod(a: int, b: int) -> int {
+  let r = a % b;
+  if r != 0 and ((r < 0) != (b < 0)) { r = r + b; }
+  return r;
+}
+fn main() {
+  let a = int(input_line());
+  let b = int(input_line());
+  while b != 0 {
+    let t = pymod(a, b);
+    a = b;
+    b = t;
+  }
+  print(a);
+}

@@ -1,0 +1,19 @@
+uses stdin;
+fn sub(cs: [str], a: int, b: int) -> str {
+  let parts: [str] = [];
+  for i in a..b { push(parts, cs[i]); }
+  return join(parts, "");
+}
+
+fn main() {
+  let s = input_line();
+  let t = input_line();
+  let cs = split(s, "");
+  let n = len(s);
+  let m = len(t);
+  let c = 0;
+  for i in 0..n - m + 1 {
+    if sub(cs, i, i + m) == t { c = c + 1; }
+  }
+  print(c);
+}

@@ -1,0 +1,14 @@
+uses stdin;
+fn main() {
+  let lo = split("abcdefghijklmnopqrstuvwxyz", "");
+  let up = split("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "");
+  let out: [str] = [];
+  for c in split(input_line(), "") {
+    let r = c;
+    for i in 0..26 {
+      if c == lo[i] { r = up[i]; } else if c == up[i] { r = lo[i]; }
+    }
+    push(out, r);
+  }
+  print(join(out, ""));
+}
