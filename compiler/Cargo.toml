@@ -1,0 +1,12 @@
+[package]
+name = "limits"
+version = "0.1.0"
+edition = "2021"
+description = "Reference interpreter for the Limits programming language (.lim)"
+
+[[bin]]
+name = "lim"
+path = "src/main.rs"
+
+[lib]
+path = "src/lib.rs"

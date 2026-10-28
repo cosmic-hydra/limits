@@ -1,0 +1,6 @@
+# Limits enforces a step budget: this loop is stopped, not left to hang.
+# Try: lim run examples/runaway.lim --max-steps 1000
+let n = 0;
+while true {
+    n = n + 1;
+}

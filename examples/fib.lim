@@ -1,0 +1,13 @@
+# Recursion, loops, and lists.
+fn fib(n) {
+    if n < 2 {
+        return n;
+    }
+    return fib(n - 1) + fib(n - 2);
+}
+
+let out = [];
+for i in 0..10 {
+    push(out, fib(i));
+}
+print("fib:", out);
