@@ -16,3 +16,7 @@ pub fn run(src: &str, out: &mut dyn std::io::Write) -> Result<(), LimError> {
     let program = parser::parse(tokens)?;
     interp::Interpreter::new(out).run(&program)
 }
+
+pub mod bytecode;
+pub mod codegen;
+pub mod vm;

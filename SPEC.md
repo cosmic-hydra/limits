@@ -7,9 +7,12 @@ Limits is a small, explicit, dynamically typed language for AI agents. Source fi
 ```
 cargo build --release --manifest-path compiler/Cargo.toml
 compiler/target/release/lim run examples/fib.lim
+compiler/target/release/lim run examples/fib.lim --engine vm
 compiler/target/release/lim run examples/runaway.lim --max-steps 1000
 compiler/target/release/lim check file.lim     # lex + parse only
 ```
+
+Engines: `--engine tree|vm` (default `tree`). Both engines enforce the same execution limits.
 
 Defaults: `--max-steps 10000000`, `--max-depth 256`. Exit codes: 0 success, 1 program error, 2 usage error.
 

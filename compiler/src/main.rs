@@ -4,7 +4,7 @@ use std::process::ExitCode;
 use limits::interp::{Interpreter, Limits};
 use limits::{lexer, parser, resolve};
 
-const USAGE: &str = "usage: lim run <file.lim> [--max-steps N] [--max-depth N]
+const USAGE: &str = "usage: lim run <file.lim> [--max-steps N] [--max-depth N] [--engine vm|tree]
        lim check <file.lim>";
 
 fn main() -> ExitCode {
@@ -21,10 +21,22 @@ fn main() -> ExitCode {
         return ExitCode::from(2);
     }
 
+    let mut engine = "tree";
     let mut limits = Limits::default();
     let mut rest = args[2..].iter();
     while let Some(flag) = rest.next() {
-        let val = rest.next().and_then(|v| v.parse::<u64>().ok());
+        let raw = rest.next();
+        if flag == "--engine" {
+            match raw.map(String::as_str) {
+                Some(v @ ("tree" | "vm")) => engine = v,
+                _ => {
+                    eprintln!("error: expected --engine vm|tree\n{}", USAGE);
+                    return ExitCode::from(2);
+                }
+            }
+            continue;
+        }
+        let val = raw.and_then(|v| v.parse::<u64>().ok());
         match (flag.as_str(), val) {
             ("--max-steps", Some(n)) => limits.max_steps = n,
             ("--max-depth", Some(n)) => limits.max_depth = n as usize,
@@ -64,7 +76,11 @@ fn main() -> ExitCode {
         "run" => {
             let stdout = std::io::stdout();
             let mut out = stdout.lock();
-            let r = Interpreter::with_limits(&mut out, limits).run(&prog);
+            let r = if engine == "vm" {
+                limits::vm::Vm::with_limits(&mut out, limits).run(limits::codegen::compile(&prog))
+            } else {
+                Interpreter::with_limits(&mut out, limits).run(&prog)
+            };
             let _ = out.flush();
             r
         }
