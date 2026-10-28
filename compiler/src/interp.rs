@@ -4,7 +4,6 @@
 
 use std::cell::RefCell;
 use std::collections::{BTreeMap, HashMap};
-use std::fmt;
 use std::io::Write;
 use std::rc::Rc;
 
@@ -26,116 +25,13 @@ impl Default for Limits {
     }
 }
 
-#[derive(Clone)]
-pub enum Value {
-    Int(i64),
-    Float(f64),
-    Str(Rc<str>),
-    Bool(bool),
-    Nil,
-    List(Rc<RefCell<Vec<Value>>>),
-    Map(Rc<RefCell<BTreeMap<String, Value>>>),
-    Func(Rc<Func>),
-    Builtin(&'static str),
-    VmFunc(Rc<crate::vm::Closure>),
-}
+pub use crate::value::Value;
 
 pub struct Func {
-    name: String,
+    pub(crate) name: String,
     params: Vec<String>,
-    body: Vec<Stmt>,
+    body: Rc<Vec<Stmt>>,
     env: Env,
-}
-
-impl Value {
-    pub fn type_name(&self) -> &'static str {
-        match self {
-            Value::Int(_) => "int",
-            Value::Float(_) => "float",
-            Value::Str(_) => "string",
-            Value::Bool(_) => "bool",
-            Value::Nil => "nil",
-            Value::List(_) => "list",
-            Value::Map(_) => "map",
-            Value::Func(_) | Value::VmFunc(_) | Value::Builtin(_) => "fn",
-        }
-    }
-
-    pub(crate) fn truthy(&self) -> bool {
-        !matches!(self, Value::Nil | Value::Bool(false))
-    }
-}
-
-impl PartialEq for Value {
-    fn eq(&self, o: &Value) -> bool {
-        use Value::*;
-        match (self, o) {
-            (Int(a), Int(b)) => a == b,
-            (Float(a), Float(b)) => a == b,
-            (Int(a), Float(b)) | (Float(b), Int(a)) => (*a as f64) == *b,
-            (Str(a), Str(b)) => a == b,
-            (Bool(a), Bool(b)) => a == b,
-            (Nil, Nil) => true,
-            (List(a), List(b)) => *a.borrow() == *b.borrow(),
-            (Map(a), Map(b)) => *a.borrow() == *b.borrow(),
-            (Func(a), Func(b)) => Rc::ptr_eq(a, b),
-            (VmFunc(a), VmFunc(b)) => Rc::ptr_eq(a, b),
-            (Builtin(a), Builtin(b)) => a == b,
-            _ => false,
-        }
-    }
-}
-
-impl fmt::Display for Value {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Value::Int(n) => write!(f, "{}", n),
-            Value::Float(x) => {
-                if x.fract() == 0.0 && x.is_finite() {
-                    write!(f, "{:.1}", x)
-                } else {
-                    write!(f, "{}", x)
-                }
-            }
-            Value::Str(s) => write!(f, "{}", s),
-            Value::Bool(b) => write!(f, "{}", b),
-            Value::Nil => write!(f, "nil"),
-            Value::List(l) => {
-                write!(f, "[")?;
-                for (i, v) in l.borrow().iter().enumerate() {
-                    if i > 0 {
-                        write!(f, ", ")?;
-                    }
-                    v.fmt_repr(f)?;
-                }
-                write!(f, "]")
-            }
-            Value::Map(m) => {
-                write!(f, "{{")?;
-                for (i, (k, v)) in m.borrow().iter().enumerate() {
-                    if i > 0 {
-                        write!(f, ", ")?;
-                    }
-                    write!(f, "{:?}: ", k)?;
-                    v.fmt_repr(f)?;
-                }
-                write!(f, "}}")
-            }
-            Value::Func(func) => write!(f, "<fn {}>", func.name),
-            Value::VmFunc(func) => write!(f, "<fn {}>", func.function.name),
-            Value::Builtin(n) => write!(f, "<builtin {}>", n),
-        }
-    }
-}
-
-impl Value {
-    /// Like Display, but quotes strings (used inside containers).
-    fn fmt_repr(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Value::Str(s) => write!(f, "{:?}", s),
-            other => write!(f, "{}", other),
-        }
-    }
 }
 
 type Env = Rc<RefCell<Scope>>;
@@ -146,41 +42,35 @@ pub struct Scope {
     parent: Option<Env>,
 }
 
-fn child(parent: &Env) -> Env {
-    Rc::new(RefCell::new(Scope {
-        vars: HashMap::new(),
-        parent: Some(parent.clone()),
-    }))
-}
-
 fn lookup(env: &Env, name: &str) -> Option<Value> {
-    let s = env.borrow();
-    match s.vars.get(name) {
-        Some(v) => Some(v.clone()),
-        None => s.parent.as_ref().and_then(|p| lookup(p, name)),
+    let mut env = env.clone();
+    loop {
+        let parent = {
+            let scope = env.borrow();
+            if let Some(v) = scope.vars.get(name) {
+                return Some(v.clone());
+            }
+            scope.parent.clone()
+        };
+        env = parent?;
     }
 }
-
-fn assign(env: &Env, name: &str, v: Value) -> bool {
-    let mut s = env.borrow_mut();
-    if let Some(slot) = s.vars.get_mut(name) {
-        *slot = v;
-        return true;
-    }
-    match s.parent.clone() {
-        Some(p) => {
-            drop(s);
-            assign(&p, name, v)
+fn assign(env: &Env, name: &str, value: Value) -> bool {
+    let mut env = env.clone();
+    loop {
+        let parent = {
+            let mut scope = env.borrow_mut();
+            if let Some(slot) = scope.vars.get_mut(name) {
+                *slot = value;
+                return true;
+            }
+            scope.parent.clone()
+        };
+        match parent {
+            Some(parent) => env = parent,
+            None => return false,
         }
-        None => false,
     }
-}
-
-enum Flow {
-    Normal,
-    Return(Value),
-    Break(Span),
-    Continue(Span),
 }
 
 pub const BUILTINS: &[&str] = &[
@@ -193,6 +83,7 @@ pub struct Interpreter<'a> {
     steps: u64,
     depth: usize,
     globals: Env,
+    heap: TreeHeap,
 }
 
 fn rt<T>(msg: impl Into<String>, span: Span) -> Result<T, LimError> {
@@ -217,66 +108,374 @@ impl<'a> Interpreter<'a> {
             limits,
             steps: 0,
             depth: 0,
+            heap: TreeHeap {
+                scopes: vec![globals.clone()],
+                lists: HashMap::new(),
+                maps: HashMap::new(),
+                next_collection: 0,
+            },
             globals,
         }
     }
 
     pub fn run(&mut self, prog: &Program) -> Result<(), LimError> {
-        let env = self.globals.clone();
-        match self.exec_block(prog, &env)? {
-            Flow::Normal | Flow::Return(_) => Ok(()),
-            Flow::Break(s) => rt("'break' outside of a loop", s),
-            Flow::Continue(s) => rt("'continue' outside of a loop", s),
+        crate::ast::validate(prog)?;
+        self.depth = 0;
+        let result = self.run_tasks(prog);
+        self.depth = 0;
+        self.heap.collect(&self.globals, &[], &[], &Task::Pop);
+        result
+    }
+
+    fn run_tasks(&mut self, prog: &Program) -> Result<(), LimError> {
+        let mut tasks = vec![Task::Block(Rc::new(prog.clone()), 0, self.globals.clone())];
+        let mut values: Vec<Value> = Vec::new();
+        while let Some(task) = tasks.pop() {
+            if self.heap.needs_collection() {
+                self.heap.collect(&self.globals, &tasks, &values, &task);
+            }
+            match task {
+                Task::Block(body, index, env) => {
+                    if let Some(stmt) = body.get(index) {
+                        tasks.push(Task::Block(body.clone(), index + 1, env.clone()));
+                        tasks.push(Task::Statement(stmt.clone(), env));
+                    }
+                }
+                Task::Statement(stmt, env) => {
+                    let s = stmt_span(&stmt);
+                    self.tick(s)?;
+                    match stmt {
+                        Stmt::Let(name, e, _) => {
+                            tasks.push(Task::Define(name, env.clone()));
+                            tasks.push(Task::Expr(e, env));
+                        }
+                        Stmt::Assign(target, e, _) => {
+                            match target {
+                                Expr::Var(name, sp) => {
+                                    tasks.push(Task::Assign(name, env.clone(), sp))
+                                }
+                                Expr::Index(o, i, sp) => {
+                                    tasks.push(Task::SetIndex(sp));
+                                    tasks.push(Task::Expr(*i, env.clone()));
+                                    tasks.push(Task::Expr(*o, env.clone()));
+                                }
+                                _ => return rt("invalid assignment target", s),
+                            }
+                            tasks.push(Task::Expr(e, env));
+                        }
+                        Stmt::Expr(e, _) => {
+                            tasks.push(Task::Pop);
+                            tasks.push(Task::Expr(e, env));
+                        }
+                        Stmt::If(c, a, b, _) => {
+                            tasks.push(Task::If(a, b, env.clone()));
+                            tasks.push(Task::Expr(c, env));
+                        }
+                        Stmt::While(c, b, _) => {
+                            tasks.push(Task::WhileNext(Rc::new(c), Rc::new(b), env, s))
+                        }
+                        Stmt::For(n, e, b, _) => {
+                            tasks.push(Task::ForStart(n, Rc::new(b), env.clone(), s));
+                            tasks.push(Task::Expr(e, env));
+                        }
+                        Stmt::Fn(name, params, body, _) => {
+                            let f = Func {
+                                name: name.clone(),
+                                params,
+                                body: Rc::new(body),
+                                env: env.clone(),
+                            };
+                            env.borrow_mut().vars.insert(name, Value::Func(Rc::new(f)));
+                        }
+                        Stmt::Return(e, _) => {
+                            tasks.push(Task::Return);
+                            if let Some(e) = e {
+                                tasks.push(Task::Expr(e, env));
+                            } else {
+                                values.push(Value::Nil);
+                            }
+                        }
+                        Stmt::Break(_) | Stmt::Continue(_) => {
+                            let is_break = matches!(stmt, Stmt::Break(_));
+                            loop {
+                                match tasks.pop() {
+                                    Some(t @ (Task::WhileNext(..) | Task::ForNext(..))) => {
+                                        if !is_break {
+                                            tasks.push(t);
+                                        }
+                                        break;
+                                    }
+                                    Some(Task::CallEnd(_)) | None => {
+                                        return rt(
+                                            if is_break {
+                                                "'break' outside of a loop"
+                                            } else {
+                                                "'continue' outside of a loop"
+                                            },
+                                            s,
+                                        )
+                                    }
+                                    _ => {}
+                                }
+                            }
+                        }
+                    }
+                }
+                Task::Expr(e, env) => match e {
+                    Expr::Int(n) => values.push(Value::Int(n)),
+                    Expr::Float(n) => values.push(Value::Float(n)),
+                    Expr::Str(s) => values.push(Value::Str(s.into())),
+                    Expr::Bool(b) => values.push(Value::Bool(b)),
+                    Expr::Nil => values.push(Value::Nil),
+                    Expr::Var(n, s) => values.push(lookup(&env, &n).ok_or_else(|| {
+                        LimError::new(Kind::Runtime, format!("undefined variable '{n}'"), s)
+                    })?),
+                    Expr::List(es) => {
+                        tasks.push(Task::List(es.len()));
+                        for e in es.into_iter().rev() {
+                            tasks.push(Task::Expr(e, env.clone()));
+                        }
+                    }
+                    Expr::Map(es, s) => {
+                        let m = Rc::new(RefCell::new(BTreeMap::new()));
+                        self.heap.track(&Value::Map(m.clone()));
+                        tasks.push(Task::MapNext(es.into_iter(), m, env, s));
+                    }
+                    Expr::Unary(op, e, s) => {
+                        tasks.push(Task::Unary(op, s));
+                        tasks.push(Task::Expr(*e, env));
+                    }
+                    Expr::Binary(op, a, b, s) => {
+                        if matches!(op, BinOp::And | BinOp::Or) {
+                            tasks.push(Task::Logic(op, *b, env.clone()));
+                            tasks.push(Task::Expr(*a, env));
+                        } else {
+                            tasks.push(Task::Binary(op, s));
+                            tasks.push(Task::Expr(*b, env.clone()));
+                            tasks.push(Task::Expr(*a, env));
+                        }
+                    }
+                    Expr::Range(a, b, s) => {
+                        tasks.push(Task::Range(s));
+                        tasks.push(Task::Expr(*b, env.clone()));
+                        tasks.push(Task::Expr(*a, env));
+                    }
+                    Expr::Index(a, b, s) => {
+                        tasks.push(Task::Index(s));
+                        tasks.push(Task::Expr(*b, env.clone()));
+                        tasks.push(Task::Expr(*a, env));
+                    }
+                    Expr::Call(f, args, s) => {
+                        tasks.push(Task::Call(args.len(), s));
+                        for e in args.into_iter().rev() {
+                            tasks.push(Task::Expr(e, env.clone()));
+                        }
+                        tasks.push(Task::Expr(*f, env));
+                    }
+                },
+                Task::Define(n, env) => {
+                    env.borrow_mut().vars.insert(n, values.pop().unwrap());
+                }
+                Task::Assign(n, env, s) => {
+                    if !assign(&env, &n, values.pop().unwrap()) {
+                        return rt(
+                            format!("assignment to undeclared variable '{n}' (use 'let')"),
+                            s,
+                        );
+                    }
+                }
+                Task::Pop => {
+                    values.pop().unwrap();
+                }
+                Task::List(n) => {
+                    let vs = values.split_off(values.len() - n);
+                    values.push(Value::List(Rc::new(RefCell::new(vs))));
+                }
+                Task::MapNext(mut iter, m, env, s) => {
+                    if let Some((k, v)) = iter.next() {
+                        tasks.push(Task::MapKey(v, iter, m, env.clone(), s));
+                        tasks.push(Task::Expr(k, env));
+                    } else {
+                        values.push(Value::Map(m));
+                    }
+                }
+                Task::MapKey(v, iter, m, env, s) => {
+                    let k = match values.pop().unwrap() {
+                        Value::Str(k) => k,
+                        other => {
+                            return rt(
+                                format!("map keys must be strings, got {}", other.type_name()),
+                                s,
+                            )
+                        }
+                    };
+                    tasks.push(Task::MapInsert(k, iter, m, env.clone(), s));
+                    tasks.push(Task::Expr(v, env));
+                }
+                Task::MapInsert(k, iter, m, env, s) => {
+                    m.borrow_mut().insert(k.to_string(), values.pop().unwrap());
+                    tasks.push(Task::MapNext(iter, m, env, s));
+                }
+                Task::Unary(op, s) => {
+                    let v = values.pop().unwrap();
+                    values.push(unary(op, v, s)?);
+                }
+                Task::Binary(op, s) => {
+                    let b = values.pop().unwrap();
+                    let a = values.pop().unwrap();
+                    values.push(binary(op, a, b, s)?);
+                }
+                Task::Logic(op, b, env) => {
+                    if values.last().unwrap().truthy() == (op == BinOp::And) {
+                        values.pop();
+                        tasks.push(Task::Expr(b, env));
+                    }
+                }
+                Task::Range(s) => {
+                    let b = values.pop().unwrap();
+                    let a = values.pop().unwrap();
+                    values.push(range(a, b, self.limits.max_steps, s)?);
+                }
+                Task::Index(s) => {
+                    let i = values.pop().unwrap();
+                    let o = values.pop().unwrap();
+                    values.push(index(o, i, s)?);
+                }
+                Task::SetIndex(s) => {
+                    let i = values.pop().unwrap();
+                    let o = values.pop().unwrap();
+                    let v = values.pop().unwrap();
+                    self.set_index(&o, &i, v, s)?;
+                }
+                Task::If(a, b, env) => {
+                    let body = if values.pop().unwrap().truthy() {
+                        Some(a)
+                    } else {
+                        b
+                    };
+                    if let Some(body) = body {
+                        let scope = self.heap.child(&env);
+                        tasks.push(Task::Block(Rc::new(body), 0, scope));
+                    }
+                }
+                Task::WhileNext(c, b, env, s) => {
+                    tasks.push(Task::WhileCheck(c.clone(), b, env.clone(), s));
+                    tasks.push(Task::Expr((*c).clone(), env));
+                }
+                Task::WhileCheck(c, b, env, s) => {
+                    if values.pop().unwrap().truthy() {
+                        self.tick(s)?;
+                        let scope = self.heap.child(&env);
+                        tasks.push(Task::WhileNext(c, b.clone(), env, s));
+                        tasks.push(Task::Block(b, 0, scope));
+                    }
+                }
+                Task::ForStart(n, b, env, s) => {
+                    let items = match values.pop().unwrap() {
+                        Value::List(v) => v.borrow().clone(),
+                        Value::Str(v) => v
+                            .chars()
+                            .map(|c| Value::Str(c.to_string().into()))
+                            .collect(),
+                        Value::Map(v) => v
+                            .borrow()
+                            .keys()
+                            .map(|k| Value::Str(k.as_str().into()))
+                            .collect(),
+                        other => {
+                            return rt(format!("cannot iterate over {}", other.type_name()), s)
+                        }
+                    };
+                    tasks.push(Task::ForNext(n, items.into_iter(), b, env, s));
+                }
+                Task::ForNext(n, mut iter, b, env, s) => {
+                    if let Some(v) = iter.next() {
+                        self.tick(s)?;
+                        let scope = self.heap.child(&env);
+                        scope.borrow_mut().vars.insert(n.clone(), v);
+                        tasks.push(Task::ForNext(n, iter, b.clone(), env, s));
+                        tasks.push(Task::Block(b, 0, scope));
+                    }
+                }
+                Task::Call(n, s) => {
+                    self.tick(s)?;
+                    let args = values.split_off(values.len() - n);
+                    let f = values.pop().unwrap();
+                    match f {
+                        Value::Builtin(n) => values.push(self.builtin(n, args, s)?),
+                        Value::Func(f) => {
+                            if args.len() != f.params.len() {
+                                return rt(
+                                    format!(
+                                        "{}() takes {} argument(s), got {}",
+                                        f.name,
+                                        f.params.len(),
+                                        args.len()
+                                    ),
+                                    s,
+                                );
+                            }
+                            if self.depth >= self.limits.max_depth {
+                                return rt(
+                                    format!(
+                                        "call depth limit exceeded ({})",
+                                        self.limits.max_depth
+                                    ),
+                                    s,
+                                );
+                            }
+                            let scope = self.heap.child(&f.env);
+                            for (p, a) in f.params.iter().zip(args) {
+                                scope.borrow_mut().vars.insert(p.clone(), a);
+                            }
+                            self.depth += 1;
+                            tasks.push(Task::CallEnd(values.len()));
+                            tasks.push(Task::Block(f.body.clone(), 0, scope));
+                        }
+                        other => return rt(format!("{} is not callable", other.type_name()), s),
+                    }
+                }
+                Task::CallEnd(base) => {
+                    self.depth -= 1;
+                    values.truncate(base);
+                    values.push(Value::Nil);
+                }
+                Task::Return => {
+                    let v = values.pop().unwrap();
+                    loop {
+                        match tasks.pop() {
+                            Some(Task::CallEnd(base)) => {
+                                self.depth -= 1;
+                                values.truncate(base);
+                                values.push(v);
+                                break;
+                            }
+                            None => return Ok(()),
+                            _ => {}
+                        }
+                    }
+                }
+            }
+            if let Some(v) = values.last() {
+                self.heap.track(v);
+            }
         }
+        Ok(())
+    }
+
+    pub(crate) fn reset_steps(&mut self) {
+        self.steps = 0;
     }
 
     pub(crate) fn tick(&mut self, span: Span) -> Result<(), LimError> {
-        self.steps += 1;
-        if self.steps > self.limits.max_steps {
+        if self.steps >= self.limits.max_steps {
             return rt(
                 format!("step limit exceeded ({} steps)", self.limits.max_steps),
                 span,
             );
         }
+        self.steps += 1;
         Ok(())
-    }
-
-    fn exec_block(&mut self, stmts: &[Stmt], env: &Env) -> Result<Flow, LimError> {
-        for s in stmts {
-            match self.exec(s, env)? {
-                Flow::Normal => {}
-                other => return Ok(other),
-            }
-        }
-        Ok(Flow::Normal)
-    }
-
-    fn exec(&mut self, stmt: &Stmt, env: &Env) -> Result<Flow, LimError> {
-        self.tick(stmt_span(stmt))?;
-        match stmt {
-            Stmt::Let(name, e, _) => {
-                let v = self.eval(e, env)?;
-                env.borrow_mut().vars.insert(name.clone(), v);
-            }
-            Stmt::Assign(..) => return self.exec_assign(stmt, env),
-            Stmt::Expr(e, _) => {
-                self.eval(e, env)?;
-            }
-            Stmt::If(..) => return self.exec_if(stmt, env),
-            Stmt::While(..) => return self.exec_while(stmt, env),
-            Stmt::For(..) => return self.exec_for(stmt, env),
-            Stmt::Fn(..) => return self.exec_fn(stmt, env),
-            Stmt::Return(e, _) => {
-                let v = match e {
-                    Some(e) => self.eval(e, env)?,
-                    None => Value::Nil,
-                };
-                return Ok(Flow::Return(v));
-            }
-            Stmt::Break(s) => return Ok(Flow::Break(*s)),
-            Stmt::Continue(s) => return Ok(Flow::Continue(*s)),
-        }
-        Ok(Flow::Normal)
     }
 
     pub(crate) fn set_index(
@@ -314,248 +513,6 @@ impl<'a> Interpreter<'a> {
         }
     }
 
-    // Keep dispatch small: large match-arm temporaries otherwise make each
-    // recursive call consume several kilobytes on debug/test thread stacks.
-    fn eval(&mut self, e: &Expr, env: &Env) -> Result<Value, LimError> {
-        match e {
-            Expr::Int(n) => Ok(Value::Int(*n)),
-            Expr::Float(n) => Ok(Value::Float(*n)),
-            Expr::Str(s) => Ok(Value::Str(s.as_str().into())),
-            Expr::Bool(b) => Ok(Value::Bool(*b)),
-            Expr::Nil => Ok(Value::Nil),
-            Expr::Var(name, s) => Self::get_variable(env, name, *s),
-            Expr::List(_) => self.eval_list(e, env),
-            Expr::Map(..) => self.eval_map(e, env),
-            Expr::Unary(op, x, s) => self.eval_unary(*op, x, env, *s),
-            Expr::Binary(op, l, r, s) => self.eval_binary(*op, l, r, env, *s),
-            Expr::Range(a, b, s) => self.eval_range(a, b, env, *s),
-            Expr::Index(a, b, s) => self.eval_index(a, b, env, *s),
-            Expr::Call(..) => self.eval_call(e, env),
-        }
-    }
-    fn get_variable(env: &Env, name: &str, s: Span) -> Result<Value, LimError> {
-        lookup(env, name).ok_or_else(|| {
-            LimError::new(Kind::Runtime, format!("undefined variable '{}'", name), s)
-        })
-    }
-    fn eval_unary(&mut self, op: UnOp, x: &Expr, env: &Env, s: Span) -> Result<Value, LimError> {
-        unary(op, self.eval(x, env)?, s)
-    }
-    fn eval_binary(
-        &mut self,
-        op: BinOp,
-        l: &Expr,
-        r: &Expr,
-        env: &Env,
-        s: Span,
-    ) -> Result<Value, LimError> {
-        let a = self.eval(l, env)?;
-        match op {
-            BinOp::And if !a.truthy() => Ok(a),
-            BinOp::Or if a.truthy() => Ok(a),
-            BinOp::And | BinOp::Or => self.eval(r, env),
-            _ => binary(op, a, self.eval(r, env)?, s),
-        }
-    }
-    fn eval_range(&mut self, a: &Expr, b: &Expr, env: &Env, s: Span) -> Result<Value, LimError> {
-        range(
-            self.eval(a, env)?,
-            self.eval(b, env)?,
-            self.limits.max_steps,
-            s,
-        )
-    }
-    fn eval_index(&mut self, a: &Expr, b: &Expr, env: &Env, s: Span) -> Result<Value, LimError> {
-        index(self.eval(a, env)?, self.eval(b, env)?, s)
-    }
-
-    fn exec_assign(&mut self, stmt: &Stmt, env: &Env) -> Result<Flow, LimError> {
-        let Stmt::Assign(target, e, span) = stmt else {
-            unreachable!()
-        };
-
-        let v = self.eval(e, env)?;
-        match target {
-            Expr::Var(name, s) => {
-                if !assign(env, name, v) {
-                    return rt(
-                        format!("assignment to undeclared variable '{}' (use 'let')", name),
-                        *s,
-                    );
-                }
-            }
-            Expr::Index(obj, idx, s) => {
-                let o = self.eval(obj, env)?;
-                let i = self.eval(idx, env)?;
-                self.set_index(&o, &i, v, *s)?;
-            }
-            _ => return rt("invalid assignment target", *span),
-        }
-
-        Ok(Flow::Normal)
-    }
-    fn exec_if(&mut self, stmt: &Stmt, env: &Env) -> Result<Flow, LimError> {
-        let Stmt::If(c, then, els, _) = stmt else {
-            unreachable!()
-        };
-
-        if self.eval(c, env)?.truthy() {
-            return self.exec_block(then, &child(env));
-        } else if let Some(b) = els {
-            return self.exec_block(b, &child(env));
-        }
-
-        Ok(Flow::Normal)
-    }
-    fn exec_while(&mut self, stmt: &Stmt, env: &Env) -> Result<Flow, LimError> {
-        let Stmt::While(c, body, span) = stmt else {
-            unreachable!()
-        };
-
-        while self.eval(c, env)?.truthy() {
-            // Charge each iteration so even an empty body counts against the budget.
-            self.tick(*span)?;
-            match self.exec_block(body, &child(env))? {
-                Flow::Break(_) => break,
-                Flow::Return(v) => return Ok(Flow::Return(v)),
-                Flow::Normal | Flow::Continue(_) => {}
-            }
-        }
-
-        Ok(Flow::Normal)
-    }
-    fn exec_for(&mut self, stmt: &Stmt, env: &Env) -> Result<Flow, LimError> {
-        let Stmt::For(name, it, body, span) = stmt else {
-            unreachable!()
-        };
-
-        let items: Vec<Value> = match self.eval(it, env)? {
-            Value::List(l) => l.borrow().clone(),
-            Value::Str(s) => s
-                .chars()
-                .map(|c| Value::Str(c.to_string().into()))
-                .collect(),
-            Value::Map(m) => m
-                .borrow()
-                .keys()
-                .map(|k| Value::Str(k.as_str().into()))
-                .collect(),
-            other => return rt(format!("cannot iterate over {}", other.type_name()), *span),
-        };
-        for item in items {
-            self.tick(*span)?;
-            let scope = child(env);
-            scope.borrow_mut().vars.insert(name.clone(), item);
-            match self.exec_block(body, &scope)? {
-                Flow::Break(_) => break,
-                Flow::Return(v) => return Ok(Flow::Return(v)),
-                Flow::Normal | Flow::Continue(_) => {}
-            }
-        }
-
-        Ok(Flow::Normal)
-    }
-    fn exec_fn(&mut self, stmt: &Stmt, env: &Env) -> Result<Flow, LimError> {
-        let Stmt::Fn(name, params, body, _) = stmt else {
-            unreachable!()
-        };
-
-        let f = Func {
-            name: name.clone(),
-            params: params.clone(),
-            body: body.clone(),
-            env: env.clone(),
-        };
-        env.borrow_mut()
-            .vars
-            .insert(name.clone(), Value::Func(Rc::new(f)));
-
-        Ok(Flow::Normal)
-    }
-    fn eval_list(&mut self, e: &Expr, env: &Env) -> Result<Value, LimError> {
-        let Expr::List(items) = e else { unreachable!() };
-        Ok({
-            let mut v = Vec::with_capacity(items.len());
-            for it in items {
-                v.push(self.eval(it, env)?);
-            }
-            Value::List(Rc::new(RefCell::new(v)))
-        })
-    }
-    fn eval_map(&mut self, e: &Expr, env: &Env) -> Result<Value, LimError> {
-        let Expr::Map(pairs, ms) = e else {
-            unreachable!()
-        };
-        Ok({
-            let mut m = BTreeMap::new();
-            for (k, v) in pairs {
-                let key = match self.eval(k, env)? {
-                    Value::Str(s) => s.to_string(),
-                    other => {
-                        return rt(
-                            format!("map keys must be strings, got {}", other.type_name()),
-                            *ms,
-                        )
-                    }
-                };
-                m.insert(key, self.eval(v, env)?);
-            }
-            Value::Map(Rc::new(RefCell::new(m)))
-        })
-    }
-    fn eval_call(&mut self, e: &Expr, env: &Env) -> Result<Value, LimError> {
-        let Expr::Call(callee, args, s) = e else {
-            unreachable!()
-        };
-        Ok({
-            let f = self.eval(callee, env)?;
-            let mut argv = Vec::with_capacity(args.len());
-            for a in args {
-                argv.push(self.eval(a, env)?);
-            }
-            self.call(f, argv, *s)?
-        })
-    }
-    fn call(&mut self, f: Value, args: Vec<Value>, s: Span) -> Result<Value, LimError> {
-        self.tick(s)?;
-        match f {
-            Value::Builtin(name) => self.builtin(name, args, s),
-            Value::Func(func) => {
-                if args.len() != func.params.len() {
-                    return rt(
-                        format!(
-                            "{}() takes {} argument(s), got {}",
-                            func.name,
-                            func.params.len(),
-                            args.len()
-                        ),
-                        s,
-                    );
-                }
-                if self.depth >= self.limits.max_depth {
-                    return rt(
-                        format!("call depth limit exceeded ({})", self.limits.max_depth),
-                        s,
-                    );
-                }
-                let scope = child(&func.env);
-                for (p, a) in func.params.iter().zip(args) {
-                    scope.borrow_mut().vars.insert(p.clone(), a);
-                }
-                self.depth += 1;
-                let r = self.exec_block(&func.body, &scope);
-                self.depth -= 1;
-                match r? {
-                    Flow::Return(v) => Ok(v),
-                    Flow::Normal => Ok(Value::Nil),
-                    Flow::Break(bs) => rt("'break' outside of a loop", bs),
-                    Flow::Continue(cs) => rt("'continue' outside of a loop", cs),
-                }
-            }
-            other => rt(format!("{} is not callable", other.type_name()), s),
-        }
-    }
-
     pub(crate) fn builtin(
         &mut self,
         name: &str,
@@ -574,8 +531,22 @@ impl<'a> Interpreter<'a> {
         };
         match name {
             "print" => {
-                let line: Vec<String> = args.iter().map(|a| a.to_string()).collect();
-                writeln!(self.out, "{}", line.join(" "))
+                let mut line = String::new();
+                for (i, arg) in args.iter().enumerate() {
+                    let value = arg
+                        .render()
+                        .map_err(|m| LimError::new(Kind::Runtime, m, s))?;
+                    if line.len().saturating_add(value.len()).saturating_add(1)
+                        > crate::value::MAX_RENDER_BYTES
+                    {
+                        return rt("value rendering limit exceeded", s);
+                    }
+                    if i != 0 {
+                        line.push(' ');
+                    }
+                    line.push_str(&value);
+                }
+                writeln!(self.out, "{line}")
                     .map_err(|e| LimError::new(Kind::Runtime, e.to_string(), s))?;
                 Ok(Value::Nil)
             }
@@ -610,7 +581,12 @@ impl<'a> Interpreter<'a> {
             }
             "str" => {
                 arity(1)?;
-                Ok(Value::Str(args[0].to_string().into()))
+                Ok(Value::Str(
+                    args[0]
+                        .render()
+                        .map_err(|m| LimError::new(Kind::Runtime, m, s))?
+                        .into(),
+                ))
             }
             "int" => {
                 arity(1)?;
@@ -664,7 +640,8 @@ impl<'a> Interpreter<'a> {
                 }
                 let msg = args
                     .get(1)
-                    .map(|m| m.to_string())
+                    .map(|m| m.render().map_err(|m| LimError::new(Kind::Runtime, m, s)))
+                    .transpose()?
                     .unwrap_or_else(|| "assertion failed".into());
                 rt(msg, s)
             }
@@ -713,8 +690,18 @@ pub(crate) fn binary(op: BinOp, a: Value, b: Value, s: Span) -> Result<Value, Li
 fn binary_other(op: BinOp, a: Value, b: Value, s: Span) -> Result<Value, LimError> {
     use Value::*;
     match op {
-        BinOp::Eq => return Ok(Bool(a == b)),
-        BinOp::Ne => return Ok(Bool(a != b)),
+        BinOp::Eq => {
+            return a
+                .equals(&b)
+                .map(Bool)
+                .map_err(|m| LimError::new(Kind::Runtime, m, s))
+        }
+        BinOp::Ne => {
+            return a
+                .equals(&b)
+                .map(|v| Bool(!v))
+                .map_err(|m| LimError::new(Kind::Runtime, m, s))
+        }
         _ => {}
     }
     Ok(match (op, &a, &b) {
@@ -808,7 +795,15 @@ pub(crate) fn range(a: Value, b: Value, max_steps: u64, s: Span) -> Result<Value
             if n > max_steps {
                 return rt(format!("range of {} elements exceeds step limit", n), s);
             }
-            Value::List(Rc::new(RefCell::new((a..b).map(Value::Int).collect())))
+            let size = usize::try_from(n).map_err(|_| {
+                LimError::new(Kind::Runtime, "range allocation exceeds host capacity", s)
+            })?;
+            let mut values = Vec::new();
+            values.try_reserve_exact(size).map_err(|_| {
+                LimError::new(Kind::Runtime, "range allocation exceeds host capacity", s)
+            })?;
+            values.extend((a..b).map(Value::Int));
+            Value::List(Rc::new(RefCell::new(values)))
         }
         (a, b) => {
             return rt(
@@ -852,4 +847,207 @@ pub(crate) fn index(o: Value, i: Value, s: Span) -> Result<Value, LimError> {
             )
         }
     })
+}
+
+// AST continuations: language calls, blocks, loops, and expression evaluation
+// use this heap stack. No Rust call chain grows with max_depth.
+type Pairs = std::vec::IntoIter<(Expr, Expr)>;
+type TreeMap = Rc<RefCell<BTreeMap<String, Value>>>;
+enum Task {
+    Block(Rc<Vec<Stmt>>, usize, Env),
+    Statement(Stmt, Env),
+    Expr(Expr, Env),
+    Define(String, Env),
+    Assign(String, Env, Span),
+    Pop,
+    List(usize),
+    MapNext(Pairs, TreeMap, Env, Span),
+    MapKey(Expr, Pairs, TreeMap, Env, Span),
+    MapInsert(Rc<str>, Pairs, TreeMap, Env, Span),
+    Unary(UnOp, Span),
+    Binary(BinOp, Span),
+    Logic(BinOp, Expr, Env),
+    Range(Span),
+    Index(Span),
+    SetIndex(Span),
+    If(Vec<Stmt>, Option<Vec<Stmt>>, Env),
+    WhileNext(Rc<Expr>, Rc<Vec<Stmt>>, Env, Span),
+    WhileCheck(Rc<Expr>, Rc<Vec<Stmt>>, Env, Span),
+    ForStart(String, Rc<Vec<Stmt>>, Env, Span),
+    ForNext(String, std::vec::IntoIter<Value>, Rc<Vec<Stmt>>, Env, Span),
+    Call(usize, Span),
+    CallEnd(usize),
+    Return,
+}
+impl Task {
+    fn roots(&self, envs: &mut Vec<Env>, values: &mut Vec<Value>) {
+        let env = match self {
+            Self::Block(_, _, e)
+            | Self::Statement(_, e)
+            | Self::Expr(_, e)
+            | Self::Define(_, e)
+            | Self::Assign(_, e, _)
+            | Self::Logic(_, _, e)
+            | Self::If(_, _, e)
+            | Self::WhileNext(_, _, e, _)
+            | Self::WhileCheck(_, _, e, _)
+            | Self::ForStart(_, _, e, _) => Some(e),
+            Self::ForNext(_, iter, _, e, _) => {
+                values.extend(iter.as_slice().iter().cloned());
+                Some(e)
+            }
+            Self::MapNext(_, m, e, _)
+            | Self::MapKey(_, _, m, e, _)
+            | Self::MapInsert(_, _, m, e, _) => {
+                values.push(Value::Map(m.clone()));
+                Some(e)
+            }
+            _ => None,
+        };
+        if let Some(e) = env {
+            envs.push(e.clone());
+        }
+    }
+}
+#[derive(Default)]
+struct TreeHeap {
+    scopes: Vec<Env>,
+    lists: HashMap<usize, Rc<RefCell<Vec<Value>>>>,
+    maps: HashMap<usize, TreeMap>,
+    next_collection: usize,
+}
+impl TreeHeap {
+    fn child(&mut self, parent: &Env) -> Env {
+        let env = Rc::new(RefCell::new(Scope {
+            vars: HashMap::new(),
+            parent: Some(parent.clone()),
+        }));
+        self.scopes.push(env.clone());
+        env
+    }
+    fn track(&mut self, value: &Value) {
+        match value {
+            Value::List(v) => {
+                self.lists
+                    .entry(Rc::as_ptr(v) as usize)
+                    .or_insert_with(|| v.clone());
+            }
+            Value::Map(v) => {
+                self.maps
+                    .entry(Rc::as_ptr(v) as usize)
+                    .or_insert_with(|| v.clone());
+            }
+            _ => {}
+        }
+    }
+    fn len(&self) -> usize {
+        self.scopes.len() + self.lists.len() + self.maps.len()
+    }
+    fn needs_collection(&self) -> bool {
+        self.len() >= self.next_collection.max(1024)
+    }
+    fn collect(&mut self, global: &Env, tasks: &[Task], stack: &[Value], current: &Task) {
+        use std::collections::HashSet;
+        let mut envs = vec![global.clone()];
+        let mut values = stack.to_vec();
+        for task in tasks {
+            task.roots(&mut envs, &mut values);
+        }
+        current.roots(&mut envs, &mut values);
+        let mut scopes = HashSet::new();
+        let mut lists = HashSet::new();
+        let mut maps = HashSet::new();
+        while !envs.is_empty() || !values.is_empty() {
+            if let Some(env) = envs.pop() {
+                if !scopes.insert(Rc::as_ptr(&env) as usize) {
+                    continue;
+                }
+                let scope = env.borrow();
+                if let Some(parent) = &scope.parent {
+                    envs.push(parent.clone());
+                }
+                values.extend(scope.vars.values().cloned());
+            } else if let Some(v) = values.pop() {
+                match v {
+                    Value::Func(f) => envs.push(f.env.clone()),
+                    Value::List(v) => {
+                        if lists.insert(Rc::as_ptr(&v) as usize) {
+                            values.extend(v.borrow().iter().cloned());
+                        }
+                    }
+                    Value::Map(v) if maps.insert(Rc::as_ptr(&v) as usize) => {
+                        values.extend(v.borrow().values().cloned());
+                    }
+                    _ => {}
+                }
+            }
+        }
+        for env in &self.scopes {
+            if !scopes.contains(&(Rc::as_ptr(env) as usize)) {
+                env.borrow_mut().vars.clear();
+            }
+        }
+        for (id, v) in &self.lists {
+            if !lists.contains(id) {
+                v.borrow_mut().clear();
+            }
+        }
+        for (id, v) in &self.maps {
+            if !maps.contains(id) {
+                v.borrow_mut().clear();
+            }
+        }
+        let mut dead = Vec::new();
+        self.scopes.retain(|s| {
+            if scopes.contains(&(Rc::as_ptr(s) as usize)) {
+                true
+            } else {
+                dead.push(s.clone());
+                false
+            }
+        });
+        while dead.pop().is_some() {}
+        self.lists.retain(|id, _| lists.contains(id));
+        self.maps.retain(|id, _| maps.contains(id));
+        self.next_collection = self.len().saturating_mul(2).saturating_add(1024);
+    }
+}
+impl Drop for TreeHeap {
+    fn drop(&mut self) {
+        for env in &self.scopes {
+            env.borrow_mut().vars.clear();
+        }
+        for v in self.lists.values() {
+            v.borrow_mut().clear();
+        }
+        for v in self.maps.values() {
+            v.borrow_mut().clear();
+        }
+        while self.scopes.pop().is_some() {}
+    }
+}
+
+#[cfg(test)]
+mod counter_tests {
+    use super::*;
+    #[test]
+    fn full_width_step_budget_never_wraps() {
+        let mut out = Vec::new();
+        let mut interpreter = Interpreter::with_limits(
+            &mut out,
+            Limits {
+                max_steps: u64::MAX,
+                max_depth: 1,
+            },
+        );
+        interpreter.steps = u64::MAX - 1;
+        let span = Span { line: 2, col: 3 };
+        interpreter.tick(span).unwrap();
+        let error = interpreter.tick(span).unwrap_err();
+        assert_eq!(error.span, span);
+        assert_eq!(
+            error.msg,
+            "step limit exceeded (18446744073709551615 steps)"
+        );
+    }
 }

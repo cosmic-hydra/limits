@@ -7,7 +7,7 @@ use std::rc::Rc;
 /// Lexical slots, nearest first. Uninitialized declarations fall through to
 /// outer bindings, preserving the tree walker's late declaration semantics.
 #[derive(Clone)]
-pub struct Binding {
+pub(crate) struct Binding {
     pub name: String,
     /// Initialized parameter in this frame; valid only when no child closure
     /// can mutate its scope. Other references use captured heap slots.
@@ -15,7 +15,7 @@ pub struct Binding {
     pub slots: Vec<(usize, usize)>,
 }
 #[derive(Clone)]
-pub enum Op {
+pub(crate) enum Op {
     Tick,
     Constant(usize),
     Get(Binding),
@@ -49,11 +49,11 @@ pub enum Op {
 }
 #[derive(Default)]
 pub struct Chunk {
-    pub code: Vec<Op>,
-    pub constants: Vec<Value>,
-    pub spans: Vec<Span>,
+    pub(crate) code: Vec<Op>,
+    pub(crate) constants: Vec<Value>,
+    pub(crate) spans: Vec<Span>,
 }
-pub struct Function {
+pub(crate) struct Function {
     pub name: String,
     pub arity: usize,
     pub params: Vec<usize>,
@@ -67,7 +67,7 @@ pub struct Function {
 
 /// A pure argument expression fused with a call. All intermediate spans are
 /// retained, and callee and argument are still evaluated before charging a call.
-pub struct CallSite {
+pub(crate) struct CallSite {
     pub callee: Binding,
     pub callee_span: Span,
     pub argument: Binding,
@@ -75,4 +75,32 @@ pub struct CallSite {
     pub op: BinOp,
     pub operand: i64,
     pub expression_span: Span,
+}
+
+/// An immutable, compiler-produced program. Bytecode construction is private:
+/// execution cannot be redirected into uncharged jumps or invalid stack states.
+///
+/// ```compile_fail
+/// let ast = limits::parser::parse(limits::lexer::lex("print(1);").unwrap()).unwrap();
+/// let program = limits::codegen::compile(&ast).unwrap();
+/// program.chunk().code.clear(); // bytecode is private and immutable
+/// ```
+#[derive(Clone)]
+pub struct CompiledProgram(pub(crate) Rc<Function>);
+
+impl CompiledProgram {
+    pub fn chunk(&self) -> &Chunk {
+        &self.0.chunk
+    }
+}
+impl Chunk {
+    pub fn instruction_count(&self) -> usize {
+        self.code.len()
+    }
+    pub fn constant_count(&self) -> usize {
+        self.constants.len()
+    }
+    pub fn spans(&self) -> &[Span] {
+        &self.spans
+    }
 }

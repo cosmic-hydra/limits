@@ -1,0 +1,37 @@
+name: Limits compiler
+on:
+  push:
+    paths: ['compiler/**', 'examples/**', '.github/workflows/compiler.yml']
+  pull_request:
+    paths: ['compiler/**', 'examples/**', '.github/workflows/compiler.yml']
+permissions:
+  contents: read
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        profile: [debug, release]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            compiler
+            examples
+            .github
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - name: Format
+        run: cargo fmt --manifest-path compiler/Cargo.toml -- --check
+      - name: Clippy
+        run: cargo clippy --manifest-path compiler/Cargo.toml --all-targets -- -D warnings
+      - name: Debug tests
+        if: matrix.profile == 'debug'
+        run: cargo test --manifest-path compiler/Cargo.toml
+      - name: Release tests
+        if: matrix.profile == 'release'
+        run: cargo test --release --manifest-path compiler/Cargo.toml

@@ -6,23 +6,75 @@ use crate::error::{Kind, LimError, Span};
 use crate::lexer::{Tok, Token};
 
 pub fn parse(tokens: Vec<Token>) -> Result<Program, LimError> {
+    if tokens.last().is_none_or(|t| t.tok != Tok::Eof) {
+        return Err(LimError::new(
+            Kind::Parse,
+            "missing end-of-file token",
+            tokens.last().map_or(Span { line: 1, col: 1 }, |t| t.span),
+        ));
+    }
     let mut p = Parser {
         toks: tokens,
         pos: 0,
+        depth: 0,
     };
     let mut prog = Vec::new();
     while !p.check(&Tok::Eof) {
         prog.push(p.stmt()?);
     }
+    crate::ast::validate(&prog)?;
     Ok(prog)
 }
 
 struct Parser {
     toks: Vec<Token>,
     pos: usize,
+    depth: usize,
 }
 
+const MAX_NESTING: usize = 128;
+
 impl Parser {
+    fn nested<T>(
+        &mut self,
+        f: impl FnOnce(&mut Self) -> Result<T, LimError>,
+    ) -> Result<T, LimError> {
+        if self.depth >= MAX_NESTING {
+            return self.err("syntax nesting limit exceeded (128)");
+        }
+        self.depth += 1;
+        let result = f(self);
+        self.depth -= 1;
+        result
+    }
+    fn checked(&self, e: Expr) -> Result<Expr, LimError> {
+        let mut work = vec![(&e, 1)];
+        while let Some((e, d)) = work.pop() {
+            if d > MAX_NESTING {
+                return self.err("expression nesting limit exceeded (128)");
+            }
+            match e {
+                Expr::List(es) => work.extend(es.iter().map(|e| (e, d + 1))),
+                Expr::Map(es, _) => {
+                    for (a, b) in es {
+                        work.push((a, d + 1));
+                        work.push((b, d + 1));
+                    }
+                }
+                Expr::Unary(_, e, _) => work.push((e, d + 1)),
+                Expr::Binary(_, a, b, _) | Expr::Range(a, b, _) | Expr::Index(a, b, _) => {
+                    work.push((a, d + 1));
+                    work.push((b, d + 1));
+                }
+                Expr::Call(f, args, _) => {
+                    work.push((f, d + 1));
+                    work.extend(args.iter().map(|e| (e, d + 1)));
+                }
+                _ => {}
+            }
+        }
+        Ok(e)
+    }
     fn peek(&self) -> &Tok {
         &self.toks[self.pos].tok
     }
@@ -73,6 +125,9 @@ impl Parser {
     }
 
     fn block(&mut self) -> Result<Vec<Stmt>, LimError> {
+        self.nested(|p| p.block_inner())
+    }
+    fn block_inner(&mut self) -> Result<Vec<Stmt>, LimError> {
         self.expect(Tok::LBrace, "'{'")?;
         let mut body = Vec::new();
         while !self.check(&Tok::RBrace) {
@@ -166,6 +221,9 @@ impl Parser {
     }
 
     fn if_stmt(&mut self) -> Result<Stmt, LimError> {
+        self.nested(|p| p.if_stmt_inner())
+    }
+    fn if_stmt_inner(&mut self) -> Result<Stmt, LimError> {
         let span = self.span();
         self.bump(); // `if`
         let c = self.expr()?;
@@ -183,6 +241,9 @@ impl Parser {
     }
 
     pub fn expr(&mut self) -> Result<Expr, LimError> {
+        self.nested(|p| p.expr_inner())
+    }
+    fn expr_inner(&mut self) -> Result<Expr, LimError> {
         self.or()
     }
 
@@ -191,7 +252,8 @@ impl Parser {
         while self.check(&Tok::Or) {
             let s = self.span();
             self.bump();
-            l = Expr::Binary(BinOp::Or, Box::new(l), Box::new(self.and()?), s);
+            let r = self.and()?;
+            l = self.checked(Expr::Binary(BinOp::Or, Box::new(l), Box::new(r), s))?;
         }
         Ok(l)
     }
@@ -201,7 +263,8 @@ impl Parser {
         while self.check(&Tok::And) {
             let s = self.span();
             self.bump();
-            l = Expr::Binary(BinOp::And, Box::new(l), Box::new(self.not()?), s);
+            let r = self.not()?;
+            l = self.checked(Expr::Binary(BinOp::And, Box::new(l), Box::new(r), s))?;
         }
         Ok(l)
     }
@@ -210,7 +273,8 @@ impl Parser {
         if self.check(&Tok::Not) {
             let s = self.span();
             self.bump();
-            return Ok(Expr::Unary(UnOp::Not, Box::new(self.not()?), s));
+            let x = self.nested(|p| p.not())?;
+            return self.checked(Expr::Unary(UnOp::Not, Box::new(x), s));
         }
         self.cmp()
     }
@@ -236,7 +300,7 @@ impl Parser {
         ) {
             return self.err("comparisons cannot be chained; use 'and'");
         }
-        Ok(Expr::Binary(op, Box::new(l), Box::new(r), s))
+        self.checked(Expr::Binary(op, Box::new(l), Box::new(r), s))
     }
 
     fn range(&mut self) -> Result<Expr, LimError> {
@@ -244,7 +308,8 @@ impl Parser {
         if self.check(&Tok::DotDot) {
             let s = self.span();
             self.bump();
-            return Ok(Expr::Range(Box::new(l), Box::new(self.add()?), s));
+            let r = self.add()?;
+            return self.checked(Expr::Range(Box::new(l), Box::new(r), s));
         }
         Ok(l)
     }
@@ -259,7 +324,8 @@ impl Parser {
             };
             let s = self.span();
             self.bump();
-            l = Expr::Binary(op, Box::new(l), Box::new(self.mul()?), s);
+            let r = self.mul()?;
+            l = self.checked(Expr::Binary(op, Box::new(l), Box::new(r), s))?;
         }
     }
 
@@ -274,7 +340,8 @@ impl Parser {
             };
             let s = self.span();
             self.bump();
-            l = Expr::Binary(op, Box::new(l), Box::new(self.unary()?), s);
+            let r = self.unary()?;
+            l = self.checked(Expr::Binary(op, Box::new(l), Box::new(r), s))?;
         }
     }
 
@@ -282,7 +349,8 @@ impl Parser {
         if self.check(&Tok::Minus) {
             let s = self.span();
             self.bump();
-            return Ok(Expr::Unary(UnOp::Neg, Box::new(self.unary()?), s));
+            let x = self.nested(|p| p.unary())?;
+            return self.checked(Expr::Unary(UnOp::Neg, Box::new(x), s));
         }
         self.postfix()
     }
@@ -302,11 +370,11 @@ impl Parser {
                     }
                 }
                 self.expect(Tok::RParen, "')'")?;
-                e = Expr::Call(Box::new(e), args, s);
+                e = self.checked(Expr::Call(Box::new(e), args, s))?;
             } else if self.eat(&Tok::LBracket) {
                 let i = self.expr()?;
                 self.expect(Tok::RBracket, "']'")?;
-                e = Expr::Index(Box::new(e), Box::new(i), s);
+                e = self.checked(Expr::Index(Box::new(e), Box::new(i), s))?;
             } else {
                 return Ok(e);
             }
@@ -315,7 +383,7 @@ impl Parser {
 
     fn primary(&mut self) -> Result<Expr, LimError> {
         let s = self.span();
-        Ok(match self.bump() {
+        let result = match self.bump() {
             Tok::Int(n) => Expr::Int(n),
             Tok::Float(f) => Expr::Float(f),
             Tok::Str(st) => Expr::Str(st),
@@ -358,6 +426,7 @@ impl Parser {
                 }
                 return self.err(format!("expected expression, found {:?}", other));
             }
-        })
+        };
+        self.checked(result)
     }
 }

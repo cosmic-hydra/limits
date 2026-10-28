@@ -6,7 +6,7 @@ fn execute(src: &str, limits: Limits, vm: bool) -> (Vec<u8>, Result<(), LimError
     let mut out = Vec::new();
     let result = lexer::lex(src).and_then(parser::parse).and_then(|p| {
         if vm {
-            Vm::with_limits(&mut out, limits).run(codegen::compile(&p))
+            Vm::with_limits(&mut out, limits).run(codegen::compile(&p)?)
         } else {
             Interpreter::with_limits(&mut out, limits).run(&p)
         }

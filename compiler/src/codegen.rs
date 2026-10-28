@@ -27,7 +27,8 @@ fn layout(body: &[Stmt], initial: &[String]) -> Vec<String> {
     }
     names
 }
-pub fn compile(program: &Program) -> Rc<Function> {
+pub fn compile(program: &Program) -> Result<CompiledProgram, crate::error::LimError> {
+    crate::ast::validate(program)?;
     let builtins: Vec<_> = BUILTINS.iter().map(|s| s.to_string()).collect();
     let names = layout(program, &builtins);
     let locals = names.len();
@@ -41,7 +42,7 @@ pub fn compile(program: &Program) -> Rc<Function> {
     let s = Span { line: 1, col: 1 };
     c.constant(Value::Nil, s);
     c.emit(Op::Return, s);
-    Rc::new(Function {
+    Ok(CompiledProgram(Rc::new(Function {
         name: "<script>".into(),
         arity: 0,
         params: vec![],
@@ -49,7 +50,7 @@ pub fn compile(program: &Program) -> Rc<Function> {
         stack_parameters: false,
         frame_only: false,
         chunk: c.chunk,
-    })
+    })))
 }
 impl Compiler {
     fn emit(&mut self, op: Op, s: Span) -> usize {

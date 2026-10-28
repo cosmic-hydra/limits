@@ -55,7 +55,17 @@ pub struct Token {
     pub span: Span,
 }
 
+/// Maximum source bytes accepted by both library and CLI entry points.
+pub const MAX_SOURCE_BYTES: usize = 16 * 1024 * 1024;
+
 pub fn lex(src: &str) -> Result<Vec<Token>, LimError> {
+    if src.len() > MAX_SOURCE_BYTES {
+        return Err(LimError::new(
+            Kind::Lex,
+            "source size limit exceeded (16777216 bytes)",
+            Span { line: 1, col: 1 },
+        ));
+    }
     let chars: Vec<char> = src.chars().collect();
     let mut toks = Vec::new();
     let (mut i, mut line, mut col) = (0usize, 1usize, 1usize);

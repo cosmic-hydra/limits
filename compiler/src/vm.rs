@@ -1,6 +1,6 @@
 //! Non-recursive stack VM. Calls use explicit frames; captured lexical scope
 //! slots are heap upvalues, so closures survive scope exit and share writes.
-use crate::bytecode::{Binding, Function, Op};
+use crate::bytecode::{Binding, CompiledProgram, Function, Op};
 use crate::error::{Kind, LimError, Span};
 use crate::interp::{self, Interpreter, Limits, Value, BUILTINS};
 use std::cell::RefCell;
@@ -15,11 +15,11 @@ struct Scope {
     frame_base: Option<usize>,
 }
 impl Scope {
-    fn new(size: usize, parent: Option<Upvalues>) -> Upvalues {
+    fn new(size: usize, parent: Option<Upvalues>, frame_base: Option<usize>) -> Upvalues {
         Rc::new(Self {
             slots: RefCell::new(vec![None; size]),
             parent,
-            frame_base: None,
+            frame_base,
         })
     }
     fn read(&self, b: &Binding, skip: usize, s: Span) -> Result<Value, LimError> {
@@ -52,7 +52,7 @@ impl Scope {
     }
 }
 pub struct Closure {
-    pub function: Rc<Function>,
+    pub(crate) function: Rc<Function>,
     upvalues: Upvalues,
 }
 struct Frame {
@@ -87,8 +87,11 @@ impl<'a> Vm<'a> {
             limits,
         }
     }
-    pub fn run(&mut self, function: Rc<Function>) -> Result<(), LimError> {
-        let scope = Scope::new(function.locals, None);
+    pub fn run(&mut self, program: CompiledProgram) -> Result<(), LimError> {
+        self.runtime.reset_steps();
+        let function = program.0;
+        let mut heap = Heap::default();
+        let scope = heap.scope(function.locals, None, None);
         for (i, b) in BUILTINS.iter().enumerate() {
             scope.slots.borrow_mut()[i] = Some(Value::Builtin(b));
         }
@@ -102,8 +105,10 @@ impl<'a> Vm<'a> {
             iterators: vec![],
         }];
         let mut stack: Vec<Value> = Vec::new();
-        let mut scopes = Vec::new();
         while !frames.is_empty() {
+            if heap.needs_collection() {
+                heap.collect(&frames, &stack);
+            }
             let frame = frames.last_mut().unwrap();
             let function = &frame.function;
             let s = function.chunk.spans[frame.ip];
@@ -165,9 +170,15 @@ impl<'a> Vm<'a> {
                 }
                 Op::List(n) => {
                     let vs = stack.split_off(stack.len() - n);
-                    stack.push(Value::List(Rc::new(RefCell::new(vs))));
+                    let value = Value::List(Rc::new(RefCell::new(vs)));
+                    heap.track(&value);
+                    stack.push(value);
                 }
-                Op::Map => stack.push(Value::Map(Rc::new(RefCell::new(BTreeMap::new())))),
+                Op::Map => {
+                    let value = Value::Map(Rc::new(RefCell::new(BTreeMap::new())));
+                    heap.track(&value);
+                    stack.push(value);
+                }
                 Op::MapKey => {
                     if !matches!(stack.last(), Some(Value::Str(_))) {
                         return Err(error(
@@ -227,7 +238,7 @@ impl<'a> Vm<'a> {
                         stack.pop();
                     }
                 }
-                Op::Enter(n) => frame.scope = Scope::new(*n, Some(frame.scope.clone())),
+                Op::Enter(n) => frame.scope = heap.scope(*n, Some(frame.scope.clone()), None),
                 Op::Exit => frame.scope = frame.scope.parent.as_ref().unwrap().clone(),
                 Op::Closure(f) => stack.push(Value::VmFunc(Rc::new(Closure {
                     function: f.clone(),
@@ -291,20 +302,24 @@ impl<'a> Vm<'a> {
                                 });
                                 continue;
                             }
-                            let mut scope = scopes.pop().unwrap_or_else(|| Scope::new(0, None));
-                            let scope_mut = Rc::get_mut(&mut scope).unwrap();
-                            scope_mut.parent = Some(f.upvalues.clone());
-                            scope_mut.frame_base = f.function.stack_parameters.then_some(base);
-                            let slots = scope_mut.slots.get_mut();
-                            slots.resize(f.function.locals, None);
-                            for (&slot, arg) in
-                                f.function.params.iter().zip(stack.drain(base + 1..))
+                            let scope = heap.scope(
+                                f.function.locals,
+                                Some(f.upvalues.clone()),
+                                f.function.stack_parameters.then_some(base),
+                            );
                             {
-                                slots[slot] = Some(arg);
-                            }
-                            stack.pop();
-                            if f.function.stack_parameters {
-                                stack.extend(slots.iter().map(|v| v.clone().unwrap_or(Value::Nil)));
+                                let mut slots = scope.slots.borrow_mut();
+                                for (&slot, arg) in
+                                    f.function.params.iter().zip(stack.drain(base + 1..))
+                                {
+                                    slots[slot] = Some(arg);
+                                }
+                                stack.pop();
+                                if f.function.stack_parameters {
+                                    stack.extend(
+                                        slots.iter().map(|v| v.clone().unwrap_or(Value::Nil)),
+                                    );
+                                }
                             }
                             frames.push(Frame {
                                 function: f.function.clone(),
@@ -325,15 +340,6 @@ impl<'a> Vm<'a> {
                     let v = stack.pop().unwrap();
                     let f = frames.pop().unwrap();
                     stack.truncate(f.base);
-                    let mut scope = f.scope;
-                    if let Some(scope_mut) =
-                        (!f.inline_scope).then(|| Rc::get_mut(&mut scope)).flatten()
-                    {
-                        scope_mut.slots.get_mut().fill(None);
-                        scope_mut.parent = None;
-                        scope_mut.frame_base = None;
-                        scopes.push(scope);
-                    }
                     if !frames.is_empty() {
                         stack.push(v);
                     }
@@ -372,7 +378,238 @@ impl<'a> Vm<'a> {
                 }
                 Op::Error(msg) => return Err(error(*msg, s)),
             }
+            if let Some(value) = stack.last() {
+                heap.track(value);
+            }
         }
         Ok(())
+    }
+}
+
+// The registry owns every VM allocation until collection. Clearing unreachable
+// edges before releasing nodes handles reference cycles and deep graphs without
+// running a recursive chain of Rc destructors. Scope parents always precede
+// their children, so scopes are released in reverse allocation order.
+type List = Rc<RefCell<Vec<Value>>>;
+type Map = Rc<RefCell<BTreeMap<String, Value>>>;
+#[derive(Default)]
+struct Heap {
+    scopes: Vec<Upvalues>,
+    lists: std::collections::HashMap<usize, List>,
+    maps: std::collections::HashMap<usize, Map>,
+    next_collection: usize,
+}
+impl Heap {
+    fn scope(&mut self, size: usize, parent: Option<Upvalues>, base: Option<usize>) -> Upvalues {
+        let scope = Scope::new(size, parent, base);
+        self.scopes.push(scope.clone());
+        scope
+    }
+    fn track(&mut self, value: &Value) {
+        match value {
+            Value::List(v) => {
+                self.lists
+                    .entry(Rc::as_ptr(v) as usize)
+                    .or_insert_with(|| v.clone());
+            }
+            Value::Map(v) => {
+                self.maps
+                    .entry(Rc::as_ptr(v) as usize)
+                    .or_insert_with(|| v.clone());
+            }
+            _ => {}
+        }
+    }
+    fn len(&self) -> usize {
+        self.scopes.len() + self.lists.len() + self.maps.len()
+    }
+    fn needs_collection(&self) -> bool {
+        self.len() >= self.next_collection.max(1024)
+    }
+    fn collect(&mut self, frames: &[Frame], stack: &[Value]) {
+        use std::collections::HashSet;
+        enum Root {
+            Scope(Upvalues),
+            Value(Value),
+        }
+        let mut work: Vec<_> = stack.iter().cloned().map(Root::Value).collect();
+        for frame in frames {
+            work.push(Root::Scope(frame.scope.clone()));
+            for iterator in &frame.iterators {
+                work.extend(iterator.as_slice().iter().cloned().map(Root::Value));
+            }
+        }
+        let mut scopes = HashSet::new();
+        let mut lists = HashSet::new();
+        let mut maps = HashSet::new();
+        while let Some(root) = work.pop() {
+            match root {
+                Root::Scope(scope) => {
+                    if !scopes.insert(Rc::as_ptr(&scope) as usize) {
+                        continue;
+                    }
+                    if let Some(parent) = &scope.parent {
+                        work.push(Root::Scope(parent.clone()));
+                    }
+                    work.extend(
+                        scope
+                            .slots
+                            .borrow()
+                            .iter()
+                            .flatten()
+                            .cloned()
+                            .map(Root::Value),
+                    );
+                }
+                Root::Value(Value::VmFunc(f)) => work.push(Root::Scope(f.upvalues.clone())),
+                Root::Value(Value::List(v)) => {
+                    if lists.insert(Rc::as_ptr(&v) as usize) {
+                        work.extend(v.borrow().iter().cloned().map(Root::Value));
+                    }
+                }
+                Root::Value(Value::Map(v)) if maps.insert(Rc::as_ptr(&v) as usize) => {
+                    work.extend(v.borrow().values().cloned().map(Root::Value));
+                }
+                _ => {}
+            }
+        }
+        // Keep strong guards until every unreachable edge has been removed.
+        for scope in &self.scopes {
+            if !scopes.contains(&(Rc::as_ptr(scope) as usize)) {
+                scope.slots.borrow_mut().clear();
+            }
+        }
+        for (&id, list) in &self.lists {
+            if !lists.contains(&id) {
+                list.borrow_mut().clear();
+            }
+        }
+        for (&id, map) in &self.maps {
+            if !maps.contains(&id) {
+                map.borrow_mut().clear();
+            }
+        }
+        let mut dead = Vec::new();
+        self.scopes.retain(|scope| {
+            if scopes.contains(&(Rc::as_ptr(scope) as usize)) {
+                true
+            } else {
+                dead.push(scope.clone());
+                false
+            }
+        });
+        while dead.pop().is_some() {}
+        self.lists.retain(|id, _| lists.contains(id));
+        self.maps.retain(|id, _| maps.contains(id));
+        self.next_collection = self.len().saturating_mul(2).saturating_add(1024);
+    }
+}
+impl Drop for Heap {
+    fn drop(&mut self) {
+        for scope in &self.scopes {
+            scope.slots.borrow_mut().clear();
+        }
+        for list in self.lists.values() {
+            list.borrow_mut().clear();
+        }
+        for map in self.maps.values() {
+            map.borrow_mut().clear();
+        }
+        while self.scopes.pop().is_some() {}
+    }
+}
+
+#[cfg(test)]
+mod heap_tests {
+    use super::*;
+    #[test]
+    fn unreachable_cycles_are_collected() {
+        let mut heap = Heap::default();
+        let v = Rc::new(RefCell::new(Vec::new()));
+        v.borrow_mut().push(Value::List(v.clone()));
+        let weak = Rc::downgrade(&v);
+        heap.track(&Value::List(v));
+        heap.collect(&[], &[]);
+        assert!(weak.upgrade().is_none());
+        assert_eq!(heap.len(), 0);
+    }
+    #[test]
+    fn reachable_cycles_survive_until_heap_drop() {
+        let weak;
+        {
+            let mut heap = Heap::default();
+            let v = Rc::new(RefCell::new(Vec::new()));
+            v.borrow_mut().push(Value::List(v.clone()));
+            weak = Rc::downgrade(&v);
+            let roots = vec![Value::List(v)];
+            heap.track(&roots[0]);
+            heap.collect(&[], &roots);
+            assert_eq!(heap.len(), 1);
+            assert_eq!(weak.upgrade().unwrap().borrow().len(), 1);
+        }
+        assert!(weak.upgrade().is_none());
+    }
+    #[test]
+    fn deep_graph_cleanup_does_not_recurse() {
+        let mut heap = Heap::default();
+        let mut v = Value::Nil;
+        for _ in 0..100_000 {
+            v = Value::List(Rc::new(RefCell::new(vec![v])));
+            heap.track(&v);
+        }
+        drop(v);
+        heap.collect(&[], &[]);
+        assert_eq!(heap.len(), 0);
+    }
+}
+
+#[cfg(test)]
+mod cycle_regressions {
+    use super::*;
+    #[test]
+    fn short_lived_recursive_scopes_have_bounded_retention() {
+        let program = crate::codegen::compile(&Vec::new()).unwrap();
+        let root = Scope::new(0, None, None);
+        let frames = vec![Frame {
+            function: program.0.clone(),
+            ip: 0,
+            scope: root.clone(),
+            base: 0,
+            locals_base: 0,
+            inline_scope: false,
+            iterators: Vec::new(),
+        }];
+        let mut heap = Heap::default();
+        for _ in 0..100_000 {
+            let scope = heap.scope(1, Some(root.clone()), None);
+            scope.slots.borrow_mut()[0] = Some(Value::VmFunc(Rc::new(Closure {
+                function: program.0.clone(),
+                upvalues: scope.clone(),
+            })));
+            if heap.needs_collection() {
+                heap.collect(&frames, &[]);
+            }
+            assert!(heap.len() <= 1024);
+        }
+        heap.collect(&frames, &[]);
+        assert_eq!(heap.len(), 0);
+    }
+    #[test]
+    fn error_unwind_releases_recursive_closures() {
+        let mut weak = None;
+        let mut fail = || -> Result<(), LimError> {
+            let mut heap = Heap::default();
+            let scope = heap.scope(1, None, None);
+            weak = Some(Rc::downgrade(&scope));
+            let program = crate::codegen::compile(&Vec::new()).unwrap();
+            scope.slots.borrow_mut()[0] = Some(Value::VmFunc(Rc::new(Closure {
+                function: program.0,
+                upvalues: scope.clone(),
+            })));
+            Err(error("test error", Span { line: 1, col: 1 }))
+        };
+        let result = fail();
+        assert!(result.is_err());
+        assert!(weak.unwrap().upgrade().is_none());
     }
 }
