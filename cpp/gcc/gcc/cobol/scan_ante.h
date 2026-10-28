@@ -1,0 +1,1097 @@
+/*
+ * Copyright (c) 2021-2026 Symas Corporation
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ * * Redistributions of source code must retain the above copyright
+ *   notice, this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above
+ *   copyright notice, this list of conditions and the following disclaimer
+ *   in the documentation and/or other materials provided with the
+ *   distribution.
+ * * Neither the name of the Symas Corporation nor the names of its
+ *   contributors may be used to endorse or promote products derived from
+ *   this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/*
+ * Flex override
+ */
+static void /* yynoreturn */ yy_fatal_error ( const char* msg  );
+
+static void inline
+die_fatal_error( const char msg[] ) {
+  cbl_internal_error("scan.o: %s",  msg);
+  yy_fatal_error(msg);
+}
+
+#define YY_FATAL_ERROR(msg) die_fatal_error((msg))
+
+/*
+ * External functions
+ */
+
+void parser_enter_file(const char *filename);
+void parser_leave_file();
+
+bool is_fixed_format();
+bool include_debug();
+int lexer_input( char buf[], int max_size, FILE *input );
+
+const char * keyword_str( int token );
+
+int repository_function_tok( const char name[] );
+
+void next_sentence_label(cbl_label_t*);
+
+size_t program_level();
+
+static int ydfparse(void);
+
+FILE * copy_mode_start();
+
+/*
+ * Public functions and data
+ */
+
+cbl_label_t *next_sentence;
+
+static bool echo_on = false;
+
+void
+lexer_echo( bool tf ) {
+  echo_on = tf;
+}
+
+bool
+lexer_echo() {
+  return echo_on;
+}
+
+// IBM says a picture can be up to 50 bytes, not 1000 words.
+// ISO says a picture can be up to 63 bytes.  We allow for a NUL terminator.
+static char orig_picture[PICTURE_MAX];
+static char orig_number[80];
+
+const char *
+original_picture() {
+  const char *out = xstrdup(orig_picture);
+  assert(orig_picture[0] != '\0');
+  return out;
+}
+
+char *
+original_number( char input[] = NULL ) {
+  if( input ) {
+    if(sizeof(orig_number) < strlen(input) ) return NULL;
+    strcpy(orig_number, input);
+    return input;
+  }
+  char *out = xstrdup(orig_number);
+  assert(orig_number[0] != '\0');
+  return out;
+}
+
+/*
+ * Local functions
+ */
+static const char * start_condition_str( int sc );
+static const char * start_condition_is();
+
+static bool nonspace( char ch ) { return !ISSPACE(ch); }
+
+cdf::parser cdf_parser;
+cdf::parser::symbol_type cdf_symbol_type;
+cdf::parser::context cdf_context(cdf_parser, cdf_symbol_type);
+
+cdf::parser::value_type ydflval;
+cdf::parser::location_type ydflloc;
+
+static int
+numstr_of( const char string[], radix_t radix = decimal_e ) {
+  yylval.numstr.is_float = false;
+  yylval.numstr.radix = radix;
+  ydflval.string = yylval.numstr.string = xstrdup(string);
+  char *comma = strchr(yylval.numstr.string, ',');
+  if( comma && comma[1] == '\0' ) *comma = '\0';
+  if( ! original_number(yylval.numstr.string) ) {
+    error_msg(yylloc, "input inconceivably long");
+    return NO_CONDITION;
+  }
+
+  const char *input = yylval.numstr.string;
+  auto eoinput = input + strlen(input);
+  auto p = std::find_if( input, eoinput,
+                         []( char ch ) { return ch == 'e' || ch == 'E';} );
+
+  if( p < eoinput ) {
+    if( eoinput == std::find(input, eoinput, symbol_decimal_point()) ) {
+      // no decimal point: 1E0 is a valid user-defined name
+      ydflval.string = yylval.string = yylval.numstr.string;
+      return NAME;
+    }
+    assert(input < p);
+    // "The literal to the left of the 'E' represents the significand. It may
+    //  be signed and shall include a decimal point. The significand shall be
+    //  from 1 to 36 digits in length."
+    if( p == std::find(input, p, symbol_decimal_point()) ) {
+      return NO_CONDITION;
+    }
+    auto nx = std::count_if(input, p, fisdigit);
+    if( 36 < nx ) {
+      error_msg(yylloc, "significand of %s has more than 36 digits (%ld)", input, (long)nx);
+      return NO_CONDITION;
+    }
+
+    // "The literal to the right of the 'E' represents the exponent. It may be
+    //  signed and shall have a maximum of four digits and no decimal point. "
+    // "The maximum permitted value and minimum permitted value of the
+    //  exponent is implementor-defined." (We allow 9999.)
+    nx = std::count_if(p, eoinput, fisdigit);
+    if( 4 < nx ) {
+      error_msg(yylloc, "exponent %qs more than 4 digits", ++p);
+      return NO_CONDITION;
+    }
+    if( eoinput != std::find(p, eoinput, symbol_decimal_point()) ) {
+      error_msg(yylloc, "exponent %qs includes decimal point", ++p);
+      return NO_CONDITION;
+    }
+
+    // "If all the digits in the significand are zero, then all the digits of
+    //  the exponent shall also be zero and neither significand nor exponent
+    //  shall have a negative sign."
+    bool zero_signficand = std::all_of( input, p,
+                                        []( char ch ) {
+                                          return !ISDIGIT(ch) || ch == '0'; } );
+    if( zero_signficand ) {
+      if( p != std::find(input, p, '-') ) {
+        error_msg(yylloc, "zero significand of %s "
+                 "cannot be negative", input);
+        return NO_CONDITION;
+      }
+      if( eoinput != std::find(p, eoinput, '-') ) {
+        error_msg(yylloc, "exponent of zero significand of %s "
+                 "cannot be negative", input);
+        return NO_CONDITION;
+      }
+    }
+    yylval.numstr.is_float = true;
+  }
+  if( 1 < std::count(input, eoinput, symbol_decimal_point()) ) {
+    error_msg(yylloc, "invalid numeric literal %qs", ++p);
+    return NO_CONDITION;
+  }
+
+  return NUMSTR;
+}
+
+static char *
+null_trim( char name[] ) {
+  auto p = std::find_if( name, name + strlen(name), fisspace );
+  if( p < name + strlen(name) ) *p = '\0';
+  return name;
+}
+
+/*
+ * CDF management
+ */
+static inline const char *
+boolalpha( bool tf ) { return tf? "True" : "False"; }
+
+struct cdf_status_t {
+  int lineno;
+  const char *filename;
+  int  token;
+  bool parsing;
+  cdf_status_t()
+    : lineno(yylineno), filename(cobol_filename())
+    , token(0), parsing(true)
+  {}
+  cdf_status_t( int token, bool parsing )
+    : lineno(yylineno), filename(cobol_filename())
+    , token(token), parsing(parsing)
+  {}
+  bool toggle() { return parsing = ! parsing; }
+
+  const char * str() const {
+    static char line[132];
+    snprintf(line, sizeof(line), "%s:%d: %s, parsing %s",
+             filename, lineno, keyword_str(token), boolalpha(parsing));
+    return line;
+  }
+  static const char * as_string( const cdf_status_t& status ) {
+    return status.str();
+  }
+};
+
+/*
+ * Scanning status is true if tokens are being parsed and false if not (because
+ * CDF is skipping some code).  Because CDF status is nested, status is true
+ * only if the whole stack is true. That is, if B is stacked on A, and A is
+ * false, then all of B is skipped, regardless of >>IF and >>ELSE for B.
+ */
+static bool run_cdf( int token );
+
+static class parsing_status_t : public std::stack<cdf_status_t> {
+  typedef int (parser_t)(void);
+  struct parsing_state_t {
+    bool at_eof, expect_field_level;
+    int pending_token;
+    parser_t *parser;
+    parsing_state_t()
+      : at_eof(false)
+      , expect_field_level(true)
+      , pending_token(0)
+      , parser(yyparse)
+    {}
+  } state, shadow;
+
+ public:
+  bool on() const { // true only if all true
+    bool parsing = std::all_of( c.begin(), c.end(),
+                               []( const auto& status ) { return status.parsing; } );
+    return parsing;
+  }
+
+  bool feed_a_parser() const {
+    return on() || state.parser == ydfparse;
+  }
+
+  void need_level( bool tf ) {     state.expect_field_level = tf; }
+  bool need_level() const { return state.expect_field_level; }
+
+  void parser_save( parser_t * new_parser ) {
+    shadow = state;
+    state.parser = new_parser;
+  }
+  void parser_restore() {
+    state.parser = shadow.parser;
+  }
+
+  void inject_token( int token ) { state.pending_token = token; }
+  int pending_token() {
+    int token = state.pending_token;
+    state.pending_token = 0;
+    return token;
+  }
+
+  void at_eof( bool tf ) { state.at_eof = shadow.at_eof = tf; assert(tf); }
+  bool at_eof() const { return state.at_eof; }
+
+  bool in_cdf() const { return state.parser == ydfparse; }
+  bool normal() const { return on() && state.parser == yyparse; }
+
+  void splat() const {
+    int i=0;
+    for( const auto& status : c ) {
+      dbgmsg( "%d %s", ++i, status.str() );
+    }
+  }
+} parsing;
+
+// Used only by parser, so scanner_normal() obviously true.
+void field_done() { orig_picture[0] = '\0'; parsing.need_level(true); }
+
+static int scanner_token() {
+  if( parsing.empty() ) {
+    error_msg(yylloc, "%<>>ELSE%> or %<>>END-IF%> without %<>>IF%>");
+    return NO_CONDITION;
+  }
+  return parsing.top().token;
+}
+
+bool scanner_parsing() { return parsing.on(); }
+bool scanner_normal()  { return parsing.normal(); }
+
+void scanner_parsing( int token, bool tf ) {
+  parsing.push( cdf_status_t(token, tf) );
+  dbgmsg("%s: parsing now %s, depth %zu",
+         keyword_str(token), boolalpha(parsing.on()), parsing.size());
+  parsing.splat();
+}
+void scanner_parsing_toggle() {
+  if( parsing.empty() ) {
+    error_msg(yylloc, "%<>>ELSE%> without %<>>IF%>");
+    return;
+  }
+  parsing.top().toggle();
+  dbgmsg("%s: parsing now %s",
+         keyword_str(CDF_ELSE), boolalpha(parsing.on()));
+}
+void scanner_parsing_pop() {
+  if( parsing.empty() ) {
+    error_msg(yylloc, "%<>>END-IF%> without %<>>IF%>");
+    return;
+  }
+  parsing.pop();
+  dbgmsg("%s: parsing now %s, depth %zu",
+         keyword_str(CDF_END_IF), boolalpha(parsing.on()),
+         parsing.size());
+  parsing.splat();
+}
+
+
+static bool level_needed() {
+  return scanner_normal() && parsing.need_level();
+}
+
+#define PUSH_CDF_STATE if( YY_START != cdf_state ) yy_push_state(cdf_state)
+
+/*
+ * Return all but the first N characters, to be rescanned by the nexst yylex.
+ * IOW, keep N characters as the token, and relinquish the rest.
+ * Must be a macro because it expands yyless.
+ */
+#define myless(N)				\
+  do {						\
+    auto _n(N);					\
+    trim_location(_n);				\
+    yyless(_n);					\
+  } while(0)
+
+static inline int
+length_upto( char ch ) {
+    auto pend = std::find( yytext, yytext + yyleng, ch );
+    return pend - yytext;
+}
+
+static inline bool
+is_name_char( char ch ) {
+  switch(ch) {
+  case '-': case '_':
+    return true;
+  }
+  return ISALNUM(ch);
+}
+
+static inline int
+length_of_name() {
+  // Find first character in yyext that is not a name character.
+  auto pend = std::find_if( yytext, yytext + yyleng,
+                            []( char ch ) {
+                              return ! is_name_char(ch);
+                            } );
+  assert(yytext < pend); // scanner ensures yytext begins with {NAME}
+  return pend - yytext;
+}
+
+class enter_leave_t {
+  typedef void( parser_enter_file_f)(const char *filename);
+  typedef void (parser_leave_file_f)();
+  parser_enter_file_f *entering;
+  parser_leave_file_f *leaving;
+  const char *filename;
+
+ public:
+  enter_leave_t() : entering(NULL), leaving(NULL), filename(NULL) {}
+  enter_leave_t(  parser_enter_file_f *entering, const char *filename )
+    : entering(entering), leaving(NULL), filename(filename)
+  {}
+  explicit enter_leave_t(parser_leave_file_f *leaving)
+    : entering(NULL), leaving(leaving), filename(NULL) {}
+
+  void notify() {
+    if( entering ) {
+      cobol_filename(filename, 0);
+      if( yy_flex_debug ) dbgmsg("starting line %4d of %s",
+                                 yylineno, filename);
+      entering(filename);
+      gcc_assert(leaving == NULL);
+    }
+    if( leaving ) {
+      cobol_filename_restore();
+      if( yy_flex_debug ) dbgmsg("resuming line %4d of %s",
+                                 yylineno, cobol_filename());
+      leaving();
+      gcc_assert(entering == NULL);
+    }
+  }
+};
+
+/*
+ * The lexer knows the immediate status of the input file and its line number
+ * from the PUSH, POP, and LINE directives.  It saves yylineno whenever it
+ * encounters a PUSH, and updates it for a POP.
+ *
+ * The line number trickles into the parser by way of location.  Only the
+ * parser knows what token it is parsing.  As for the filename, the lexer
+ * queues enter/leave notices for the parser.
+ *
+ * Whenever the parser fetches a token, it gets the current line number from
+ * yylineno, and the current filename by depleting the notification queue, if
+ * any, and using the last one.
+ */
+class input_file_status_t {
+ public:
+  struct input_pos_t { int lineno; const char *filename; };
+ private:
+  std::queue <enter_leave_t> inputs;
+  std::stack<input_pos_t> positions;
+ public:
+  void enter(const char *filename) {
+    inputs.push( enter_leave_t(parser_enter_file, filename) );
+    positions.push( input_pos_t{ yylineno, filename } );
+  }
+  void leave() {
+    inputs.push( enter_leave_t(parser_leave_file) );
+    positions.pop();
+  }
+  void notify() {
+    while( ! inputs.empty() ) {
+      auto enter_leave = inputs.front();
+      enter_leave.notify();
+      inputs.pop();
+    }
+  }
+  input_pos_t pending() const { assert( ! positions.empty() ); return positions.top(); }
+};
+
+static input_file_status_t input_file_status;
+
+void input_file_status_notify() { input_file_status.notify(); }
+
+/*
+ * After the input filename and yylineno are set, update the location of the
+ * scanned token.
+ */
+static void
+update_location( const cbl_loc_t *ploc = nullptr ) {
+  cbl_loc_t loc = {
+    yylloc.last_line, yylloc.last_column,
+    yylineno,         yylloc.last_column + yyleng
+  };
+  if( ploc ) loc = *ploc;
+
+  const char *p = static_cast<char*>(memrchr(yytext, '\n', yyleng));
+  if( p ) {
+    loc.last_column = (yytext + yyleng) - p;
+  }
+
+  ydflloc = yylloc = loc;
+
+  dbgmsg("  SC: <%s> (%d,%d) to (%d,%d)",
+         start_condition_is(),
+         yylloc.first_line, yylloc.first_column,
+         yylloc.last_line,  yylloc.last_column);
+}
+
+static void
+reset_location() {
+  static const cbl_loc_t loc { yylineno, 1, yylineno, 1 };
+  update_location(&loc);
+}
+
+#define YY_USER_ACTION update_location();
+
+template <typename T>
+T * rsearch( T* a, T* z, T sarg ) {
+  std::reverse_iterator<T*> beg(z), end(a);
+  auto p = std::find(beg, end, sarg);
+  return p != end? p.base() : nullptr;
+}
+
+/*
+ * Before calling yyless to tell the generated scanner to rescan nkeep
+ * characters, set the scanner's location to reflect the cbl_loc_t of what
+ * we're keeping.  Set last_line and last_column by adding the newline count
+ * and characters after the last newline (if any) of the kept region to the
+ * first_line and first_column.
+ */
+static void
+trim_location( int nkeep) {
+  gcc_assert( 0 <= nkeep && nkeep <= yyleng );
+  auto nline = std::count(yytext, yytext + nkeep, '\n');
+  auto ntoss = yyleng - nkeep;
+  dbgmsg("%s:%d: yyless(%d), rescan '%.*s' (%d bytes)",
+         __func__, __LINE__, nkeep, ntoss, yytext + nkeep, ntoss);
+
+  gcc_assert( yylloc.first_line + nline <= yylloc.last_line );
+  yylloc.last_line = yylloc.first_line + int(nline);
+  gcc_assert( yylloc.first_line <= yylloc.last_line );
+
+  if( nline == 0) {
+    yylloc.last_column = yylloc.first_column + nkeep;
+  } else {
+    auto eokeep = yytext + nkeep;
+    auto nl = rsearch(yytext, eokeep, '\n');
+    gcc_assert( nl != nullptr );
+    yylloc.last_column = 1 + (eokeep - nl);
+  }
+
+  gcc_assert( yylloc.first_line <= yylloc.last_line );
+  gcc_assert( 0 < yylloc.last_column );
+
+  ////location_dump(__func__, __LINE__, "yylloc", yylloc, true);
+}
+
+static void
+update_location_col( const char str[], int correction = 0) {
+  auto col = yylloc.last_column - strlen(str) + correction;
+  if( col > 0 ) {
+    yylloc.first_column = col;
+  }
+  location_dump(__func__, __LINE__, "yylloc", yylloc);
+}
+
+#define not_implemented(...) cbl_unimplemented_at(yylloc, __VA_ARGS__)
+
+#define YY_USER_INIT do {			\
+    static cbl_loc_t ones = {1,1, 1,1};		\
+    ydflloc = yylloc = ones;                    \
+  } while(0)
+
+/*
+ * YY_DECL is the generated lexer.  The parser calls yylex().  yylex() invokes
+ * next_token(), which calls this lexer function.  The Flex-generated code
+ * updates neither yylval nor yylloc.  That job is left to the actions.
+ *
+ * The parser relies on yylex to set yylval and yylloc each time it is
+ * called. It maintains a separate copy for each term, and uses
+ * YYLLOC_DEFAULT() to update the location of nonterminals.
+ */
+#define YY_DECL int lexer(void)
+
+# define YY_INPUT(buf, result, max_size)                        \
+{                                                               \
+  if( 0 == (result = lexer_input(buf, max_size, yyin)) )        \
+    result = YY_NULL;                                           \
+}
+
+#define bcomputable(T, C)                               \
+    yylval.computational.type=T,                        \
+    yylval.computational.capacity=C,                    \
+    yylval.computational.signable=true, _BINARY_INTEGER
+#define scomputable(T, C)                               \
+    yylval.computational.type=T,                        \
+    yylval.computational.capacity=C,                    \
+    yylval.computational.signable=true, COMPUTATIONAL
+#define ucomputable(T, C)                               \
+    yylval.computational.type=T,                        \
+    yylval.computational.capacity=C,                    \
+    yylval.computational.signable=false, COMPUTATIONAL
+
+static char *tmpstring = NULL;
+
+#define PROGRAM current_program_index()
+
+// map of alias => canonical
+static std::map <std::string, std::string> keyword_aliases;
+
+std::pair<std::string, bool>
+keyword_alias_add( const std::string& keyword, const std::string& alias ) {
+  auto elem = std::make_pair(alias, keyword);
+  auto result = keyword_aliases.insert(elem);
+  return std::make_pair(keyword_aliases[alias], result.second);
+}
+
+/*
+ * Because numeric USAGE types don't have distinct tokens and may have aliases,
+ * we keep a table of their canonical names, which we use if we encounter an
+ * alias.
+ */
+struct bint_t {
+  int token;
+  cbl_field_type_t type;
+  uint32_t capacity; // zero means capacity depends on PICTURE
+  bool signable;
+};
+static const std::map <std::string, bint_t > binary_integers {
+  { "BINARY",           { COMPUTATIONAL, FldNumericBinary,  0, false } },
+  { "COMP",             { COMPUTATIONAL, FldNumericBinary,  0, false } },
+  { "COMPUTATIONAL",    { COMPUTATIONAL, FldNumericBinary,  0, false } },
+  { "COMP-4",           { COMPUTATIONAL, FldNumericBinary,  0, false } },
+  { "COMPUTATIONAL-4",  { COMPUTATIONAL, FldNumericBinary,  0, false } },
+
+  { "BINARY-CHAR",      { _BINARY_INTEGER, FldNumericBin5,   1, true } },
+  { "BINARY-SHORT",     { _BINARY_INTEGER, FldNumericBin5,   2, true } },
+  { "BINARY-LONG",      { _BINARY_INTEGER, FldNumericBin5,   4, true } },
+  { "BINARY-DOUBLE",    { _BINARY_INTEGER, FldNumericBin5,   8, true } },
+  { "BINARY-LONG-LONG", { _BINARY_INTEGER, FldNumericBin5,   8, true } },
+
+  { "COMP-5",           { COMPUTATIONAL, FldNumericBin5,    0, false } },
+  { "COMPUTATIONAL-5",  { COMPUTATIONAL, FldNumericBin5,    0, false } },
+  { "COMP-X",           { COMPUTATIONAL, FldNumericBin5, 0xFF, false } },
+  { "COMPUTATIONAL-X",  { COMPUTATIONAL, FldNumericBin5, 0xFF, false } },
+
+  { "COMP-1",           { COMPUTATIONAL, FldFloat,  4, false } },
+  { "COMPUTATIONAL-1",  { COMPUTATIONAL, FldFloat,  4, false } },
+  { "FLOAT-BINARY-32",  { COMPUTATIONAL, FldFloat,  4, false } },
+  { "FLOAT-SHORT",      { COMPUTATIONAL, FldFloat,  4, false } },
+
+  { "COMP-2",           { COMPUTATIONAL, FldFloat,  8, false } },
+  { "COMPUTATIONAL-2",  { COMPUTATIONAL, FldFloat,  8, false } },
+  { "FLOAT-BINARY-64",  { COMPUTATIONAL, FldFloat,  8, false } },
+  { "FLOAT-LONG",       { COMPUTATIONAL, FldFloat,  8, false } },
+  { "FLOAT-BINARY-128", { COMPUTATIONAL, FldFloat, 16, false } },
+  { "FLOAT-EXTENDED",   { COMPUTATIONAL, FldFloat, 16, false } },
+
+  { "COMP-6",           { COMPUTATIONAL, FldPacked, 0, false } },
+  { "COMPUTATIONAL-6",  { COMPUTATIONAL, FldPacked, 0, false } },
+};
+
+static int
+binary_integer_usage( const char name[]) {
+  // uname can't be cbl_name_t, because at this point name[] might have more
+  // than sizeof(cbl_name_t) characters.  The length check comes later.
+  char *uname = xstrdup(name);
+  std::transform(name, name + strlen(name), uname, ftoupper);
+
+  dbgmsg("%s:%d: checking %s in %zu keyword_aliases",
+	 __func__, __LINE__, uname,
+	 keyword_aliases.size() );
+
+  std::string key = uname;
+  auto alias = keyword_aliases.find(key);
+  if( alias != keyword_aliases.end() ) key = alias->second;
+
+  auto p = binary_integers.find(key);
+  if( p == binary_integers.end() ) return 0;
+
+  yylval.computational.type = p->second.type;
+  yylval.computational.capacity = p->second.capacity;
+  yylval.computational.signable = p->second.signable;
+  dbgmsg("%s:%d: %s has type %d", __func__, __LINE__,
+	 uname, p->second.type );
+  free(uname);
+  return p->second.token;
+}
+
+static void
+verify_ws( char ch ) {
+  if( ! fisspace(ch) ) {
+    dialect_ok(yylloc, LexSeparatorE, "missing separator space");
+  }
+}
+
+int
+binary_integer_usage_of( const char name[] ) {
+  cbl_name_t uname = {};
+  std::transform(name, name + strlen(name), uname, ftoupper);
+
+  auto p = binary_integers.find(uname);
+  if( p != binary_integers.end() ) {
+    int token = p->second.token;
+    switch( token ) {
+    case COMPUTATIONAL:
+    case _BINARY_INTEGER:
+      return token;
+    default:
+      gcc_unreachable();
+      assert(false);
+    }
+  }
+  return 0;
+}
+
+static uint32_t
+level_of( const char input[] ) {
+  unsigned int output = 0;
+
+  if( input[0] == '0' ) input++;
+
+  if( 1 != sscanf(input, "%u", &output) ) {
+    cbl_internal_error( "%s:%d: invalid level '%s'", __func__, __LINE__, input );
+  }
+
+  return output;
+}
+
+/*
+ * Input may have leading or trailing V, which is ignored.
+ * Return the decoded picture size insofar as possible.
+ * If the picture switches from 9s to Ps, say, set pleft to the remainder.
+ */
+static int
+ndigit(int len, const char **pleft = nullptr) {
+  const char *p = yytext, *pend = yytext + len;
+  if( TOUPPER(p[0]) == 'V' ) p++;
+  if( p == pend ) return 0; // Only the V
+  int n = 0;
+
+  for( char model = *p; p < pend; p++ ) {
+    assert(*p == model);
+    n++;
+    if( p[1] == model ) continue;
+
+    std::pair<uint32_t, int> result = repeat_count(p);
+    int count = result.first, pos = result.second;
+
+    if( pos == -1 ) {
+      if( pleft ) *pleft = ++p;  // because *p at least was ok, per assertion.
+      break;
+    }
+    --n += count; // the 9 before the paren in 9(8) doesn't count
+    p += pos;
+    if( *p != model ) {
+      if( pleft ) *pleft  = p;
+      break;
+    }
+    --p; // point to closing parenthesis
+  }
+  return n;
+}
+
+static int
+picset( int token, int leng = yyleng ) {
+  static const char * const eop = orig_picture + sizeof(orig_picture);
+  char *p = orig_picture + strlen(orig_picture);
+
+  if( eop < p + leng ) {
+    error_msg(yylloc, "PICTURE exceeds maximum size of %zu bytes",
+             sizeof(orig_picture) - 1);
+  }
+  snprintf( p, eop - p, "%s", yytext );
+  return token;
+}
+
+static inline bool
+is_integer_token( int *pvalue = NULL ) {
+  int v, n = 0;
+  if( pvalue == NULL ) pvalue = &v;
+  return 1 == sscanf(yytext, "%d%n", pvalue, &n) && n == yyleng;
+}
+
+static bool need_nume = false;
+bool need_nume_set( bool tf ) {
+  dbgmsg( "need_nume now %s", tf? "true" : "false" );
+  return need_nume = tf;
+}
+
+static int datetime_format_of( const char input[] );
+
+static int
+symbol_function_token( const char name[] ) {
+  const auto L = symbol_function_any( 0, name );
+  if( L ) {
+    auto e = symbol_elem_of(L);
+    return symbol_index(e);
+  }
+  return 0;
+}
+
+bool
+in_identification_division();
+bool in_procedure_division();
+bool in_environment_division();
+
+static symbol_elem_t *
+symbol_exists( const char name[] ) {
+  if( in_procedure_division() ) {
+    auto names = teed_up_names();
+    names.push_front(name);
+    auto found = symbol_find( PROGRAM, names, false);
+    if( found.second ) return found.first;
+    // try again with just one name in case of e.g. FldClass
+    names.clear();
+    names.push_front(name);
+    found = symbol_find( PROGRAM, names, false);
+    if( found.second ) return found.first;
+  }
+  /*
+   * Before data division has been defined and the cache populated, or if the
+   * map search failes, search the symbol table in case of named literal.
+   */
+  symbol_elem_t *e = symbol_field( PROGRAM, 0, name );
+  return e;
+}
+
+static int
+typed_name( const char name[] ) {
+  if( 0 == PROGRAM ) return NAME;
+  if( need_nume ) { need_nume_set(false); return NUME; }
+
+  int token = repository_function_tok(name);
+  switch(token) {
+  case 0:
+    if(false) // we don't know how to do this yet.
+    { // Functions in the symbol table may be used without the FUNCTION keyword.
+      cbl_label_t *L = symbol_function_any(0, name);
+      if( L ) {
+        auto args = prototype_args(L->name);
+        token = args.second && args.first.empty() ? FUNCTION_UDF_0 : FUNCTION_UDF;
+        yylval.number = symbol_function_token(name);
+        return token;
+      }
+    }
+    break;
+  case FUNCTION_UDF:
+  case FUNCTION_UDF_0:
+    yylval.number = symbol_function_token(name);
+    __attribute__((fallthrough));
+  default:
+    return token;
+  }
+
+  struct symbol_elem_t *e = symbol_special( PROGRAM, name );
+  if( e ) return  cbl_special_name_of(e)->token;
+
+  // If we're in the configuration section, Data Division is still empty.
+  // Give priority to intrinsic functions names.
+  if( in_environment_division() ) {
+    token = keyword_tok(yytext, true);
+    auto name = intrinsic_function_name(token);
+    if( name ) return token;
+  }
+
+  e = symbol_exists( name );
+
+  auto type = e && e->type == SymField? cbl_field_of(e)->type : FldInvalid;
+
+  switch(type) {
+  case FldLiteralA:
+    {
+      auto f = cbl_field_of(e);
+      if( is_constant(f) ) {
+	if(  f->data.original() ) {
+	  int token = cbl_figconst_tok(f->data.original());
+	  if( token ) return token;
+	}
+        int token = datetime_format_of(f->data.original());
+        if( token ) {
+          yylval.string = xstrdup(f->data.original());
+          return token;
+        }
+      }
+    }
+    __attribute__((fallthrough));
+  case FldLiteralN:
+    {
+      const auto f = cbl_field_of(e);
+      if( type == FldLiteralN ) {
+        yylval.numstr.radix =
+          f->has_attr(hex_encoded_e)? hexadecimal_e : decimal_e;
+        yylval.numstr.string = xstrdup(f->data.original());
+        const auto estring = yylval.numstr.string + strlen(yylval.numstr.string);
+        yylval.numstr.is_float = ! std::all_of(yylval.numstr.string,
+                                               estring,
+                                               fisdigit);
+        return NUMSTR;
+      }
+      if( !f->has_attr(record_key_e) ) { // not a key-name literal
+        yylval.literal.set(f);
+        ydflval.string = yylval.literal.data;
+        return LITERAL;
+      }
+    }
+    __attribute__((fallthrough));
+  case FldInvalid:
+  case FldGroup:
+  case FldForward:
+  case FldIndex:
+  case FldAlphanumeric:
+  case FldPacked:
+  case FldNumericDisplay:
+  case FldNumericEdited:
+  case FldAlphaEdited:
+  case FldNumericBinary:
+  case FldFloat:
+  case FldNumericBin5:
+  case FldPointer:
+    return NAME;
+  case FldSwitch:
+    return SWITCH;
+  case FldClass:
+    return cbl_field_of(e)->level == 88? NAME88 : CLASS_NAME;
+    break;
+  default:
+    cbl_internal_error("%s:%d: invalid symbol type %s for symbol %qs",
+          __func__, __LINE__, cbl_field_type_str(type), name);
+    return NAME;
+  }
+  return cbl_field_of(e)->level == 88? NAME88 : NAME;
+}
+
+int
+retype_name_token() {
+  return typed_name(ydflval.string);
+}
+
+static char *
+tmpstring_append( int len ) {
+  const char *extant = tmpstring == NULL ? "" : tmpstring;
+  char *s = xasprintf("%s%.*s", extant, len, yytext);
+  free(tmpstring);
+  return tmpstring = s;
+}
+
+#define pop_return yy_pop_state(); return
+
+static bool is_not = false;
+
+static uint64_t
+integer_of( const char input[], bool is_hex = false) {
+  uint64_t output = 0;
+  const char *fmt = is_hex? "%ul" : "%hl";
+
+  if( input[0] == '0' ) input++;
+
+  if( 1 != sscanf(input, fmt, &output) ) {
+    cbl_internal_error( "%s:%d: invalid integer '%s'", __func__, __LINE__, input );
+  }
+
+  return output;
+}
+
+static inline bool is_quote( const char ch ) {
+  return ch == '\'' || ch == '"';
+}
+
+static int yyinput();
+static void yyunput(int ch, char yytext_ptr[]);
+
+static int
+continue_string( char quote ) {
+  int ch;
+
+  for( ; (ch = yyinput()) != quote; yylloc.last_column++ ) {
+    switch(ch) {
+    case EOF: case 0:  return ch;
+    case '\n':
+      yylloc.last_line = ++yylineno;
+      yylloc.last_column = 0;
+      break;
+    default:
+      if( ! ISSPACE(ch) ) {
+        return ch;
+      }
+    }
+  }
+
+  yylloc.last_column++;
+  return ch;
+}
+
+static std::string
+skip_string(char delimiter) {
+  int ch;
+  std::string found;
+
+  while ((ch = yyinput()) != EOF ) {
+    dbgmsg("%s:%d: input '%c'", __func__, __LINE__, ch);
+    found += ch;
+    if (ch == delimiter) {
+      if( (ch = yyinput()) == EOF ) break;
+      dbgmsg("%s:%d: input '%c'", __func__, __LINE__, ch);
+      if (ch == delimiter) {
+        found += ch;
+        continue;
+      } else {
+        unput(ch);
+        dbgmsg("%s:%d: unput '%c'", __func__, __LINE__, ch);
+        return found; // Found valid closing delimiter
+      }
+    }
+  }
+  return found;
+}
+
+/*
+ * Loosely parse what might be a refmod expression.  This is used to decide
+ * whether to indicate a refmod to the parser with an LPAREN token, or not,
+ * with a '(' token.  The input is known to have a first line that begins with
+ * '('., includes ':', and ends with ')'.
+ *
+ * Single forward pass: track paren depth, require exactly one ':' at depth 1,
+ * skip quoted regions (doubled quote is escape).  Allows arithmetic and
+ * parentheses in the left part, e.g. ((LENGTH OF x/2) - (y/2)) : 1.
+ */
+static bool
+is_refmod() {
+  class yystr_t {
+    std::string text;
+  public:
+    ~yystr_t() {
+      while( ! text.empty() ) {
+        char ch = text.back();
+        text.pop_back();
+        unput(ch);
+        dbgmsg("%s:%d: unput '%c'", __func__, __LINE__, ch);
+      }
+    }
+    int input() {
+      int ch = yyinput();
+      dbgmsg("%s:%d: input '%c'", __func__, __LINE__, ch);
+      if( ch != EOF) text += ch;
+      return ch;
+    }
+    yystr_t& operator+=( const std::string& that ) {
+      text += that;
+      return *this;
+    }
+    const char * c_str() const { return text.c_str(); }
+    size_t size() const { return text.size(); }
+  } yystr;
+
+  gcc_assert( *yytext == '(' );
+
+  int ch, depth = 1;
+  bool colon_at_depth1 = false;
+
+  while( (ch = yystr.input()) != EOF ) {
+    if( is_quote(ch) ) {
+      std::string s = skip_string(ch);
+      if( s.empty() ) {
+        break;
+      }
+      yystr += s;
+      continue;
+    }
+    if( ch == '(' ) {
+      depth++;
+      continue;
+    }
+    if( ch == ')' ) {
+      depth--;
+      if( depth < 0 ) return false;
+      if( depth == 0 ) return colon_at_depth1;
+      continue;
+    }
+    if( ch == ':' && depth == 1 ) {
+      if( colon_at_depth1 ) return false;
+      colon_at_depth1 = true;
+      continue;
+    }
+  }
+  dbgmsg("%s:%d: '%.*s' is %sa refmod", __func__, __LINE__,
+         int(yystr.size()), yystr.c_str(), colon_at_depth1? "" : "not ");
+  return colon_at_depth1;
+}
+
+/*
+ * Given a QSTRING in yytext, remove leading and trailing quotes, and undouble
+ * any in the body of the string.
+ */
+static char*
+unquote() {
+  char *p = yytext, *pend = yytext + yyleng;
+  char *output = xstrdup(yytext), quote = *p;
+  char prior = '\0';
+
+  pend = std::copy_if( ++p, --pend, output,
+                       [quote, &prior]( char ch ) {
+                         if( ch == quote ) {
+                           if( ch == prior ) {
+                             prior = '\0';
+                             return false;
+                           }
+                           prior = ch;
+                         }
+                         return true;
+                       } );
+  *pend = '\0';
+  return output;
+}

@@ -1,0 +1,95 @@
+/* Copyright (C) 2025-2026 Free Software Foundation, Inc.
+   Contributed by Thomas Koenig, Nicolas Koenig, Andre Vehreschild
+
+This file is part of the GNU Fortran Shmem Coarray Library (caf_shmem).
+
+Caf_shmem is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+Caf_shmem is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+Under Section 7 of GPL version 3, you are granted additional
+permissions described in the GCC Runtime Library Exception, version
+3.1, as published by the Free Software Foundation.
+
+You should have received a copy of the GNU General Public License and
+a copy of the GCC Runtime Library Exception along with this program;
+see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+<http://www.gnu.org/licenses/>.  */
+
+#ifndef SYNC_H
+#define SYNC_H
+
+#include "alloc.h"
+#include "counter_barrier.h"
+
+typedef struct {
+  /* Mutex and condition variable needed for signaling events.  */
+  caf_shmem_mutex event_lock;
+  caf_shmem_condvar event_cond;
+  caf_shmem_mutex sync_images_table_lock;
+  shared_mem_ptr sync_images_table;
+  shared_mem_ptr sync_images_cond_vars;
+} sync_shared;
+
+typedef struct {
+  sync_shared *cis;
+  int *table; // we can cache the table and the trigger pointers here
+  caf_shmem_condvar *triggers;
+} sync_t;
+
+typedef caf_shmem_mutex caf_shmem_lock_t;
+
+typedef int event_t;
+
+void sync_init (sync_t *, shared_memory);
+
+void sync_init_supervisor (sync_t *, alloc *);
+
+/* Synchronize the images of the current team.  Returns false without
+   synchronizing when a stopped image is a member of the team.  TERMINATED,
+   when given, receives the number of images of the team that had terminated
+   when the images synchronized.  */
+
+bool sync_all (int *terminated);
+
+/* Prototype for circular dependency break.  */
+
+struct caf_shmem_team;
+typedef struct caf_shmem_team *caf_shmem_team_t;
+
+void sync_team (caf_shmem_team_t team);
+
+/* Like sync_all for TEAM.  */
+
+bool sync_team_unless_stopped (caf_shmem_team_t team, int *terminated);
+
+/* Synchronize with the SIZE images in the array, or with the images of the
+   current team when SIZE is zero.  Returns true when an image of the set
+   terminated before the images synchronized.  */
+
+bool sync_table (sync_t *, int *, int);
+
+/* Set the status of IMAGE, which terminated, to stopped or failed, count it
+   and wake the images waiting in sync_table.  */
+
+void notify_image_terminated (sync_t *, int image, bool stopped);
+
+void lock_alloc_lock (sync_t *);
+
+void unlock_alloc_lock (sync_t *);
+
+void lock_event (sync_t *);
+
+void unlock_event (sync_t *);
+
+void event_post (sync_t *);
+
+void event_wait (sync_t *);
+
+#endif

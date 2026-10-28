@@ -1,0 +1,1160 @@
+// Copyright (C) 2020-2026 Free Software Foundation, Inc.
+
+// This file is part of GCC.
+
+// GCC is free software; you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free
+// Software Foundation; either version 3, or (at your option) any later
+// version.
+
+// GCC is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+// for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with GCC; see the file COPYING3.  If not see
+// <http://www.gnu.org/licenses/>.
+
+#include "rust-hir-map.h"
+#include "optional.h"
+#include "rust-ast-full.h"
+#include "rust-ast.h"
+#include "rust-diagnostics.h"
+#include "rust-hir-full.h"
+#include "rust-item.h"
+#include "rust-macro-builtins.h"
+#include "rust-mapping-common.h"
+#include "rust-attribute-values.h"
+#include "rust-finalized-name-resolution-context.h"
+
+namespace Rust {
+namespace Analysis {
+
+NodeMapping
+NodeMapping::get_error ()
+{
+  return NodeMapping (UNKNOWN_CRATENUM, UNKNOWN_NODEID, UNKNOWN_HIRID,
+		      UNKNOWN_LOCAL_DEFID);
+}
+
+CrateNum
+NodeMapping::get_crate_num () const
+{
+  return crateNum;
+}
+
+NodeId
+NodeMapping::get_nodeid () const
+{
+  return nodeId;
+}
+
+HirId
+NodeMapping::get_hirid () const
+{
+  return hirId;
+}
+
+LocalDefId
+NodeMapping::get_local_defid () const
+{
+  return localDefId;
+}
+
+DefId
+NodeMapping::get_defid () const
+{
+  return get_defid (get_crate_num (), get_local_defid ());
+}
+
+DefId
+NodeMapping::get_defid (CrateNum crate_num, LocalDefId local_defid)
+{
+  return DefId{crate_num, local_defid};
+}
+
+std::string
+NodeMapping::as_string () const
+{
+  std::ostringstream ss;
+  ss << "["
+     << "C: " << get_crate_num ();
+  if (get_nodeid () != UNKNOWN_NODEID)
+    ss << " Nid: " << get_nodeid ();
+
+  if (get_hirid () != UNKNOWN_HIRID)
+    ss << " Hid: " << get_hirid ();
+
+  if (get_local_defid () != UNKNOWN_LOCAL_DEFID)
+    ss << " Lid: " << get_local_defid ();
+
+  ss << "]";
+  return ss.str ();
+}
+
+// Mappings Class now
+static const HirId kDefaultNodeIdBegin = 1;
+static const HirId kDefaultHirIdBegin = 1;
+static const HirId kDefaultCrateNumBegin = 0;
+
+CrateMappings::CrateMappings ()
+  : crate_num_itr (kDefaultCrateNumBegin), current_crate_num (UNKNOWN_CRATENUM)
+{}
+
+Mappings::Mappings ()
+  : hirIdIter (kDefaultHirIdBegin), nodeIdIter (kDefaultNodeIdBegin),
+    hirImplIndexesBuilt (false)
+{
+  Analysis::NodeMapping node (0, 0, 0, 0);
+  builtinMarker
+    = new HIR::ImplBlock (node, {}, {}, nullptr, nullptr, HIR::WhereClause ({}),
+			  BoundPolarity::RegularBound,
+			  HIR::Visibility (HIR::Visibility::VisType::Public),
+			  {}, {}, UNDEF_LOCATION);
+}
+
+Mappings::~Mappings () { delete builtinMarker; }
+
+Mappings &
+Mappings::get ()
+{
+  static Mappings instance{};
+  return instance;
+}
+
+CrateNum
+CrateMappings::get_next_crate_num (const std::string &name)
+{
+  auto id = crate_num_itr;
+  crate_num_itr++;
+  crate_names.insert (id, name);
+  return id;
+}
+
+void
+CrateMappings::set_current_crate (CrateNum crateNum)
+{
+  current_crate_num = crateNum;
+}
+
+CrateNum
+CrateMappings::get_current_crate () const
+{
+  return current_crate_num;
+}
+
+tl::optional<CrateNum>
+CrateMappings::lookup_crate_num (NodeId node_id) const
+{
+  auto it = crate_node_to_crate_num.find (node_id);
+  if (it == crate_node_to_crate_num.end ())
+    return tl::nullopt;
+
+  return it->second;
+}
+
+const std::string &
+CrateMappings::get_current_crate_name () const
+{
+  return crate_names.lookup (get_current_crate ()).value ();
+}
+
+tl::optional<CrateNum>
+CrateMappings::lookup_crate_name (const std::string &crate_name) const
+{
+  for (const auto &it : crate_names.get_storage ())
+    {
+      if (it.second.compare (crate_name) == 0)
+	return it.first;
+    }
+  return tl::nullopt;
+}
+
+tl::optional<NodeId>
+CrateMappings::crate_num_to_nodeid (const CrateNum &crate_num) const
+{
+  auto it = ast_crate.find (crate_num);
+  if (it == ast_crate.end ())
+    return tl::nullopt;
+
+  return it->second->get_node_id ();
+}
+
+bool
+CrateMappings::node_is_crate (NodeId node_id) const
+{
+  return lookup_crate_num (node_id).has_value ();
+}
+
+NodeId
+Mappings::get_next_node_id ()
+{
+  auto it = nodeIdIter;
+  if (UNLIKELY (it > MAX_NODEID))
+    rust_fatal_error (UNKNOWN_LOCATION, "out of node ids");
+  nodeIdIter++;
+  return it;
+}
+
+HirId
+Mappings::get_next_hir_id (CrateNum crateNum)
+{
+  auto id = hirIdIter;
+  hirIdIter++;
+
+  auto it = hirNodesWithinCrate.find (crateNum);
+  if (it == hirNodesWithinCrate.end ())
+    {
+      hirNodesWithinCrate.insert ({crateNum, {}});
+    }
+
+  hirNodesWithinCrate[crateNum].insert (id);
+  return id;
+}
+
+LocalDefId
+Mappings::get_next_localdef_id (CrateNum crateNum)
+{
+  auto it = localIdIter.find (crateNum);
+  if (it == localIdIter.end ())
+    {
+      localIdIter.insert ({crateNum, 1});
+    }
+
+  it = localIdIter.find (crateNum);
+  rust_assert (it != localIdIter.end ());
+
+  LocalDefId id = it->second;
+  localIdIter[crateNum] = id + 1;
+  return id;
+}
+
+AST::Crate &
+CrateMappings::get_ast_crate (CrateNum crateNum)
+{
+  auto it = ast_crate.find (crateNum);
+  rust_assert (it != ast_crate.end ());
+  return *it->second;
+}
+
+AST::Crate &
+Mappings::get_ast_crate_by_node_id (NodeId id)
+{
+  return *crate.get_ast_crate_by_node_id_raw (id);
+}
+
+AST::Crate *
+CrateMappings::get_ast_crate_by_node_id_raw (NodeId id)
+{
+  CrateNum crateNum = lookup_crate_num (id).value ();
+  auto it = ast_crate.find (crateNum);
+  rust_assert (it != ast_crate.end ());
+  return it->second;
+}
+
+AST::Crate &
+CrateMappings::insert_ast_crate (std::unique_ptr<AST::Crate> &&crate,
+				 CrateNum crate_num)
+{
+  auto it = ast_crate.find (crate_num);
+  rust_assert (it == ast_crate.end ());
+
+  // store it
+  crate_node_to_crate_num.insert ({crate->get_node_id (), crate_num});
+  ast_crate.insert ({crate_num, crate.release ()});
+
+  // return the reference to it
+  it = ast_crate.find (crate_num);
+  rust_assert (it != ast_crate.end ());
+  return *it->second;
+}
+
+HIR::Crate &
+Mappings::get_hir_crate (CrateNum crateNum)
+{
+  auto it = hir_crate_mappings.find (crateNum);
+  rust_assert (it != hir_crate_mappings.end ());
+  return *it->second;
+}
+
+bool
+Mappings::is_local_hirid_crate (HirId crateNum)
+{
+  for (const auto &it : hir_crate_mappings)
+    {
+      const auto &crate = it.second;
+      if (crate->get_mappings ().get_hirid () == crateNum)
+	return true;
+    }
+  return false;
+}
+
+HIR::Crate &
+Mappings::insert_hir_crate (std::unique_ptr<HIR::Crate> &&crate)
+{
+  CrateNum crateNum = crate->get_mappings ().get_crate_num ();
+  auto it = hir_crate_mappings.find (crateNum);
+  rust_assert (it == hir_crate_mappings.end ());
+
+  insert_node_to_hir (crate->get_mappings ().get_nodeid (),
+		      crate->get_mappings ().get_hirid ());
+  hir_crate_mappings.insert ({crateNum, crate.release ()});
+
+  it = hir_crate_mappings.find (crateNum);
+  rust_assert (it != hir_crate_mappings.end ());
+  return *it->second;
+}
+
+void
+Mappings::insert_defid_mapping (DefId id, HIR::Item *item)
+{
+  CrateNum crate_num = id.crateNum;
+  LocalDefId local_def_id = id.localDefId;
+
+  rust_assert (!lookup_defid (id));
+  rust_assert (!lookup_local_defid (crate_num, local_def_id));
+  rust_assert (!lookup_trait_item_defid (id));
+
+  defIdMappings[id] = item;
+  insert_local_defid_mapping (crate_num, local_def_id, item);
+}
+
+tl::optional<HIR::Item *>
+Mappings::lookup_defid (DefId id)
+{
+  auto it = defIdMappings.find (id);
+  if (it == defIdMappings.end ())
+    return tl::nullopt;
+
+  return it->second;
+}
+
+void
+Mappings::insert_defid_mapping (DefId id, HIR::TraitItem *item)
+{
+  CrateNum crate_num = id.crateNum;
+  LocalDefId local_def_id = id.localDefId;
+
+  rust_assert (!lookup_defid (id));
+  rust_assert (!lookup_local_defid (crate_num, local_def_id));
+  rust_assert (!lookup_trait_item_defid (id));
+
+  defIdTraitItemMappings[id] = item;
+}
+
+tl::optional<HIR::TraitItem *>
+Mappings::lookup_trait_item_defid (DefId id)
+{
+  auto it = defIdTraitItemMappings.find (id);
+  if (it == defIdTraitItemMappings.end ())
+    return tl::nullopt;
+
+  return it->second;
+}
+
+void
+Mappings::insert_hir_enumitem (HIR::Enum *parent, HIR::EnumItem *item)
+{
+  auto id = item->get_mappings ().get_hirid ();
+  auto result = lookup_hir_enumitem (id);
+  rust_assert (result.first == nullptr);
+
+  hirEnumItemMappings[id] = {parent, item};
+  insert_node_to_hir (item->get_mappings ().get_nodeid (), id);
+}
+
+std::pair<HIR::Enum *, HIR::EnumItem *>
+Mappings::lookup_hir_enumitem (HirId id)
+{
+  auto it = hirEnumItemMappings.find (id);
+  if (it == hirEnumItemMappings.end ())
+    return {nullptr, nullptr};
+
+  return it->second;
+}
+
+void
+Mappings::insert_hir_extern_item (HIR::ExternalItem *item, HirId parent_block)
+{
+  auto id = item->get_mappings ().get_hirid ();
+  rust_assert (!lookup_hir_extern_item (id));
+
+  hirExternItemMappings[id] = {item, parent_block};
+  insert_node_to_hir (item->get_mappings ().get_nodeid (), id);
+}
+
+tl::optional<std::pair<HIR::ExternalItem *, HirId>>
+Mappings::lookup_hir_extern_item (HirId id)
+{
+  auto it = hirExternItemMappings.find (id);
+  if (it == hirExternItemMappings.end ())
+    return tl::nullopt;
+
+  return it->second;
+}
+
+void
+Mappings::insert_hir_impl_block (HIR::ImplBlock *item)
+{
+  auto id = item->get_mappings ().get_hirid ();
+  rust_assert (!lookup_hir_impl_block (id));
+
+  HirId impl_type_id = item->get_type ().get_mappings ().get_hirid ();
+  hirImplBlockMappings[id] = item;
+  if (item->has_trait_ref ())
+    hirTraitImplBlockMappings[id] = item;
+  else
+    {
+      for (auto &impl_item : item->get_impl_items ())
+	{
+	  if (impl_item->get_impl_item_type ()
+	      != HIR::ImplItem::ImplItemType::FUNCTION)
+	    continue;
+
+	  auto *function = static_cast<HIR::Function *> (impl_item.get ());
+	  if (!function->is_method ())
+	    continue;
+
+	  auto name = function->get_function_name ().as_string ();
+	  hirInherentImplItemMappings[name].emplace_back (impl_item.get (),
+							  item);
+	}
+    }
+  hirImplBlockTypeMappings[impl_type_id] = item;
+  insert_node_to_hir (item->get_mappings ().get_nodeid (), id);
+}
+
+tl::optional<HIR::ImplBlock *>
+Mappings::lookup_hir_impl_block (HirId id)
+{
+  auto it = hirImplBlockMappings.find (id);
+  if (it == hirImplBlockMappings.end ())
+    return tl::nullopt;
+
+  return it->second;
+}
+
+tl::optional<HIR::ImplBlock *>
+Mappings::lookup_impl_block_type (HirId id)
+{
+  auto it = hirImplBlockTypeMappings.find (id);
+  if (it == hirImplBlockTypeMappings.end ())
+    return tl::nullopt;
+
+  return it->second;
+}
+
+void
+Mappings::insert_hir_implitem (HirId parent_impl_id, HIR::ImplItem *item)
+{
+  auto id = item->get_impl_mappings ().get_hirid ();
+  rust_assert (!lookup_hir_implitem (id));
+
+  hirImplItemMappings[id]
+    = std::pair<HirId, HIR::ImplItem *> (parent_impl_id, item);
+  insert_node_to_hir (item->get_impl_mappings ().get_nodeid (), id);
+}
+
+tl::optional<std::pair<HIR::ImplItem *, HirId>>
+Mappings::lookup_hir_implitem (HirId id)
+{
+  auto it = hirImplItemMappings.find (id);
+  if (it == hirImplItemMappings.end ())
+    return tl::nullopt;
+
+  return std::make_pair (it->second.second, it->second.first);
+}
+
+void
+Mappings::insert_local_defid_mapping (CrateNum crateNum, LocalDefId id,
+				      HIR::Item *item)
+{
+  rust_assert (!lookup_local_defid (crateNum, id));
+  localDefIdMappings[crateNum][id] = item;
+}
+
+tl::optional<HIR::Item *>
+Mappings::lookup_local_defid (CrateNum crateNum, LocalDefId id)
+{
+  auto it = localDefIdMappings.find (crateNum);
+  if (it == localDefIdMappings.end ())
+    return tl::nullopt;
+
+  auto iy = it->second.find (id);
+  if (iy == it->second.end ())
+    return tl::nullopt;
+
+  return iy->second;
+}
+
+void
+Mappings::walk_local_defids_for_crate (CrateNum crateNum,
+				       std::function<bool (HIR::Item *)> cb)
+{
+  auto it = localDefIdMappings.find (crateNum);
+  if (it == localDefIdMappings.end ())
+    return;
+
+  for (auto iy = it->second.begin (); iy != it->second.end (); iy++)
+    {
+      if (!cb (iy->second))
+	return;
+    }
+}
+
+void
+Mappings::insert_node_to_hir (NodeId id, HirId ref)
+{
+  nodeIdToHirMappings[id] = ref;
+  hirIdToNodeMappings[ref] = id;
+}
+
+tl::optional<HirId>
+Mappings::lookup_node_to_hir (NodeId id)
+{
+  auto it = nodeIdToHirMappings.find (id);
+  if (it == nodeIdToHirMappings.end ())
+    return tl::nullopt;
+
+  return {it->second};
+}
+
+tl::optional<NodeId>
+Mappings::lookup_hir_to_node (HirId id)
+{
+  auto it = hirIdToNodeMappings.find (id);
+  if (it == hirIdToNodeMappings.end ())
+    return tl::nullopt;
+
+  return {it->second};
+}
+
+void
+Mappings::insert_location (HirId id, location_t locus)
+{
+  locations[id] = locus;
+}
+
+location_t
+Mappings::lookup_location (HirId id)
+{
+  auto it = locations.find (id);
+  if (it == locations.end ())
+    return UNDEF_LOCATION;
+
+  return it->second;
+}
+
+tl::optional<HIR::Stmt *>
+Mappings::resolve_nodeid_to_stmt (NodeId id)
+{
+  auto it = nodeIdToHirMappings.find (id);
+  if (it == nodeIdToHirMappings.end ())
+    return tl::nullopt;
+
+  HirId resolved = it->second;
+  return hir.stmts.lookup (resolved);
+}
+
+void
+Mappings::iterate_impl_items (
+  std::function<bool (HirId, HIR::ImplItem *, HIR::ImplBlock *)> cb)
+{
+  for (auto it = hirImplItemMappings.begin (); it != hirImplItemMappings.end ();
+       it++)
+    {
+      auto id = it->first;
+      auto impl_item = it->second.second;
+      auto impl
+	= lookup_associated_impl (impl_item->get_impl_mappings ().get_hirid ());
+      if (!cb (id, impl_item, impl))
+	return;
+    }
+}
+
+void
+Mappings::insert_adt_impl_mapping (DefId adt_id, HIR::ImplBlock *impl)
+{
+  hirAdtImplMappings[adt_id].push_back (impl);
+  hirIndexedAdtImpls.insert (impl);
+}
+
+void
+Mappings::build_impl_indexes ()
+{
+  gcc_checking_assert (!hirImplIndexesBuilt);
+  if (hirImplIndexesBuilt)
+    return;
+  hirImplIndexesBuilt = true;
+
+  auto &nr_ctx = Resolver2_0::FinalizedNameResolutionContext::get ();
+  auto resolve_item = [&] (const HIR::Type &type) -> HIR::Item * {
+    auto node_id = nr_ctx.lookup (type.get_mappings ().get_nodeid (),
+				  Resolver2_0::Namespace::Types);
+    if (!node_id.has_value ())
+      return nullptr;
+
+    auto hir_id = lookup_node_to_hir (node_id.value ());
+    gcc_checking_assert (hir_id.has_value ());
+    if (!hir_id.has_value ())
+      return nullptr;
+
+    auto item = hir.items.lookup (hir_id.value ());
+    return item.has_value () ? item.value () : nullptr;
+  };
+
+  iterate_impl_blocks ([&] (HirId, HIR::ImplBlock *impl) -> bool {
+    HIR::Item *self_item = resolve_item (impl->get_type ());
+    if (self_item != nullptr)
+      {
+	auto kind = self_item->get_item_kind ();
+	if (kind == HIR::Item::ItemKind::Struct
+	    || kind == HIR::Item::ItemKind::Enum
+	    || kind == HIR::Item::ItemKind::Union)
+	  insert_adt_impl_mapping (self_item->get_mappings ().get_defid (),
+				   impl);
+      }
+
+    if (impl->has_trait_ref ())
+      {
+	HIR::Item *trait_item = resolve_item (impl->get_trait_ref ());
+	if (trait_item != nullptr
+	    && trait_item->get_item_kind () == HIR::Item::ItemKind::Trait)
+	  insert_trait_impl_mapping (trait_item->get_mappings ().get_defid (),
+				     impl);
+      }
+    return true;
+  });
+}
+
+void
+Mappings::iterate_adt_impl_items (
+  DefId adt_id,
+  std::function<bool (HirId, HIR::ImplItem *, HIR::ImplBlock *)> cb)
+{
+  auto iterate_impl = [&] (HIR::ImplBlock *impl) {
+    for (auto &item : impl->get_impl_items ())
+      {
+	HIR::ImplItem *impl_item = item.get ();
+	HirId id = impl_item->get_impl_mappings ().get_hirid ();
+	if (!cb (id, impl_item, impl))
+	  return false;
+      }
+    return true;
+  };
+
+  auto adt_impls = hirAdtImplMappings.find (adt_id);
+  if (adt_impls != hirAdtImplMappings.end ())
+    for (auto *impl : adt_impls->second)
+      if (!iterate_impl (impl))
+	return;
+
+  // Impl self types which cannot be classified as a concrete ADT include
+  // blanket implementations such as `impl<T> Trait for T`.  They must remain
+  // candidates for every ADT receiver.
+  for (auto &mapping : hirImplBlockMappings)
+    {
+      HIR::ImplBlock *impl = mapping.second;
+      if (hirIndexedAdtImpls.find (impl) == hirIndexedAdtImpls.end ())
+	if (!iterate_impl (impl))
+	  return;
+    }
+}
+
+void
+Mappings::insert_trait_impl_mapping (DefId trait_id, HIR::ImplBlock *impl)
+{
+  hirTraitImplMappings[trait_id].push_back (impl);
+}
+
+void
+Mappings::iterate_trait_impl_blocks_for_item (
+  const std::string &name, std::function<bool (HirId, HIR::ImplBlock *)> cb)
+{
+  auto traits = hirTraitItemNameMappings.find (name);
+  if (traits == hirTraitItemNameMappings.end ())
+    return;
+
+  for (auto trait_id : traits->second)
+    {
+      auto impls = hirTraitImplMappings.find (trait_id);
+      if (impls == hirTraitImplMappings.end ())
+	continue;
+
+      for (auto *impl : impls->second)
+	if (!cb (impl->get_mappings ().get_hirid (), impl))
+	  return;
+    }
+}
+
+void
+Mappings::insert_trait_item_mapping (HirId trait_item_id, HIR::Trait *trait)
+{
+  rust_assert (hirTraitItemsToTraitMappings.find (trait_item_id)
+	       == hirTraitItemsToTraitMappings.end ());
+  hirTraitItemsToTraitMappings[trait_item_id] = trait;
+
+  auto item = hir.trait_items.lookup (trait_item_id);
+  rust_assert (item.has_value ());
+  if (item.value ()->get_item_kind () != HIR::TraitItem::TraitItemKind::FUNC)
+    return;
+
+  auto *function = static_cast<HIR::TraitItemFunc *> (item.value ());
+  if (!function->get_decl ().is_method ())
+    return;
+
+  auto name = function->get_decl ().get_function_name ().as_string ();
+  hirTraitItemNameMappings[name].push_back (
+    trait->get_mappings ().get_defid ());
+}
+
+void
+Mappings::iterate_trait_impl_items (
+  DefId trait_id,
+  std::function<bool (HirId, HIR::ImplItem *, HIR::ImplBlock *)> cb)
+{
+  auto trait_impls = hirTraitImplMappings.find (trait_id);
+  if (trait_impls == hirTraitImplMappings.end ())
+    return;
+
+  for (auto *impl : trait_impls->second)
+    for (auto &item : impl->get_impl_items ())
+      {
+	HIR::ImplItem *impl_item = item.get ();
+	HirId id = impl_item->get_impl_mappings ().get_hirid ();
+	if (!cb (id, impl_item, impl))
+	  return;
+      }
+}
+
+void
+Mappings::iterate_trait_impl_blocks (
+  DefId trait_id, std::function<bool (HirId, HIR::ImplBlock *)> cb)
+{
+  auto trait_impls = hirTraitImplMappings.find (trait_id);
+  if (trait_impls == hirTraitImplMappings.end ())
+    return;
+
+  for (auto *impl : trait_impls->second)
+    if (!cb (impl->get_mappings ().get_hirid (), impl))
+      return;
+}
+
+void
+Mappings::iterate_impl_blocks (std::function<bool (HirId, HIR::ImplBlock *)> cb)
+{
+  for (auto it = hirImplBlockMappings.begin ();
+       it != hirImplBlockMappings.end (); it++)
+    {
+      HirId id = it->first;
+      HIR::ImplBlock *impl_block = it->second;
+      if (!cb (id, impl_block))
+	return;
+    }
+}
+
+void
+Mappings::iterate_trait_items (
+  std::function<bool (HIR::TraitItem *, HIR::Trait *)> cb)
+{
+  for (auto it = hirTraitItemMappings.begin ();
+       it != hirTraitItemMappings.end (); it++)
+    {
+      HirId trait_item_id = it->first;
+      HIR::TraitItem *trait_item = it->second;
+      HIR::Trait *trait = lookup_trait_item_mapping (trait_item_id);
+
+      if (!cb (trait_item, trait))
+	return;
+    }
+}
+
+void
+Mappings::insert_macro_def (AST::MacroRulesDefinition *macro)
+{
+  auto outer_attrs = macro->get_outer_attrs ();
+  bool should_be_builtin
+    = std::any_of (outer_attrs.begin (), outer_attrs.end (),
+		   [] (AST::Attribute attr) {
+		     return attr.get_path ()
+			    == Values::Attributes::RUSTC_BUILTIN_MACRO;
+		   });
+  if (should_be_builtin)
+    {
+      auto builtin
+	= MacroBuiltin::builtins.lookup (macro->get_rule_name ().as_string ());
+      if (!builtin.has_value ())
+	{
+	  rust_error_at (macro->get_locus (),
+			 "cannot find a built-in macro with name %qs",
+			 macro->get_rule_name ().as_string ().c_str ());
+	  return;
+	}
+
+      auto transcriber = MacroBuiltin::builtin_transcribers.find (
+	macro->get_rule_name ().as_string ());
+      macro->set_builtin_transcriber (transcriber->second);
+    }
+
+  auto it = macroMappings.find (macro->get_node_id ());
+  rust_assert (it == macroMappings.end ());
+
+  macroMappings[macro->get_node_id ()] = {macro, crate.get_current_crate ()};
+}
+
+tl::optional<AST::MacroRulesDefinition *>
+Mappings::lookup_macro_def (NodeId id)
+{
+  auto it = macroMappings.find (id);
+  if (it == macroMappings.end ())
+    return tl::nullopt;
+
+  return it->second.first;
+}
+
+tl::optional<CrateNum>
+Mappings::lookup_macro_def_crate (NodeId id)
+{
+  auto it = macroMappings.find (id);
+  if (it == macroMappings.end ())
+    return tl::nullopt;
+
+  return it->second.second;
+}
+
+void
+Mappings::insert_macro_invocation (AST::MacroInvocation &invoc,
+				   AST::MacroRulesDefinition *def)
+{
+  auto it = macroInvocations.find (invoc.get_node_id ());
+  rust_assert (it == macroInvocations.end ());
+
+  macroInvocations[invoc.get_node_id ()] = def;
+}
+
+tl::optional<AST::MacroRulesDefinition *>
+Mappings::lookup_macro_invocation (AST::MacroInvocation &invoc)
+{
+  auto it = macroInvocations.find (invoc.get_node_id ());
+  if (it == macroInvocations.end ())
+    return tl::nullopt;
+
+  return it->second;
+}
+
+void
+Mappings::insert_exported_macro (AST::MacroRulesDefinition &def)
+{
+  exportedMacros.emplace_back (def);
+}
+
+std::vector<AST::MacroRulesDefinition>
+Mappings::get_exported_macros ()
+{
+  return exportedMacros;
+}
+
+void
+Mappings::insert_module_child (NodeId module, NodeId child)
+{
+  auto it = module_child_map.find (module);
+  if (it == module_child_map.end ())
+    module_child_map.insert ({module, {child}});
+  else
+    it->second.emplace_back (child);
+}
+
+tl::optional<std::vector<NodeId> &>
+Mappings::lookup_module_children (NodeId module)
+{
+  auto it = module_child_map.find (module);
+  if (it == module_child_map.end ())
+    return tl::nullopt;
+
+  return it->second;
+}
+
+void
+Mappings::insert_glob_container (NodeId id, AST::GlobContainer *container)
+{
+  rust_assert (glob_containers.find (id) == glob_containers.end ());
+
+  // Crates have different memory managements that regular items
+  if (container->get_glob_container_kind () == AST::GlobContainer::Kind::Crate)
+    glob_containers[id] = crate.get_ast_crate_by_node_id_raw (id);
+  else
+    glob_containers[id] = container;
+}
+
+void
+Mappings::insert_module_id (NodeId id)
+{
+  module_ids.insert (id);
+}
+
+bool
+Mappings::is_module (NodeId id)
+{
+  return module_ids.find (id) != module_ids.end ();
+}
+
+void
+Mappings::insert_extern_crate_id (NodeId id)
+{
+  extern_crate_ids.insert (id);
+}
+
+bool
+Mappings::is_extern_crate (NodeId id)
+{
+  return extern_crate_ids.find (id) != extern_crate_ids.end ();
+}
+
+tl::optional<AST::GlobContainer *>
+Mappings::lookup_glob_container (NodeId id)
+{
+  auto it = glob_containers.find (id);
+  if (it == glob_containers.end ())
+    return tl::nullopt;
+
+  return {it->second};
+}
+
+void
+Mappings::insert_module_child_item (NodeId module,
+				    Resolver::CanonicalPath child)
+{
+  rust_assert (!child.is_empty ());
+  rust_assert (child.get_node_id () != UNKNOWN_NODEID);
+
+  auto it = module_child_items.find (module);
+  if (it == module_child_items.end ())
+    module_child_items.insert ({module, {child}});
+  else
+    it->second.emplace_back (child);
+}
+
+tl::optional<std::vector<Resolver::CanonicalPath> &>
+Mappings::lookup_module_chidren_items (NodeId module)
+{
+  auto it = module_child_items.find (module);
+  if (it == module_child_items.end ())
+    return tl::nullopt;
+
+  return it->second;
+}
+
+tl::optional<Resolver::CanonicalPath &>
+Mappings::lookup_module_child (NodeId module, const std::string &item_name)
+{
+  tl::optional<std::vector<Resolver::CanonicalPath> &> children
+    = lookup_module_chidren_items (module);
+  if (!children.has_value ())
+    return tl::nullopt;
+
+  // lookup the children to match the name if we can
+  for (auto &child : children.value ())
+    {
+      const std::string &raw_identifier = child.get ();
+      bool found = raw_identifier.compare (item_name) == 0;
+      if (found)
+	return child;
+    }
+
+  return tl::nullopt;
+}
+
+void
+Mappings::insert_child_item_to_parent_module_mapping (NodeId child_item,
+						      NodeId parent_module)
+{
+  child_to_parent_module_map.insert ({child_item, parent_module});
+}
+
+tl::optional<NodeId>
+Mappings::lookup_parent_module (NodeId child_item)
+{
+  auto it = child_to_parent_module_map.find (child_item);
+  if (it == child_to_parent_module_map.end ())
+    return tl::nullopt;
+
+  return it->second;
+}
+
+bool
+Mappings::node_is_module (NodeId query)
+{
+  return module_child_items.find (query) != module_child_items.end ();
+}
+
+void
+Mappings::insert_ast_item (AST::Item *item)
+{
+  auto it = ast_item_mappings.find (item->get_node_id ());
+  rust_assert (it == ast_item_mappings.end ());
+
+  ast_item_mappings[item->get_node_id ()] = item;
+}
+
+tl::optional<AST::Item *>
+Mappings::lookup_ast_item (NodeId id)
+{
+  auto it = ast_item_mappings.find (id);
+  if (it == ast_item_mappings.end ())
+    return tl::nullopt;
+
+  return it->second;
+}
+
+HIR::ImplBlock *
+Mappings::lookup_builtin_marker ()
+{
+  return builtinMarker;
+}
+
+// FIXME: Before merging: Should we remove the `locus` parameter here? since
+// lang items are looked up mostly for code generation, it doesn't make sense to
+// error out on the locus of the node trying to access an inexistant lang item
+DefId
+Mappings::get_lang_item (LangItem::Kind item_type, location_t locus)
+{
+  if (auto item = lookup_lang_item (item_type))
+    return *item;
+
+  rust_fatal_error (locus, "failed to find lang item %s",
+		    LangItem::ToString (item_type).c_str ());
+}
+
+tl::optional<HIR::TraitItem *>
+Mappings::lookup_trait_item_lang_item (LangItem::Kind item, location_t locus)
+{
+  DefId trait_item_id = get_lang_item (item, locus);
+  return lookup_trait_item_defid (trait_item_id);
+}
+
+void
+Mappings::insert_lang_item (LangItem::Kind item_type, DefId id)
+{
+  auto it = lang_item_mappings.find (item_type);
+  rust_assert (it == lang_item_mappings.end ());
+
+  lang_item_mappings[item_type] = id;
+}
+
+tl::optional<DefId &>
+Mappings::lookup_lang_item (LangItem::Kind item_type)
+{
+  auto it = lang_item_mappings.find (item_type);
+  if (it == lang_item_mappings.end ())
+    return tl::nullopt;
+
+  return it->second;
+}
+
+void
+Mappings::insert_lang_item_node (LangItem::Kind item_type, NodeId node_id)
+{
+  auto it = lang_item_nodes.find (item_type);
+  rust_assert (it == lang_item_nodes.end ());
+
+  lang_item_nodes.insert ({item_type, node_id});
+}
+
+tl::optional<NodeId &>
+Mappings::lookup_lang_item_node (LangItem::Kind item_type)
+{
+  auto it = lang_item_nodes.find (item_type);
+  if (it == lang_item_nodes.end ())
+    return tl::nullopt;
+
+  return it->second;
+}
+
+NodeId
+Mappings::get_lang_item_node (LangItem::Kind item_type)
+{
+  if (auto lookup = lookup_lang_item_node (item_type))
+    return *lookup;
+
+  rust_fatal_error (UNKNOWN_LOCATION, "undeclared lang item: %qs",
+		    LangItem::PrettyString (item_type).c_str ());
+}
+
+std::string &
+Mappings::get_lang_item_identifier (LangItem::Kind item_type)
+{
+  // Lang item names are hardcoded because they're only required for metadata
+  // dump which will get removed at some point
+  static std::unordered_map<LangItem::Kind, std::string> identifiers
+    = {{LangItem::Kind::COPY, "Copy"},
+       {LangItem::Kind::CLONE, "Clone"},
+       {LangItem::Kind::STRUCTURAL_PEQ, "StructuralPartialEq"},
+       {LangItem::Kind::STRUCTURAL_TEQ, "StructuralEq"},
+       {LangItem::Kind::SIZED, "Sized"},
+       {LangItem::Kind::EQ, "PartialEq"},
+       {LangItem::Kind::PHANTOM_DATA, "PhantomData"}};
+  auto result = identifiers.find (item_type);
+  if (result != identifiers.cend ())
+    return result->second;
+  rust_unreachable ();
+}
+
+void
+Mappings::insert_auto_trait (HIR::Trait *trait)
+{
+  auto_traits.emplace_back (trait);
+}
+
+std::vector<HIR::Trait *> &
+Mappings::get_auto_traits ()
+{
+  return auto_traits;
+}
+
+void
+Mappings::add_capture (NodeId closure, NodeId definition)
+{
+  auto cap = captures.find (closure);
+  if (cap == captures.end ())
+    captures[closure] = {definition};
+  else
+    cap->second.push_back (definition);
+}
+
+tl::optional<std::vector<NodeId>>
+Mappings::lookup_captures (NodeId closure)
+{
+  auto cap = captures.find (closure);
+  if (cap == captures.end ())
+    return tl::nullopt;
+  else
+    return cap->second;
+}
+
+void
+Mappings::add_derived_node (NodeId node_id)
+{
+  derived_nodes.insert (node_id);
+}
+
+bool
+Mappings::is_derived_node (NodeId node_id)
+{
+  return derived_nodes.find (node_id) != derived_nodes.end ();
+}
+
+void
+Mappings::add_function_node (NodeId node_id)
+{
+  function_nodes.insert (node_id);
+}
+
+bool
+Mappings::is_function_node (NodeId node_id)
+{
+  return function_nodes.find (node_id) != function_nodes.end ();
+}
+
+} // namespace Analysis
+} // namespace Rust

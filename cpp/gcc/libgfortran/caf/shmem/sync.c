@@ -1,0 +1,211 @@
+/* Copyright (C) 2025-2026 Free Software Foundation, Inc.
+   Contributed by Thomas Koenig, Nicolas Koenig, Andre Vehreschild
+
+This file is part of the GNU Fortran Shmem Coarray Library (caf_shmem).
+
+Caf_shmem is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+Caf_shmem is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+Under Section 7 of GPL version 3, you are granted additional
+permissions described in the GCC Runtime Library Exception, version
+3.1, as published by the Free Software Foundation.
+
+You should have received a copy of the GNU General Public License and
+a copy of the GCC Runtime Library Exception along with this program;
+see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+<http://www.gnu.org/licenses/>.  */
+
+#include "libgfortran.h"
+#include "supervisor.h"
+#include "sync.h"
+#include "teams_mgmt.h"
+#include "thread_support.h"
+
+#include <string.h>
+
+static inline void
+lock_table (sync_t *si)
+{
+  caf_shmem_mutex_lock (&si->cis->sync_images_table_lock);
+}
+
+static inline void
+unlock_table (sync_t *si)
+{
+  caf_shmem_mutex_unlock (&si->cis->sync_images_table_lock);
+}
+
+void
+sync_init (sync_t *si, shared_memory sm)
+{
+  *si = (sync_t) {
+    &this_image.supervisor->sync_shared,
+    SHMPTR_AS (int *, this_image.supervisor->sync_shared.sync_images_table, sm),
+    SHMPTR_AS (caf_shmem_condvar *,
+	       this_image.supervisor->sync_shared.sync_images_cond_vars, sm)};
+}
+
+void
+sync_init_supervisor (sync_t *si, alloc *ai)
+{
+  const int num_images = local->total_num_images;
+  const size_t table_size_in_bytes = sizeof (int) * num_images * num_images;
+
+  si->cis = &this_image.supervisor->sync_shared;
+
+  initialize_shared_mutex (&si->cis->event_lock);
+  initialize_shared_condition (&si->cis->event_cond, num_images);
+
+  initialize_shared_mutex (&si->cis->sync_images_table_lock);
+
+  si->cis->sync_images_table
+    = allocator_shared_malloc_or_die (alloc_get_allocator (ai),
+				      table_size_in_bytes);
+  si->cis->sync_images_cond_vars
+    = allocator_shared_malloc_or_die (alloc_get_allocator (ai),
+				      sizeof (caf_shmem_condvar) * num_images);
+
+  si->table = SHMPTR_AS (int *, si->cis->sync_images_table, ai->mem);
+  si->triggers
+    = SHMPTR_AS (caf_shmem_condvar *, si->cis->sync_images_cond_vars, ai->mem);
+
+  for (int i = 0; i < num_images; i++)
+    initialize_shared_condition (&si->triggers[i], num_images);
+
+  memset (si->table, 0, table_size_in_bytes);
+}
+
+/* Whether one of the SIZE IMAGES has stopped.  */
+
+static bool
+stopped_image_in (const int *images, int size)
+{
+  for (int i = 0; i < size; ++i)
+    if (this_image.supervisor->images[images[i]].status == IMAGE_SUCCESS)
+      return true;
+  return false;
+}
+
+bool
+sync_table (sync_t *si, int *images, int size)
+{
+  /* The variable `table` is an N x N matrix, where N is the number of all
+     images.  The position (i, j) (where i and j are always the real images
+     index, i.e. after team de-mapping) tells whether image i has seen the same
+     number of synchronisation calls to sync_table like j.  When table(i,j) ==
+     table(j,i) then the sync for i with this image is completed (here j is the
+     real image index of the current image).  When this holds for all i in the
+     current set of images (or all images, if the set is empty), then sync table
+     command is completed.
+     */
+  volatile int *table = si->table;
+  /* The table is allocated for all images, so the row stride is the total
+     number of images and not the (shrinking) number of images in a team.  */
+  const size_t img_c = local->total_num_images;
+  bool terminated;
+  int i;
+
+  if (size <= 0)
+    {
+      images = caf_current_team->u.image_info->image_map;
+      size = caf_current_team->u.image_info->image_map_size;
+    }
+
+  lock_table (si);
+  /* Count the statement even with a stopped image in the set, so that the
+     counts of the active images keep pairing corresponding statements.  */
+  for (i = 0; i < size; ++i)
+    {
+      if (this_image.supervisor->images[images[i]].status != IMAGE_OK)
+	continue;
+      ++table[images[i] + img_c * this_image.image_num];
+      caf_shmem_cond_signal (&si->triggers[images[i]]);
+    }
+  for (;;)
+    {
+      /* With a stopped image in the set this only has the effect of SYNC
+	 MEMORY; failed images are skipped (F2023 11.7.11).  */
+      if (stopped_image_in (images, size))
+	break;
+      for (i = 0; i < size; ++i)
+	if (this_image.supervisor->images[images[i]].status == IMAGE_OK
+	    && table[images[i] + img_c * this_image.image_num]
+		 > table[this_image.image_num + img_c * images[i]])
+	  break;
+      if (i == size)
+	break;
+      caf_shmem_cond_wait (&si->triggers[this_image.image_num],
+			   &si->cis->sync_images_table_lock);
+    }
+  terminated = false;
+  for (i = 0; i < size; ++i)
+    if (this_image.supervisor->images[images[i]].status != IMAGE_OK)
+      terminated = true;
+  unlock_table (si);
+  return terminated;
+}
+
+void
+notify_image_terminated (sync_t *si, int image, bool stopped)
+{
+  /* Under the table lock, so that an image about to wait in sync_table
+     either sees the new status or is woken.  */
+  lock_table (si);
+  atomic_fetch_add (stopped ? &this_image.supervisor->finished_images
+			    : &this_image.supervisor->failed_images, 1);
+  this_image.supervisor->images[image].status
+    = stopped ? IMAGE_SUCCESS : IMAGE_FAILED;
+  for (int j = 0; j < local->total_num_images; ++j)
+    caf_shmem_cond_signal (&si->triggers[j]);
+  unlock_table (si);
+}
+
+bool
+sync_all (int *terminated)
+{
+  return sync_team_unless_stopped (caf_current_team, terminated);
+}
+
+void
+sync_team (caf_shmem_team_t team)
+{
+  counter_barrier_wait (&team->u.image_info->image_count, NULL);
+}
+
+bool
+sync_team_unless_stopped (caf_shmem_team_t team, int *terminated)
+{
+  return counter_barrier_wait_abortable (&team->u.image_info->image_count,
+					 terminated);
+}
+
+void
+lock_event (sync_t *si)
+{
+  caf_shmem_mutex_lock (&si->cis->event_lock);
+}
+
+void
+unlock_event (sync_t *si)
+{
+  caf_shmem_mutex_unlock (&si->cis->event_lock);
+}
+
+void
+event_post (sync_t *si)
+{
+  caf_shmem_cond_broadcast (&si->cis->event_cond);
+}
+
+void
+event_wait (sync_t *si)
+{
+  caf_shmem_cond_wait (&si->cis->event_cond, &si->cis->event_lock);
+}

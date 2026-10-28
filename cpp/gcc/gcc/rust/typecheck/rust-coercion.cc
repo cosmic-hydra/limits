@@ -1,0 +1,680 @@
+// Copyright (C) 2020-2026 Free Software Foundation, Inc.
+
+// This file is part of GCC.
+
+// GCC is free software; you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free
+// Software Foundation; either version 3, or (at your option) any later
+// version.
+
+// GCC is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+// for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with GCC; see the file COPYING3.  If not see
+// <http://www.gnu.org/licenses/>.
+
+#include "rust-coercion.h"
+#include "rust-type-util.h"
+#include "rust-tyty.h"
+
+namespace Rust {
+namespace Resolver {
+
+TypeCoercionRules::CoercionResult
+TypeCoercionRules::Coerce (TyTy::BaseType *receiver, TyTy::BaseType *expected,
+			   location_t locus, bool allow_autoderef,
+			   bool is_cast_site)
+{
+  TypeCoercionRules resolver (expected, locus, true, allow_autoderef, false,
+			      is_cast_site);
+  bool ok = resolver.do_coercion (receiver);
+  return ok ? resolver.try_result : CoercionResult::get_error ();
+}
+
+TypeCoercionRules::CoercionResult
+TypeCoercionRules::TryCoerce (TyTy::BaseType *receiver,
+			      TyTy::BaseType *expected, location_t locus,
+			      bool allow_autoderef, bool is_cast_site,
+			      bool allow_never_coercion)
+{
+  TypeCoercionRules resolver (expected, locus, false, allow_autoderef, true,
+			      is_cast_site, allow_never_coercion);
+  bool ok = resolver.do_coercion (receiver);
+  return ok ? resolver.try_result : CoercionResult::get_error ();
+}
+
+TypeCoercionRules::TypeCoercionRules (TyTy::BaseType *expected,
+				      location_t locus, bool emit_errors,
+				      bool allow_autoderef, bool try_flag,
+				      bool is_cast_site,
+				      bool allow_never_coercion)
+  : AutoderefCycle (!allow_autoderef), mappings (Analysis::Mappings::get ()),
+    context (TypeCheckContext::get ()), expected (expected), locus (locus),
+    try_result (CoercionResult::get_error ()), emit_errors (emit_errors),
+    try_flag (try_flag), is_cast_site (is_cast_site),
+    allow_never_coercion (allow_never_coercion)
+{}
+
+bool
+TypeCoercionRules::do_coercion (TyTy::BaseType *receiver)
+{
+  // FIXME this is not finished and might be super simplified
+  // see:
+  // https://github.com/rust-lang/rust/blob/7eac88abb2e57e752f3302f02be5f3ce3d7adfb4/compiler/rustc_typeck/src/check/coercion.rs
+
+  if (receiver->get_kind () == TyTy::TypeKind::NEVER)
+    {
+      try_result = coerce_never (receiver);
+      return true;
+    }
+
+  // unsize
+  tl::expected<CoercionResult, CoerceUnsizedError> unsize_coercion
+    = coerce_unsized (receiver, expected);
+  if (unsize_coercion)
+    {
+      try_result = unsize_coercion.value ();
+      return true;
+    }
+  else if (unsize_coercion.error () == CoerceUnsizedError::Unsafe)
+    {
+      // location_t lhs = mappings.lookup_location (receiver->get_ref ());
+      // location_t rhs = mappings.lookup_location (expected->get_ref ());
+      // object_unsafe_error (locus, lhs, rhs);
+      return false;
+    }
+
+  // pointers
+  switch (expected->get_kind ())
+    {
+    case TyTy::TypeKind::POINTER:
+      {
+	auto *ptr = expected->as<TyTy::PointerType> ();
+	try_result = coerce_unsafe_ptr (receiver, ptr, ptr->mutability ());
+	return !try_result.is_error ();
+      }
+
+    case TyTy::TypeKind::REF:
+      {
+	auto *ptr = expected->as<TyTy::ReferenceType> ();
+	try_result
+	  = coerce_borrowed_pointer (receiver, ptr, ptr->mutability ());
+	return !try_result.is_error ();
+      }
+      break;
+
+    default:
+      break;
+    }
+
+  // https://github.com/rust-lang/rust/blob/7eac88abb2e57e752f3302f02be5f3ce3d7adfb4/compiler/rustc_typeck/src/check/coercion.rs#L210
+  switch (receiver->get_kind ())
+    {
+    default:
+      {
+	rust_debug (
+	  "do_coercion default unify and infer expected: %s receiver %s",
+	  receiver->debug_str ().c_str (), expected->debug_str ().c_str ());
+	TyTy::BaseType *result
+	  = unify_site_and (receiver->get_ref (),
+			    TyTy::TyWithLocation (expected),
+			    TyTy::TyWithLocation (receiver),
+			    locus /*unify_locus*/, false /*emit_errors*/,
+			    !try_flag /*commit_if_ok*/, try_flag /*infer*/,
+			    try_flag /*cleanup on error*/,
+			    true /*check_bounds*/, allow_never_coercion);
+	if (result->get_kind () != TyTy::TypeKind::ERROR)
+	  {
+	    try_result = CoercionResult{{}, result};
+	    return true;
+	  }
+      }
+      break;
+    }
+
+  return !try_result.is_error ();
+}
+
+TypeCoercionRules::CoercionResult
+TypeCoercionRules::coerce_never (TyTy::BaseType *receiver)
+{
+  // handle never
+  // https://github.com/rust-lang/rust/blob/7eac88abb2e57e752f3302f02be5f3ce3d7adfb4/compiler/rustc_typeck/src/check/coercion.rs#L155
+
+  // Subtle: If we are coercing from `!` to `?T`, where `?T` is an unbound
+  // type variable, we want `?T` to fallback to `!` if not
+  // otherwise constrained. An example where this arises:
+  //
+  //     let _: Option<?T> = Some({ return; });
+  //
+  // here, we would coerce from `!` to `?T`.
+  if (expected->has_substitutions_defined () && !expected->is_concrete ())
+    {
+      location_t locus = mappings.lookup_location (receiver->get_ref ());
+      TyTy::TyVar implicit_var = TyTy::TyVar::get_implicit_infer_var (locus);
+      return CoercionResult{{}, implicit_var.get_tyty ()};
+    }
+
+  bool expected_is_infer_var = expected->get_kind () == TyTy::TypeKind::INFER;
+  bool expected_is_general_infer_var
+    = expected_is_infer_var
+      && (static_cast<TyTy::InferType *> (expected)->get_infer_kind ()
+	  == TyTy::InferType::InferTypeKind::GENERAL);
+
+  // FIXME this 'expected_is_general_infer_var' case needs to eventually
+  // should go away see: compile/never_type_err1.rs
+  //
+  // I think we need inference obligations to say that yes we have a
+  // general inference variable but we add the oligation to the expected
+  // type that it could default to '!'
+  if (expected_is_general_infer_var)
+    return CoercionResult{{}, receiver};
+  else
+    return CoercionResult{{}, expected->clone ()};
+}
+
+TypeCoercionRules::CoercionResult
+TypeCoercionRules::coerce_unsafe_ptr (TyTy::BaseType *receiver,
+				      TyTy::PointerType *expected,
+				      Mutability to_mutbl)
+{
+  rust_debug ("coerce_unsafe_ptr(receiver={%s}, expected={%s})",
+	      receiver->debug_str ().c_str (), expected->debug_str ().c_str ());
+
+  Mutability from_mutbl = Mutability::Imm;
+  TyTy::BaseType *element = nullptr;
+  switch (receiver->get_kind ())
+    {
+    case TyTy::TypeKind::REF:
+      {
+	TyTy::ReferenceType *ref
+	  = static_cast<TyTy::ReferenceType *> (receiver);
+	from_mutbl = ref->mutability ();
+	element = ref->get_base ();
+      }
+      break;
+
+    case TyTy::TypeKind::POINTER:
+      {
+	TyTy::PointerType *ref = static_cast<TyTy::PointerType *> (receiver);
+	from_mutbl = ref->mutability ();
+	element = ref->get_base ();
+      }
+      break;
+
+    default:
+      {
+	if (types_compatable (TyTy::TyWithLocation (receiver),
+			      TyTy::TyWithLocation (expected), UNKNOWN_LOCATION,
+			      false))
+	  return CoercionResult{{}, expected->clone ()};
+
+	return CoercionResult::get_error ();
+      }
+    }
+
+  bool receiver_is_non_ptr = receiver->get_kind () != TyTy::TypeKind::POINTER;
+  if (autoderef_flag && receiver_is_non_ptr)
+    {
+      // it is unsafe to autoderef to raw pointers
+      return CoercionResult::get_error ();
+    }
+
+  if (!coerceable_mutability (from_mutbl, to_mutbl))
+    {
+      location_t lhs = mappings.lookup_location (receiver->get_ref ());
+      location_t rhs = mappings.lookup_location (expected->get_ref ());
+      mismatched_mutability_error (locus, lhs, rhs);
+      return TypeCoercionRules::CoercionResult::get_error ();
+    }
+
+  TyTy::PointerType *coerced_mutability
+    = new TyTy::PointerType (receiver->get_ref (),
+			     TyTy::TyVar (element->get_ref ()), to_mutbl);
+
+  rust_debug ("coerce_unsafe_ptr unify-site");
+
+  // this is a really annoying case rust allows casts of any ptr to another ptr
+  // types
+  //
+  //  *?   vs *i32  - simple coercion valid
+  //  *?   vs *T    - simple coercion valid
+  //  *i32 vs *i32  - simple coercion valid
+  //  *i32 vs *u8   - simple coercion not valid but allowed in cast site
+  //  *T   vs *u8   - not valid but is allowed in cast site
+
+  TyTy::BaseType *result
+    = unify_site_and (receiver->get_ref (), TyTy::TyWithLocation (expected),
+		      TyTy::TyWithLocation (coerced_mutability),
+		      locus /*unify_locus*/, !try_flag /*emit_errors*/,
+		      !try_flag /*commit_if_ok*/,
+		      try_flag && !is_cast_site /*infer*/,
+		      try_flag /*cleanup on error*/, true /*check_bounds*/,
+		      allow_never_coercion);
+  bool unsafe_ptr_coerceion_ok = result->get_kind () != TyTy::TypeKind::ERROR;
+  if (unsafe_ptr_coerceion_ok)
+    return CoercionResult{{}, result};
+
+  return TypeCoercionRules::CoercionResult::get_error ();
+}
+
+/// Reborrows `&mut A` to `&mut B` and `&(mut) A` to `&B`.
+/// To match `A` with `B`, autoderef will be performed,
+/// calling `deref`/`deref_mut` where necessary.
+TypeCoercionRules::CoercionResult
+TypeCoercionRules::coerce_borrowed_pointer (TyTy::BaseType *receiver,
+					    TyTy::ReferenceType *expected,
+					    Mutability to_mutbl)
+{
+  rust_debug ("coerce_borrowed_pointer(a={%s}, b={%s})",
+	      receiver->debug_str ().c_str (), expected->debug_str ().c_str ());
+
+  Mutability from_mutbl = Mutability::Imm;
+  switch (receiver->get_kind ())
+    {
+    case TyTy::TypeKind::REF:
+      {
+	from_mutbl = receiver->as<TyTy::ReferenceType> ()->mutability ();
+      }
+      break;
+    default:
+      {
+	rust_debug ("coerce_borrowed_pointer -- unify");
+	TyTy::BaseType *result
+	  = unify_site_and (receiver->get_ref (),
+			    TyTy::TyWithLocation (receiver),
+			    TyTy::TyWithLocation (expected), locus,
+			    false /*emit_errors*/, !try_flag /*commit_if_ok*/,
+			    try_flag /* infer */,
+			    try_flag /*cleanup_on_failure*/,
+			    true /*check_bounds*/, allow_never_coercion);
+	bool default_coerceion_ok
+	  = result->get_kind () != TyTy::TypeKind::ERROR;
+	if (default_coerceion_ok)
+	  return CoercionResult{{}, result};
+
+	return TypeCoercionRules::CoercionResult::get_error ();
+      }
+    }
+
+  if (!coerceable_mutability (from_mutbl, to_mutbl))
+    {
+      location_t lhs = mappings.lookup_location (receiver->get_ref ());
+      location_t rhs = mappings.lookup_location (expected->get_ref ());
+      mismatched_mutability_error (locus, lhs, rhs);
+      return TypeCoercionRules::CoercionResult::get_error ();
+    }
+
+  rust_debug ("coerce_borrowed_pointer -- autoderef cycle");
+  AutoderefCycle::cycle (receiver);
+  rust_debug ("coerce_borrowed_pointer -- result: [%s] with adjustments: [%zu]",
+	      try_result.is_error () ? "failed" : "matched",
+	      try_result.adjustments.size ());
+
+  return try_result;
+}
+
+// &[T; n] or &mut [T; n] -> &[T]
+// or &mut [T; n] -> &mut [T]
+// or &Concrete -> &Trait, etc.
+// https://doc.rust-lang.org/stable/reference/type-coercions.html
+tl::expected<TypeCoercionRules::CoercionResult,
+	     TypeCoercionRules::CoerceUnsizedError>
+TypeCoercionRules::coerce_unsized (TyTy::BaseType *source,
+				   TyTy::BaseType *target, bool is_inner)
+{
+  rust_debug ("coerce_unsized(source={%s}, target={%s})",
+	      source->debug_str ().c_str (), target->debug_str ().c_str ());
+  size_t adjustments_size = adjustments.size ();
+
+  auto setup = unwrap_ptrs_and_refs (source, target);
+  if (!setup)
+    return tl::unexpected<CoerceUnsizedError> (setup.error ());
+
+  // FIXME
+  // there is a bunch of code to ensure something is coerce able to a dyn
+  // trait we need to support but we need to support a few more lang items for
+  // that see:
+  // https://github.com/rust-lang/rust/blob/7eac88abb2e57e752f3302f02be5f3ce3d7adfb4/compiler/rustc_typeck/src/check/coercion.rs#L582
+
+  auto a = setup->ty_a;
+  auto b = setup->ty_b;
+
+  tl::expected<TyTy::BaseType *, CoerceUnsizedError> inner_result
+    = tl::unexpected<CoerceUnsizedError> (CoerceUnsizedError::Regular);
+
+  bool expect_dyn = b->get_kind () == TyTy::TypeKind::DYNAMIC;
+  bool need_unsize = a->get_kind () != TyTy::TypeKind::DYNAMIC;
+
+  bool expect_slice = b->get_kind () == TyTy::TypeKind::SLICE;
+  bool is_array = a->get_kind () == TyTy::TypeKind::ARRAY;
+
+  bool expect_adt = b->get_kind () == TyTy::TypeKind::ADT;
+  bool is_adt = a->get_kind () == TyTy::TypeKind::ADT;
+
+  if (expect_dyn && need_unsize)
+    inner_result
+      = (!setup->unwrapped_pointer && !is_inner)
+	  ? tl::unexpected<CoerceUnsizedError> (inner_result.error ())
+	  : coerce_unsized_dyn (a, b);
+
+  else if (expect_slice && is_array)
+    inner_result
+      = (!setup->unwrapped_pointer && !is_inner)
+	  ? tl::unexpected<CoerceUnsizedError> (inner_result.error ())
+	  : coerce_unsized_array_to_slice (a, b);
+
+  else if (expect_adt && is_adt)
+    inner_result = coerce_unsized_adt (a, b, setup->needs_reborrow);
+
+  if (!inner_result)
+    {
+      adjustments.erase (adjustments.begin () + adjustments_size,
+			 adjustments.end ());
+      return tl::unexpected<CoerceUnsizedError> (inner_result.error ());
+    }
+
+  TyTy::BaseType *result = inner_result.value ();
+
+  if (setup->needs_reborrow)
+    result = apply_reborrow_adjustment (source, target, result,
+					setup->expected_mutability);
+
+  return CoercionResult{adjustments, result};
+}
+
+tl::expected<TypeCoercionRules::CoercionSetup,
+	     TypeCoercionRules::CoerceUnsizedError>
+TypeCoercionRules::unwrap_ptrs_and_refs (TyTy::BaseType *source,
+					 TyTy::BaseType *target)
+{
+  bool source_is_ref = source->get_kind () == TyTy::TypeKind::REF;
+  bool source_is_ptr = source->get_kind () == TyTy::TypeKind::POINTER;
+  bool target_is_ref = target->get_kind () == TyTy::TypeKind::REF;
+  bool target_is_ptr = target->get_kind () == TyTy::TypeKind::POINTER;
+
+  bool needs_reborrow = false;
+  bool unwrapped_pointer = false;
+  TyTy::BaseType *ty_a = source;
+  TyTy::BaseType *ty_b = target;
+  Mutability expected_mutability = Mutability::Imm;
+  if (source_is_ref && target_is_ref)
+    {
+      TyTy::ReferenceType *source_ref
+	= static_cast<TyTy::ReferenceType *> (source);
+      TyTy::ReferenceType *target_ref
+	= static_cast<TyTy::ReferenceType *> (target);
+
+      Mutability from_mutbl = source_ref->mutability ();
+      Mutability to_mutbl = target_ref->mutability ();
+      if (!coerceable_mutability (from_mutbl, to_mutbl))
+	{
+	  location_t lhs = mappings.lookup_location (source->get_ref ());
+	  location_t rhs = mappings.lookup_location (target->get_ref ());
+	  mismatched_mutability_error (locus, lhs, rhs);
+	  return tl::unexpected<CoerceUnsizedError> (
+	    CoerceUnsizedError::Unsafe);
+	}
+
+      ty_a = source_ref->get_base ();
+      ty_b = target_ref->get_base ();
+      needs_reborrow = true;
+      unwrapped_pointer = true;
+      expected_mutability = to_mutbl;
+
+      adjustments.emplace_back (Adjustment::AdjustmentType::INDIRECTION,
+				source_ref, ty_a);
+    }
+  else if (source_is_ref && target_is_ptr)
+    {
+      TyTy::ReferenceType *source_ref
+	= static_cast<TyTy::ReferenceType *> (source);
+      TyTy::PointerType *target_ref = static_cast<TyTy::PointerType *> (target);
+
+      Mutability from_mutbl = source_ref->mutability ();
+      Mutability to_mutbl = target_ref->mutability ();
+      if (!coerceable_mutability (from_mutbl, to_mutbl))
+	{
+	  location_t lhs = mappings.lookup_location (source->get_ref ());
+	  location_t rhs = mappings.lookup_location (target->get_ref ());
+	  mismatched_mutability_error (locus, lhs, rhs);
+	  return tl::unexpected<CoerceUnsizedError> (
+	    CoerceUnsizedError::Unsafe);
+	}
+
+      ty_a = source_ref->get_base ();
+      ty_b = target_ref->get_base ();
+      needs_reborrow = true;
+      unwrapped_pointer = true;
+      expected_mutability = to_mutbl;
+
+      adjustments.emplace_back (Adjustment::AdjustmentType::INDIRECTION,
+				source_ref, ty_a);
+    }
+  else if (source_is_ptr && target_is_ptr)
+    {
+      TyTy::PointerType *source_ref = static_cast<TyTy::PointerType *> (source);
+      TyTy::PointerType *target_ref = static_cast<TyTy::PointerType *> (target);
+
+      Mutability from_mutbl = source_ref->mutability ();
+      Mutability to_mutbl = target_ref->mutability ();
+      if (!coerceable_mutability (from_mutbl, to_mutbl))
+	{
+	  location_t lhs = mappings.lookup_location (source->get_ref ());
+	  location_t rhs = mappings.lookup_location (target->get_ref ());
+	  mismatched_mutability_error (locus, lhs, rhs);
+	  return tl::unexpected<CoerceUnsizedError> (
+	    CoerceUnsizedError::Unsafe);
+	}
+
+      ty_a = source_ref->get_base ();
+      ty_b = target_ref->get_base ();
+      needs_reborrow = true;
+      unwrapped_pointer = true;
+      expected_mutability = to_mutbl;
+
+      adjustments.emplace_back (Adjustment::AdjustmentType::INDIRECTION,
+				source_ref, ty_a);
+    }
+
+  return CoercionSetup{ty_a, ty_b, needs_reborrow, expected_mutability,
+		       unwrapped_pointer};
+}
+
+tl::expected<TyTy::BaseType *, TypeCoercionRules::CoerceUnsizedError>
+TypeCoercionRules::coerce_unsized_array_to_slice (TyTy::BaseType *a,
+						  TyTy::BaseType *b)
+{
+  auto array_type = static_cast<const TyTy::ArrayType *> (a);
+  auto slice_type = static_cast<const TyTy::SliceType *> (b);
+
+  TyTy::BaseType *array_element = array_type->get_element_type ();
+  TyTy::BaseType *slice_element = slice_type->get_element_type ();
+
+  if (!array_element->is_equal (*slice_element))
+    return tl::unexpected<CoerceUnsizedError> (CoerceUnsizedError::Regular);
+
+  TyTy::BaseType *result = b->clone ();
+
+  adjustments.emplace_back (Adjustment::UNSIZE, a, result);
+
+  return result;
+}
+tl::expected<TyTy::BaseType *, TypeCoercionRules::CoerceUnsizedError>
+TypeCoercionRules::coerce_unsized_dyn (TyTy::BaseType *a, TyTy::BaseType *b)
+{
+  bool bounds_compatible = b->bounds_compatible (*a, locus, false);
+  if (!bounds_compatible)
+    return tl::unexpected<CoerceUnsizedError> (CoerceUnsizedError::Unsafe);
+
+  // return the unsize coercion
+  TyTy::BaseType *result = b->clone ();
+  // result->set_ref (a->get_ref ());
+
+  // append a dyn coercion adjustment
+  adjustments.emplace_back (Adjustment::UNSIZE, a, result);
+
+  return result;
+}
+tl::expected<TyTy::BaseType *, TypeCoercionRules::CoerceUnsizedError>
+TypeCoercionRules::coerce_unsized_adt (TyTy::BaseType *a, TyTy::BaseType *b,
+				       bool needs_reborrow)
+{
+  auto source_adt = static_cast<const TyTy::ADTType *> (a);
+  auto target_adt = static_cast<const TyTy::ADTType *> (b);
+
+  if ((!source_adt->is_struct_struct () && !source_adt->is_tuple_struct ())
+      || (!target_adt->is_struct_struct () && !target_adt->is_tuple_struct ())
+      || (source_adt->get_id () != target_adt->get_id ())
+      || (source_adt->get_variants ().front ()->num_fields ()
+	  != target_adt->get_variants ().front ()->num_fields ()))
+    return tl::unexpected<CoerceUnsizedError> (CoerceUnsizedError::Regular);
+
+  auto source_variant = source_adt->get_variants ().front ();
+  auto target_variant = target_adt->get_variants ().front ();
+
+  TyTy::BaseType *differing_source_field = nullptr;
+  TyTy::BaseType *differing_target_field = nullptr;
+  size_t diff_count = 0;
+  bool is_last_field = false;
+
+  for (size_t i = 0; i < source_variant->num_fields (); i++)
+    {
+      auto s_field_raw
+	= source_variant->get_field_at_index (i)->get_field_type ();
+      auto t_field_raw
+	= target_variant->get_field_at_index (i)->get_field_type ();
+      auto s_field = s_field_raw->contains_infer ()
+		       ? s_field_raw
+		       : s_field_raw->monomorphized_clone ();
+      auto t_field = t_field_raw->contains_infer ()
+		       ? t_field_raw
+		       : t_field_raw->monomorphized_clone ();
+
+      // https://doc.rust-lang.org/reference/dynamically-sized-types.html
+      if (!s_field->is_equal (*t_field))
+	{
+	  if (s_field->is<TyTy::ADTType> () && t_field->is<TyTy::ADTType> ())
+	    if (auto phantom_data
+		= mappings.lookup_lang_item (LangItem::Kind::PHANTOM_DATA))
+	      if (s_field->as<TyTy::ADTType> ()->get_id () == phantom_data
+		  && t_field->as<TyTy::ADTType> ()->get_id () == phantom_data)
+		continue;
+
+	  differing_source_field = s_field;
+	  differing_target_field = t_field;
+	  diff_count++;
+	  is_last_field = (i == source_variant->num_fields () - 1);
+	}
+    }
+
+  if (diff_count != 1)
+    return tl::unexpected<CoerceUnsizedError> (CoerceUnsizedError::Regular);
+
+  if (needs_reborrow && !is_last_field)
+    return tl::unexpected<CoerceUnsizedError> (CoerceUnsizedError::Regular);
+
+  auto adjustments_size = adjustments.size ();
+  auto inner_coercion
+    = coerce_unsized (differing_source_field, differing_target_field, true);
+  if (!inner_coercion)
+    return tl::unexpected<CoerceUnsizedError> (inner_coercion.error ());
+  adjustments.erase (adjustments.begin () + adjustments_size,
+		     adjustments.end ());
+
+  TyTy::BaseType *result = b->clone ();
+  adjustments.emplace_back (Adjustment::UNSIZE, a, result);
+
+  return result;
+}
+TyTy::BaseType *
+TypeCoercionRules::apply_reborrow_adjustment (TyTy::BaseType *source,
+					      TyTy::BaseType *target,
+					      TyTy::BaseType *result,
+					      Mutability expected_mutability)
+{
+  TyTy::BaseType *reborrow = nullptr;
+
+  if (target->get_kind () == TyTy::TypeKind::POINTER)
+    {
+      reborrow = new TyTy::PointerType (source->get_ref (),
+					TyTy::TyVar (result->get_ref ()),
+					expected_mutability);
+    }
+  else
+    {
+      reborrow = new TyTy::ReferenceType (source->get_ref (),
+					  TyTy::TyVar (result->get_ref ()),
+					  expected_mutability);
+    }
+
+  Adjustment::AdjustmentType borrow_type
+    = expected_mutability == Mutability::Imm ? Adjustment::IMM_REF
+					     : Adjustment::MUT_REF;
+
+  adjustments.emplace_back (borrow_type, result, reborrow);
+  return reborrow;
+}
+
+bool
+TypeCoercionRules::select (TyTy::BaseType &autoderefed)
+{
+  rust_debug ("TypeCoercionRules::select autoderefed={%s} can_eq expected={%s}",
+	      autoderefed.debug_str ().c_str (),
+	      expected->debug_str ().c_str ());
+
+  TyTy::BaseType *result
+    = unify_site_and (autoderefed.get_ref (), TyTy::TyWithLocation (expected),
+		      TyTy::TyWithLocation (&autoderefed),
+		      UNDEF_LOCATION /* locus */, false /*emit_errors*/,
+		      !try_flag /*commit_if_ok*/, try_flag /*infer*/,
+		      try_flag /*cleanup*/, true /*check_bounds*/,
+		      allow_never_coercion);
+  bool ok = result->get_kind () != TyTy::TypeKind::ERROR;
+  if (!ok)
+    return false;
+
+  try_result = CoercionResult{adjustments, result};
+  return true;
+}
+
+/// Coercing a mutable reference to an immutable works, while
+/// coercing `&T` to `&mut T` should be forbidden.
+bool
+TypeCoercionRules::coerceable_mutability (Mutability from_mutbl,
+					  Mutability to_mutbl)
+{
+  return to_mutbl == Mutability::Imm || (from_mutbl == to_mutbl);
+}
+
+void
+TypeCoercionRules::mismatched_mutability_error (location_t expr_locus,
+						location_t lhs, location_t rhs)
+{
+  if (!emit_errors)
+    return;
+
+  rich_location r (line_table, expr_locus);
+  r.add_range (lhs);
+  r.add_range (rhs);
+  rust_error_at (r, "mismatched mutability");
+}
+
+void
+TypeCoercionRules::object_unsafe_error (location_t expr_locus, location_t lhs,
+					location_t rhs)
+{
+  if (!emit_errors)
+    return;
+
+  rich_location r (line_table, expr_locus);
+  r.add_range (lhs);
+  r.add_range (rhs);
+  rust_error_at (r, "unsafe unsize coercion");
+}
+
+} // namespace Resolver
+} // namespace Rust
