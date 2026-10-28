@@ -81,6 +81,13 @@ pub struct Func {
     pub params: Vec<(String, TyExpr)>,
     pub ret: Option<TyExpr>,
     pub body: Vec<Stmt>,
+    /// Contract clauses: `requires e;` before the body, `ensures e;` (may use
+    /// `result`) checked on every return. Empty for most functions.
+    pub requires: Vec<Expr>,
+    pub ensures: Vec<Expr>,
+    /// `test "name" { }` blocks are parameterless functions with
+    /// this display name (qualified by module after checking).
+    pub test: Option<String>,
     /// Index of the defining module (set by the checker; 0 is the root file).
     pub file: usize,
     pub line: u32,
@@ -101,6 +108,8 @@ pub struct Struct {
 pub struct Program {
     /// Dotted import paths (`util.strings`) with their position.
     pub imports: Vec<(String, u32, u32)>,
+    /// Capabilities from `uses a, b.c;` with their position.
+    pub uses: Vec<(String, u32, u32)>,
     pub funcs: Vec<Func>,
     pub structs: Vec<Struct>,
     /// Display path of each module's file ("" for the root), by module index.

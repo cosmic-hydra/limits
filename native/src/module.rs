@@ -13,6 +13,8 @@ pub struct Module {
     /// Path shown in errors ("" for the root file).
     pub file: String,
     pub prog: Program,
+    /// Import chain from the root, e.g. "main.lim -> a.lim -> b.lim".
+    pub chain: String,
     /// Import alias (last path segment) -> module index.
     pub aliases: HashMap<String, usize>,
 }
@@ -65,8 +67,19 @@ impl Loader {
         } else {
             self.show(&path)
         };
-        let src = match std::fs::read_to_string(&path) {
-            Ok(s) => s,
+        let src = match std::fs::read(&path).map(String::from_utf8) {
+            Ok(Ok(s)) => s,
+            Ok(Err(e)) => {
+                // A located lex error, so `--json` covers it too.
+                let ok = &e.as_bytes()[..e.utf8_error().valid_up_to()];
+                let ok = std::str::from_utf8(ok).unwrap_or_default();
+                let last = ok.rsplit('\n').next().unwrap_or("");
+                let line = ok.matches('\n').count() as u32 + 1;
+                let col = last.chars().count() as u32 + 1;
+                let msg = "invalid UTF-8 in source file".to_string();
+                self.err(Error::new("lex", line, col, msg), &file);
+                return None;
+            }
             Err(e) => {
                 eprintln!("limits: cannot read '{}': {}", path.display(), e);
                 std::process::exit(2)
@@ -81,7 +94,14 @@ impl Loader {
         };
         let imports = prog.imports.clone();
         let idx = self.mods.len();
+        let chain: Vec<String> = self
+            .stack
+            .iter()
+            .chain([&path])
+            .map(|p| self.show(p))
+            .collect();
         self.mods.push(Module {
+            chain: chain.join(" -> "),
             name,
             file: file.clone(),
             prog,

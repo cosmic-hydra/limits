@@ -1,0 +1,2 @@
+uses env;
+pub fn g() { print(env("HOME")); }

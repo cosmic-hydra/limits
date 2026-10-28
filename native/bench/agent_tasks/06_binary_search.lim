@@ -1,0 +1,40 @@
+# Binary search: lower-bound lookups into a sorted list.
+fn rnd(s: [int]) -> int {
+    s[0] = (s[0] * 1103515245 + 12345) % 2147483648;
+    return s[0] / 65536;
+}
+
+fn lower_bound(xs: [int], x: int) -> int {
+    let lo = 0;
+    let hi = len(xs);
+    while lo < hi {
+        let mid = (lo + hi) / 2;
+        if xs[mid] < x {
+            lo = mid + 1;
+        } else {
+            hi = mid;
+        }
+    }
+    return lo;
+}
+
+fn main() {
+    let seed = [9];
+    let xs: [int] = [];
+    let v = 0;
+    for i in 0..200000 {
+        v = v + 1 + rnd(seed) % 5;
+        push(xs, v);
+    }
+    let found = 0;
+    let possum = 0;
+    for i in 0..200000 {
+        let q = rnd(seed) % (v + 1);
+        let p = lower_bound(xs, q);
+        possum = possum + p;
+        if p < len(xs) and xs[p] == q {
+            found = found + 1;
+        }
+    }
+    print(found, possum);
+}

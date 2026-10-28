@@ -55,8 +55,10 @@ fn import_cycle_prints_path() {
 fn private_and_unknown_items() {
     fails(
         "private",
-        "check error at 4:9: function 'hidden' in module 'lib' is private (mark it 'pub')\n\
-         check error at 5:11: struct 'Secret' in module 'lib' is private (mark it 'pub')\n\
+        "check error at 4:9: function 'hidden' in module 'lib' is private\n  \
+         hint: add 'pub' to fn hidden in lib.lim\n\
+         check error at 5:11: struct 'Secret' in module 'lib' is private\n  \
+         hint: add 'pub' to struct Secret in lib.lim\n\
          check error at 6:9: module 'lib' has no function 'nope'\n\
          check error at 6:21: unknown module 'other' (missing 'import other;'?)",
     );
@@ -89,5 +91,20 @@ fn runtime_error_in_module_names_the_file() {
     assert_eq!(
         err,
         "runtime error in m/u.lim at 2:12: index 5 out of bounds for list of length 1"
+    );
+}
+
+#[test]
+fn inline_tests_in_modules_without_main() {
+    let (code, out, err) = run("tests/fixtures/inline", "test");
+    assert_eq!((code, err.as_str()), (0, ""));
+    assert_eq!(out, "ok root\nok m.sq\n2 passed, 0 failed\n");
+}
+
+#[test]
+fn module_capability_must_be_granted_by_root() {
+    fails(
+        "caps",
+        "check error in b.lim at 1:6: capability 'env' is not declared by the root file (import chain: main.lim -> a.lim -> b.lim)\n  hint: add 'env' to the 'uses' line of the root file",
     );
 }

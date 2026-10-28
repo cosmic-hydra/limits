@@ -7,8 +7,41 @@ use crate::Error;
 use std::collections::{HashMap, HashSet};
 
 pub const BUILTINS: &[&str] = &[
-    "print", "len", "push", "pop", "str", "int", "float", "assert", "sqrt",
+    "print",
+    "len",
+    "push",
+    "pop",
+    "str",
+    "int",
+    "float",
+    "assert",
+    "sqrt",
+    "split",
+    "join",
+    "sort",
+    "read_file",
+    "write_file",
+    "env",
+    "now_ms",
+    "args",
+    "input_line",
 ];
+
+/// Capabilities a file may declare with `uses ...;`.
+pub const CAPS: &[&str] = &["fs.read", "fs.write", "env", "time", "args", "stdin"];
+
+/// I/O builtins: name, required capability, parameter types, return type.
+fn io_builtin(name: &str) -> Option<(&'static str, Vec<Ty>, Ty)> {
+    Some(match name {
+        "read_file" => ("fs.read", vec![Ty::Str], Ty::Str),
+        "write_file" => ("fs.write", vec![Ty::Str, Ty::Str], Ty::Unit),
+        "env" => ("env", vec![Ty::Str], Ty::Str),
+        "now_ms" => ("time", vec![], Ty::Int),
+        "args" => ("args", vec![], Ty::List(Box::new(Ty::Str))),
+        "input_line" => ("stdin", vec![], Ty::Str),
+        _ => return None,
+    })
+}
 
 /// Struct name -> fields in declaration order.
 pub type StructMap = HashMap<String, Vec<(String, Ty)>>;
@@ -23,6 +56,8 @@ pub struct Checker {
     names: Vec<String>,
     aliases: Vec<HashMap<String, usize>>,
     files: Vec<String>,
+    /// Per module: declared capabilities.
+    caps: Vec<HashSet<String>>,
     cur: usize,
     scopes: Vec<HashMap<String, Ty>>,
     ret: Ty,
@@ -40,7 +75,8 @@ fn qualify(module: &str, item: &str) -> String {
 
 /// Check every module and merge them into one program whose item names (and
 /// every call, struct literal and type that refers to them) are qualified.
-pub fn check(mods: &mut [Module]) -> Result<(Program, StructMap), Vec<Error>> {
+/// `need_main` is false in `limits test` mode, where no entry point is used.
+pub fn check(mods: &mut [Module], need_main: bool) -> Result<(Program, StructMap), Vec<Error>> {
     let mut c = Checker {
         structs: HashMap::new(),
         funcs: HashMap::new(),
@@ -49,12 +85,34 @@ pub fn check(mods: &mut [Module]) -> Result<(Program, StructMap), Vec<Error>> {
         names: mods.iter().map(|m| m.name.clone()).collect(),
         aliases: mods.iter().map(|m| m.aliases.clone()).collect(),
         files: mods.iter().map(|m| m.file.clone()).collect(),
+        caps: mods
+            .iter()
+            .map(|m| m.prog.uses.iter().map(|u| u.0.clone()).collect())
+            .collect(),
         cur: 0,
         scopes: Vec::new(),
         ret: Ty::Unit,
         loops: 0,
         errs: Vec::new(),
     };
+    // Capabilities: known names only, and a module may use only what the
+    // root file declared (the host grants capabilities to the whole program).
+    for (i, m) in mods.iter().enumerate() {
+        c.cur = i;
+        for (u, l, col) in &m.prog.uses {
+            if !CAPS.contains(&u.as_str()) {
+                let h = format!("capabilities are: {}", CAPS.join(", "));
+                c.err_h(*l, *col, format!("unknown capability '{}'", u), h);
+            } else if i > 0 && !c.caps[0].contains(u) {
+                let m = format!(
+                    "capability '{}' is not declared by the root file (import chain: {})",
+                    u, m.chain
+                );
+                let h = format!("add '{}' to the 'uses' line of the root file", u);
+                c.err_h(*l, *col, m, h);
+            }
+        }
+    }
     // Pass 1a: declare every struct name in every module.
     for (i, m) in mods.iter().enumerate() {
         c.cur = i;
@@ -90,7 +148,7 @@ pub fn check(mods: &mut [Module]) -> Result<(Program, StructMap), Vec<Error>> {
             }
             c.structs.insert(qualify(&m.name, &s.name), fields);
         }
-        for f in &mut m.prog.funcs {
+        for f in m.prog.funcs.iter_mut().filter(|f| f.test.is_none()) {
             let ps: Vec<Ty> = f.params.iter_mut().map(|(_, t)| c.resolve(t)).collect();
             let r = f.ret.as_mut().map_or(Ty::Unit, |t| c.resolve(t));
             let q = qualify(&m.name, &f.name);
@@ -141,6 +199,7 @@ pub fn check(mods: &mut [Module]) -> Result<(Program, StructMap), Vec<Error>> {
     }
     c.cur = 0;
     match c.funcs.get("main") {
+        _ if !need_main => {}
         None => c.err(1, 1, "missing 'fn main()'".into()),
         Some((p, r)) if !p.is_empty() || *r != Ty::Unit => {
             let f = mods[0]
@@ -161,7 +220,11 @@ pub fn check(mods: &mut [Module]) -> Result<(Program, StructMap), Vec<Error>> {
     for (i, m) in mods.iter_mut().enumerate() {
         c.cur = i;
         for f in &mut m.prog.funcs {
-            let Some((ps, r)) = c.funcs.get(&qualify(&m.name, &f.name)).cloned() else {
+            let sig = match f.test {
+                Some(_) => Some((Vec::new(), Ty::Unit)),
+                None => c.funcs.get(&qualify(&m.name, &f.name)).cloned(),
+            };
+            let Some((ps, r)) = sig else {
                 continue; // builtin redefinition, already reported
             };
             c.ret = r.clone();
@@ -171,6 +234,17 @@ pub fn check(mods: &mut [Module]) -> Result<(Program, StructMap), Vec<Error>> {
                     c.err(f.line, f.col, format!("duplicate parameter '{}'", n));
                 }
             }
+            for e in &mut f.requires {
+                c.want(e, &Ty::Bool, "requires clause");
+            }
+            c.scopes.push(HashMap::new());
+            if r != Ty::Unit {
+                c.scopes[1].insert("result".into(), r.clone());
+            }
+            for e in &mut f.ensures {
+                c.want(e, &Ty::Bool, "ensures clause");
+            }
+            c.scopes.pop();
             c.block(&mut f.body, false);
             if r != Ty::Unit && !returns(&f.body) {
                 c.err(
@@ -193,6 +267,7 @@ pub fn check(mods: &mut [Module]) -> Result<(Program, StructMap), Vec<Error>> {
     for (i, m) in mods.iter_mut().enumerate() {
         for mut f in std::mem::take(&mut m.prog.funcs) {
             f.name = qualify(&m.name, &f.name);
+            f.test = f.test.map(|t| qualify(&m.name, &t));
             f.file = i;
             out.funcs.push(f);
         }
@@ -223,9 +298,30 @@ fn compat(a: &Ty, b: &Ty) -> bool {
 
 impl Checker {
     fn err(&mut self, l: u32, c: u32, m: String) {
+        self.err_h(l, c, m, String::new());
+    }
+
+    fn err_h(&mut self, l: u32, c: u32, m: String, hint: String) {
         let mut e = Error::new("check", l, c, m);
         e.file = self.files[self.cur].clone();
+        e.hint = hint;
         self.errs.push(e);
+    }
+
+    /// "did you mean" over the functions (or structs) of module `m`.
+    fn suggest_item(&self, n: &str, fns: bool, m: usize) -> String {
+        let pre = qualify(&self.names[m], "");
+        let keys: Vec<&String> = if fns {
+            self.funcs.keys().collect()
+        } else {
+            self.structs.keys().collect()
+        };
+        let local = keys
+            .into_iter()
+            .filter_map(|k| k.strip_prefix(pre.as_str()))
+            .filter(|k| !k.contains('.'));
+        let extra = if fns && m == self.cur { BUILTINS } else { &[] };
+        crate::diag::suggest(n, local.chain(extra.iter().copied()))
     }
 
     /// Resolve a function (`fns`) or struct name as written in the current
@@ -247,7 +343,8 @@ impl Checker {
             } else {
                 format!("unknown struct '{}'", n)
             };
-            self.err(l, c, m);
+            let h = self.suggest_item(n, fns, self.cur);
+            self.err_h(l, c, m, h);
             return None;
         };
         let Some(&m) = self.aliases[self.cur].get(alias) else {
@@ -265,19 +362,16 @@ impl Checker {
             (self.structs.contains_key(&q), self.pub_structs.contains(&q))
         };
         if !known {
-            self.err(
-                l,
-                c,
-                format!("module '{}' has no {} '{}'", alias, what, item),
-            );
+            let h = self.suggest_item(item, fns, m);
+            let msg = format!("module '{}' has no {} '{}'", alias, what, item);
+            self.err_h(l, c, msg, h);
             return None;
         }
         if !public {
-            let m = format!(
-                "{} '{}' in module '{}' is private (mark it 'pub')",
-                what, item, alias
-            );
-            self.err(l, c, m);
+            let msg = format!("{} '{}' in module '{}' is private", what, item, alias);
+            let kw = if fns { "fn" } else { "struct" };
+            let h = format!("add 'pub' to {} {} in {}", kw, item, self.files[m]);
+            self.err_h(l, c, msg, h);
             return None;
         }
         Some(q)
@@ -297,7 +391,8 @@ impl Checker {
                         .structs
                         .contains_key(&qualify(&self.names[self.cur], n)) =>
                 {
-                    self.err(*l, *c, format!("unknown type '{}'", n));
+                    let h = self.suggest_item(n, false, self.cur);
+                    self.err_h(*l, *c, format!("unknown type '{}'", n), h);
                     Ty::Err
                 }
                 _ => match self.item(&n.clone(), false, *l, *c) {
@@ -309,6 +404,14 @@ impl Checker {
                 },
             },
         }
+    }
+
+    fn suggest_var(&self, n: &str) -> String {
+        let names = self
+            .scopes
+            .iter()
+            .flat_map(|s| s.keys().map(String::as_str));
+        crate::diag::suggest(n, names)
     }
 
     fn lookup(&self, n: &str) -> Option<&Ty> {
@@ -381,11 +484,12 @@ impl Checker {
             Stmt::Assign(target, v) => {
                 if let ExprKind::Var(n) = &target.kind {
                     if self.lookup(n).is_none() {
-                        self.err(
-                            target.line,
-                            target.col,
-                            format!("assignment to undeclared variable '{}'", n),
-                        );
+                        let h = match self.suggest_var(n) {
+                            h if h.is_empty() => format!("declare it first: let {} = ...;", n),
+                            h => h,
+                        };
+                        let m = format!("assignment to undeclared variable '{}'", n);
+                        self.err_h(target.line, target.col, m, h);
                         self.expr(v, None);
                         return;
                     }
@@ -473,7 +577,12 @@ impl Checker {
                 Some(t) => t.clone(),
                 None => {
                     let n = n.clone();
-                    self.err(l, c, format!("undefined variable '{}'", n));
+                    let h = if n == "result" {
+                        "'result' only exists in 'ensures' of a fn with a return type".into()
+                    } else {
+                        self.suggest_var(&n)
+                    };
+                    self.err_h(l, c, format!("undefined variable '{}'", n), h);
                     Ty::Err
                 }
             },
@@ -603,7 +712,9 @@ impl Checker {
                         Some((_, t)) => t.clone(),
                         None => {
                             let m = format!("struct '{}' has no field '{}'", s, f);
-                            self.err(l, c, m);
+                            let names = self.structs[s].iter().map(|(n, _)| n.as_str());
+                            let h = crate::diag::suggest(f, names);
+                            self.err_h(l, c, m, h);
                             Ty::Err
                         }
                     },
@@ -662,6 +773,21 @@ impl Checker {
                 let m = format!("'{}' expects {}, got {}", name, what, ts[i]);
                 me.err(pos[i].0, pos[i].1, m);
             };
+            if let Some((cap, ps, r)) = io_builtin(name) {
+                if !self.caps[self.cur].contains(cap) {
+                    let m = format!("'{}' needs capability '{}'", name, cap);
+                    let h = format!("add 'uses {};' at the top of this file", cap);
+                    self.err_h(l, c, m, h);
+                }
+                if arity(ps.len()..=ps.len(), self) {
+                    for (i, p) in ps.iter().enumerate() {
+                        if !compat(&ts[i], p) {
+                            bad(self, i, &format!("a {}", p), &ts);
+                        }
+                    }
+                }
+                return r;
+            }
             return match name {
                 "print" => {
                     for (i, t) in ts.iter().enumerate() {
@@ -723,6 +849,36 @@ impl Checker {
                     } else {
                         Ty::Float
                     }
+                }
+                "split" | "join" => {
+                    let want = if name == "split" {
+                        Ty::Str
+                    } else {
+                        Ty::List(Box::new(Ty::Str))
+                    };
+                    if arity(2..=2, self) {
+                        if !compat(&ts[0], &want) {
+                            bad(self, 0, &format!("a {}", want), &ts);
+                        }
+                        if !compat(&ts[1], &Ty::Str) {
+                            bad(self, 1, "a str separator", &ts);
+                        }
+                    }
+                    if name == "split" {
+                        Ty::List(Box::new(Ty::Str))
+                    } else {
+                        Ty::Str
+                    }
+                }
+                "sort" => {
+                    let ok = |t: &Ty| matches!(t, Ty::Int | Ty::Float | Ty::Str | Ty::Err);
+                    if arity(1..=1, self)
+                        && !matches!(&ts[0], Ty::List(t) if ok(t))
+                        && ts[0] != Ty::Err
+                    {
+                        bad(self, 0, "a list of int, float or str", &ts);
+                    }
+                    Ty::Unit
                 }
                 "sqrt" => {
                     if arity(1..=1, self) && !compat(&ts[0], &Ty::Float) {

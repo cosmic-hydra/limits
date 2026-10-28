@@ -1,0 +1,24 @@
+# FizzBuzz variant with 3/5/7.
+fn main() {
+    let lines: [str] = [];
+    let words = 0;
+    for i in 1..500001 {
+        let s = "";
+        if i % 3 == 0 {
+            s = s + "Fizz";
+        }
+        if i % 5 == 0 {
+            s = s + "Buzz";
+        }
+        if i % 7 == 0 {
+            s = s + "Bazz";
+        }
+        if s == "" {
+            s = str(i);
+        } else {
+            words = words + 1;
+        }
+        push(lines, s);
+    }
+    print(words, len(join(lines, "\n")), lines[104]);
+}

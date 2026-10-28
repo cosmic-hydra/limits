@@ -12,6 +12,15 @@ pub struct Opts {
     pub max_mem: u64,
     /// Upper bound on the number of C translation units (for parallel cc).
     pub parts: usize,
+    /// Runtime errors as JSON lines (`--json`).
+    pub json: bool,
+    /// Build the inline tests (`limits test`) instead of `main`.
+    pub tests: bool,
+    /// `--allow` grants: canonical path prefixes for fs.read / fs.write
+    /// (empty = current directory) and env var names (empty = all).
+    pub allow_read: Vec<String>,
+    pub allow_write: Vec<String>,
+    pub allow_env: Vec<String>,
 }
 
 /// Generated code below this many bytes always stays in one C file.
@@ -29,6 +38,9 @@ struct Gen<'a> {
     checked: bool,
     /// Added to line numbers: the current function's file index << 20.
     fofs: u32,
+    /// `ensures` clauses of the current function, checked at every return.
+    ensures: &'a [Expr],
+    fname: &'a str,
 }
 
 fn cty(t: &Ty) -> String {
@@ -52,12 +64,24 @@ fn to_val(code: &str, t: &Ty) -> String {
     }
 }
 
-fn from_val(code: &str, t: &Ty) -> String {
+/// Accessor suffix and C storage type of a list element (see LM_LIST).
+fn elem(list: &Ty) -> (&'static str, String) {
+    match list {
+        Ty::List(t) => match **t {
+            Ty::Bool => ("b", "bool".into()),
+            Ty::Int => ("i", "int64_t".into()),
+            Ty::Float => ("f", "double".into()),
+            _ => ("p", "void *".into()),
+        },
+        _ => unreachable!(),
+    }
+}
+
+/// Cast a value read from a list back to its C type (pointer elements are `void *`).
+fn from_slot(code: String, t: &Ty) -> String {
     match t {
-        Ty::Int => format!("{}.i", code),
-        Ty::Bool => format!("((bool){}.i)", code),
-        Ty::Float => format!("{}.f", code),
-        _ => format!("(({}){}.p)", cty(t), code),
+        Ty::Bool | Ty::Int | Ty::Float => code,
+        _ => format!("(({}){})", cty(t), code),
     }
 }
 
@@ -79,7 +103,12 @@ fn c_escape(s: &str) -> String {
 /// Generate C. Returns one or more complete translation units; the first one
 /// holds `main`. Several are returned only for large programs when
 /// `o.parts > 1`, so the C compiler can run in parallel.
-pub fn generate(prog: &Program, structs: &crate::check::StructMap, o: &Opts) -> Vec<String> {
+pub fn generate(
+    prog: &Program,
+    structs: &crate::check::StructMap,
+    o: &Opts,
+    root: &str,
+) -> Vec<String> {
     let mut g = Gen {
         out: String::new(),
         strs: Vec::new(),
@@ -96,7 +125,15 @@ pub fn generate(prog: &Program, structs: &crate::check::StructMap, o: &Opts) -> 
         ret_unit: true,
         checked: o.checked,
         fofs: 0,
+        ensures: &[],
+        fname: "",
     };
+    // Tests are only compiled by `limits test`, which never calls `main`.
+    let funcs: Vec<&Func> = prog
+        .funcs
+        .iter()
+        .filter(|f| o.tests || f.test.is_none())
+        .collect();
     // Struct declarations, constructors and printers.
     let mut decls = String::new();
     for s in &prog.structs {
@@ -116,7 +153,7 @@ pub fn generate(prog: &Program, structs: &crate::check::StructMap, o: &Opts) -> 
         let _ =
             writeln!(
             decls,
-            "static S_{0} *mk_{0}({1}int l, int c) {{\n  S_{0} *r = lm_alloc(sizeof(S_{0}), l, c);",
+            "static LM_U S_{0} *mk_{0}({1}int l, int c) {{\n  S_{0} *r = lm_alloc(sizeof(S_{0}), l, c);",
             mangle(&s.name),
             params.iter().map(|p| format!("{}, ", p)).collect::<String>()
         );
@@ -148,9 +185,8 @@ pub fn generate(prog: &Program, structs: &crate::check::StructMap, o: &Opts) -> 
         decls.push_str("    lm_puts(b, \"}\");\n    break;\n  }\n");
     }
     decls.push_str("  }\n  (void)b; (void)p; (void)d;\n}\n");
-    decls.push_str(
-        "static const char *lm_file_name(int i) {\n  static const char *const n[] = {\"\"",
-    );
+    decls.push_str("static const char *lm_file_name(int i) {\n  static const char *const n[] = {");
+    let _ = write!(decls, "\"{}\"", c_escape(root));
     for f in prog.files.iter().skip(1) {
         let _ = write!(decls, ", \"{}\"", c_escape(f));
     }
@@ -160,9 +196,13 @@ pub fn generate(prog: &Program, structs: &crate::check::StructMap, o: &Opts) -> 
     let sig = |f: &Func| -> (String, Vec<Ty>, Ty) {
         let r = f.ret.as_ref().map_or(Ty::Unit, ty_of);
         let ps: Vec<Ty> = f.params.iter().map(|(_, t)| ty_of(t)).collect();
-        (format!("LM_FN {} fn_{}", cty(&r), mangle(&f.name)), ps, r)
+        (
+            format!("LM_FN LM_U {} fn_{}", cty(&r), mangle(&f.name)),
+            ps,
+            r,
+        )
     };
-    for f in &prog.funcs {
+    for f in &funcs {
         let (head, ps, _) = sig(f);
         let ps: Vec<String> = ps.iter().map(cty).collect();
         let _ = writeln!(
@@ -177,15 +217,17 @@ pub fn generate(prog: &Program, structs: &crate::check::StructMap, o: &Opts) -> 
         );
     }
     let mut chunks = Vec::new();
-    for f in &prog.funcs {
+    for f in &funcs {
         let (head, ps, r) = sig(f);
         g.scopes = vec![HashMap::new()];
         g.ret_unit = r == Ty::Unit;
         g.fofs = (f.file as u32) << 20;
+        g.fname = &f.name;
+        g.ensures = if o.checked { &f.ensures } else { &[] };
         let mut params = Vec::new();
         for ((n, _), t) in f.params.iter().zip(&ps) {
             let c = g.bind(n);
-            params.push(format!("{} {}", cty(t), c));
+            params.push(format!("{} LM_U {}", cty(t), c));
         }
         let _ = writeln!(
             g.out,
@@ -200,8 +242,14 @@ pub fn generate(prog: &Program, structs: &crate::check::StructMap, o: &Opts) -> 
         if o.checked {
             let _ = writeln!(g.out, "  LM_ENTER({}, {});", f.line + g.fofs, f.col);
         }
+        if o.checked {
+            for e in &f.requires {
+                g.contract(e, "requires");
+            }
+        }
         g.block(&f.body);
         if g.ret_unit {
+            g.ensures(None);
             g.line("LM_LEAVE;");
         } else {
             g.line("__builtin_unreachable();");
@@ -229,13 +277,37 @@ pub fn generate(prog: &Program, structs: &crate::check::StructMap, o: &Opts) -> 
     if o.checked {
         c.push_str("#define LM_CHECKED 1\n");
     }
+    if o.json {
+        c.push_str(
+            "#define LM_JSON 1\nstatic const char *const lm_codes[] __attribute__((unused)) = {",
+        );
+        for (_, frag, code) in crate::diag::CODES.iter().filter(|r| r.0 == "runtime") {
+            let _ = write!(c, "\"{}\", \"{}\", ", c_escape(frag), code);
+        }
+        c.push_str("0};\n");
+    }
+    for (n, xs) in [
+        ("read", &o.allow_read),
+        ("write", &o.allow_write),
+        ("env", &o.allow_env),
+    ] {
+        let _ = write!(
+            c,
+            "static const char *const lm_allow_{}[] __attribute__((unused)) = {{",
+            n
+        );
+        for x in xs {
+            let _ = write!(c, "\"{}\", ", c_escape(x));
+        }
+        c.push_str("0};\n");
+    }
     c.push_str(include_str!("runtime.h"));
     c.push_str("\n/* ---- program ---- */\n");
     c.push_str(&decls);
     for (i, s) in g.strs.iter().enumerate() {
         let _ = writeln!(
             c,
-            "static LmStr lm_s{} = {{{}, \"{}\"}};",
+            "static LmStr LM_U lm_s{} = {{{}, \"{}\"}};",
             i,
             s.len(),
             c_escape(s)
@@ -246,7 +318,7 @@ pub fn generate(prog: &Program, structs: &crate::check::StructMap, o: &Opts) -> 
     // Distribute functions over `parts` files, balancing by size.
     let mut tus = vec![c.clone(); parts];
     tus[0].push_str(
-        "LM_DEF int64_t lm_steps = LM_MAX_STEPS, lm_depth, lm_mem;\nLM_DEF char *lm_ap, *lm_aend, *lm_stack_lo;\nLM_DEF int lm_rl, lm_rc;\n",
+        "LM_DEF LM_U int64_t lm_steps = LM_MAX_STEPS, lm_depth, lm_mem;\nLM_DEF char *lm_ap, *lm_aend, *lm_stack_lo;\nLM_DEF int lm_rl, lm_rc, lm_argc;\nLM_DEF char **lm_argv;\nLM_DEF lm_buf lm_line;\n",
     );
     let per = total / parts + 1;
     let (mut i, mut acc) = (0, 0);
@@ -257,7 +329,15 @@ pub fn generate(prog: &Program, structs: &crate::check::StructMap, o: &Opts) -> 
         acc += ch.len();
         tus[i].push_str(&ch);
     }
-    tus[0].push_str("int main(void) {\n  static char obuf[1 << 16];\n  setvbuf(stdout, obuf, _IOFBF, sizeof obuf);\n  lm_stack_init();\n  fn__main();\n  fflush(stdout);\n  return 0;\n}\n");
+    let mut body = String::from("fn__main();");
+    if o.tests {
+        body = "lm_argc--; lm_argv++;\n  switch (argc > 1 ? atoi(argv[1]) : -1) {\n".into();
+        for (i, f) in funcs.iter().filter(|f| f.test.is_some()).enumerate() {
+            let _ = writeln!(body, "  case {}: fn_{}(); break;", i, mangle(&f.name));
+        }
+        body.push_str("  default: return 2;\n  }");
+    }
+    let _ = write!(tus[0], "int main(int argc, char **argv) {{\n  static char obuf[1 << 16];\n  (void)argc; (void)argv;\n  setvbuf(stdout, obuf, _IOFBF, sizeof obuf);\n  lm_argc = argc; lm_argv = argv;\n  lm_stack_init();\n  {}\n  fflush(stdout);\n  return 0;\n}}\n", body);
     tus
 }
 
@@ -357,7 +437,7 @@ impl<'a> Gen<'a> {
             Stmt::Let(name, _, e, ..) => {
                 let v = self.expr(e);
                 let c = self.bind(name);
-                self.line(&format!("{} {} = {};", cty(&e.ty), c, v));
+                self.line(&format!("{} LM_U {} = {};", cty(&e.ty), c, v));
             }
             Stmt::Assign(t, v) => {
                 let val = self.expr(v);
@@ -366,10 +446,11 @@ impl<'a> Gen<'a> {
                     ExprKind::Field(o, f) => format!("{}->f_{} = {};", self.expr(o), f, val),
                     ExprKind::Index(l, i) => {
                         format!(
-                            "lm_set({}, {}, {}, {}, {});",
+                            "lm_set_{}({}, {}, {}, {}, {});",
+                            elem(&l.ty).0,
                             self.expr(l),
                             self.expr(i),
-                            to_val(&val, &v.ty),
+                            val,
                             t.line + self.fofs,
                             t.col
                         )
@@ -386,7 +467,7 @@ impl<'a> Gen<'a> {
                 for (i, (cond, b)) in arms.iter().enumerate() {
                     let c = self.expr(cond);
                     let kw = if i == 0 { "if" } else { "} else if" };
-                    self.line(&format!("{} ({}) {{", kw, c));
+                    self.line(&format!("{} ((bool){}) {{", kw, c));
                     self.sub_block(b);
                 }
                 if let Some(b) = els {
@@ -397,7 +478,7 @@ impl<'a> Gen<'a> {
             }
             Stmt::While(cond, b) => {
                 let c = self.expr(cond);
-                self.line(&format!("while ({}) {{", c));
+                self.line(&format!("while ((bool){}) {{", c));
                 self.ind += 1;
                 self.step(cond.line, cond.col);
                 self.ind -= 1;
@@ -414,7 +495,7 @@ impl<'a> Gen<'a> {
                 self.step(a.line, a.col);
                 self.scopes.push(HashMap::new());
                 let cv = self.bind(v);
-                self.line(&format!("int64_t {} = {};", cv, k));
+                self.line(&format!("int64_t LM_U {} = {};", cv, k));
                 self.block(body);
                 self.scopes.pop();
                 self.ind -= 1;
@@ -423,20 +504,21 @@ impl<'a> Gen<'a> {
             Stmt::ForList(v, e, body) => {
                 let ce = self.expr(e);
                 let (k, l) = (self.fresh("k"), self.fresh("l"));
-                let elem = match &e.ty {
+                let et = match &e.ty {
                     Ty::List(t) => (**t).clone(),
                     _ => unreachable!(),
                 };
+                let st = elem(&e.ty).1;
                 self.line(&format!("for (lm_list *{l} = {ce}, *{l}_ = 0; !{l}_; {l}_ = {l}) for (int64_t {k} = 0; {k} < {l}->len; {k}++) {{"));
                 self.ind += 1;
                 self.step(e.line, e.col);
                 self.scopes.push(HashMap::new());
                 let cv = self.bind(v);
                 self.line(&format!(
-                    "{} {} = {};",
-                    cty(&elem),
+                    "{} LM_U {} = {};",
+                    cty(&et),
                     cv,
-                    from_val(&format!("{}->d[{}]", l, k), &elem)
+                    from_slot(format!("(({st} *){l}->d)[{k}]"), &et)
                 ));
                 self.block(body);
                 self.scopes.pop();
@@ -448,22 +530,50 @@ impl<'a> Gen<'a> {
             Stmt::Return(e, ..) => {
                 let leave = if self.checked { "LM_LEAVE; " } else { "" };
                 match e {
-                    None => self.line(&format!("{{ {}return; }}", leave)),
+                    None => {
+                        self.line("{");
+                        self.ensures(None);
+                        self.line(&format!("  {}return;\n}}", leave));
+                    }
                     Some(e) => {
                         let c = self.expr(e);
                         let r = self.fresh("r");
-                        self.line(&format!(
-                            "{{ {} {} = {}; {}return {}; }}",
-                            cty(&e.ty),
-                            r,
-                            c,
-                            leave,
-                            r
-                        ));
+                        self.line(&format!("{{ {} {} = {};", cty(&e.ty), r, c));
+                        self.ensures(Some(&r));
+                        self.line(&format!("  {}return {}; }}", leave, r));
                     }
                 }
             }
         }
+    }
+
+    /// Emit a runtime check of one contract clause.
+    fn contract(&mut self, e: &Expr, what: &str) {
+        let c = self.expr(e);
+        let m = c_escape(&format!("{} failed in fn {}", what, self.fname));
+        let (l, col) = (e.line + self.fofs, e.col);
+        self.line(&format!(
+            "if (!({})) lm_panic({}, {}, \"{}\");",
+            c, l, col, m
+        ));
+    }
+
+    /// Check the `ensures` clauses, with `result` bound to the C variable `r`.
+    fn ensures(&mut self, r: Option<&str>) {
+        if self.ensures.is_empty() {
+            return;
+        }
+        // Clauses see the parameters and `result`, never body locals.
+        let mut scope = HashMap::new();
+        if let Some(r) = r {
+            scope.insert("result".to_string(), r.to_string());
+        }
+        let params = self.scopes[0].clone();
+        let saved = std::mem::replace(&mut self.scopes, vec![params, scope]);
+        for e in self.ensures {
+            self.contract(e, "ensures");
+        }
+        self.scopes = saved;
     }
 
     /// Wrap a call to a builtin that charges steps for O(n) work, so the
@@ -495,16 +605,16 @@ impl<'a> Gen<'a> {
             }
             ExprKind::Var(n) => self.var(n),
             ExprKind::List(items) => {
+                let (sx, st) = elem(&e.ty);
                 if items.is_empty() {
-                    return format!("lm_list_lit(0, 0, {}, {})", l, c);
+                    return format!("lm_lit_{}(0, 0, {}, {})", sx, l, c);
                 }
-                let vs: Vec<String> = items
-                    .iter()
-                    .map(|it| to_val(&self.expr(it), &it.ty))
-                    .collect();
+                let vs: Vec<String> = items.iter().map(|it| self.expr(it)).collect();
                 format!(
-                    "lm_list_lit({}, (lm_val[]){{{}}}, {}, {})",
+                    "lm_lit_{}({}, ({}[]){{{}}}, {}, {})",
+                    sx,
                     items.len(),
+                    st,
                     vs.join(", "),
                     l,
                     c
@@ -577,8 +687,15 @@ impl<'a> Gen<'a> {
                 }
             }
             ExprKind::Index(x, i) => {
-                let g = format!("lm_get({}, {}, {}, {})", self.expr(x), self.expr(i), l, c);
-                from_val(&g, &e.ty)
+                let g = format!(
+                    "lm_get_{}({}, {}, {}, {})",
+                    elem(&x.ty).0,
+                    self.expr(x),
+                    self.expr(i),
+                    l,
+                    c
+                );
+                from_slot(g, &e.ty)
             }
             ExprKind::Field(x, f) => format!("{}->f_{}", self.expr(x), f),
             ExprKind::Call(name, args) => self.call(name, args, e),
@@ -594,10 +711,10 @@ impl<'a> Gen<'a> {
                 let mut parts = Vec::new();
                 for (i, (a, code)) in args.iter().zip(&ca).enumerate() {
                     if i > 0 {
-                        parts.push("putchar(' ')".to_string());
+                        parts.push(format!("lm_print_sep(' ', {}, {})", l, c));
                     }
                     parts.push(match &a.ty {
-                        Ty::Int => format!("lm_print_int({})", code),
+                        Ty::Int => format!("lm_print_int({}, {}, {})", code, l, c),
                         Ty::Str => {
                             self.costly("void", format!("lm_print_str({}, {}, {})", code, l, c))
                         }
@@ -613,21 +730,28 @@ impl<'a> Gen<'a> {
                         }
                     });
                 }
-                parts.push("putchar('\\n')".into());
-                format!("({})", parts.join(", "))
+                parts.push(format!("lm_print_sep('\\n', {}, {})", l, c));
+                format!(
+                    "({{ int64_t lm_ps = lm_line.len; {}; lm_print_end(lm_ps); }})",
+                    parts.join(", ")
+                )
             }
             "len" if t0 == Ty::Str => {
                 self.costly("int64_t", format!("lm_str_len({}, {}, {})", ca[0], l, c))
             }
             "len" => format!("({})->len", ca[0]),
             "push" => format!(
-                "lm_push({}, {}, {}, {})",
+                "lm_push_{}({}, {}, {}, {})",
+                elem(&t0).0,
                 ca[0],
-                to_val(&ca[1], &args[1].ty),
+                ca[1],
                 l,
                 c
             ),
-            "pop" => from_val(&format!("lm_pop({}, {}, {})", ca[0], l, c), &e.ty),
+            "pop" => from_slot(
+                format!("lm_pop_{}({}, {}, {})", elem(&t0).0, ca[0], l, c),
+                &e.ty,
+            ),
             "str" => match &t0 {
                 Ty::Str => ca[0].clone(),
                 Ty::Int => format!("lm_str_int({}, {}, {})", ca[0], l, c),
@@ -655,6 +779,27 @@ impl<'a> Gen<'a> {
                 _ => format!("lm_float_of_str({}, {}, {})", ca[0], l, c),
             },
             "sqrt" => format!("sqrt({})", ca[0]),
+            "split" => self.costly(
+                "lm_list *",
+                format!("lm_split({}, {}, {}, {})", ca[0], ca[1], l, c),
+            ),
+            "join" => self.costly(
+                "lm_str",
+                format!("lm_join({}, {}, {}, {})", ca[0], ca[1], l, c),
+            ),
+            "sort" => self.costly(
+                "void",
+                format!("lm_sort_{}({}, {}, {})", elem(&t0).0, ca[0], l, c),
+            ),
+            "read_file" => self.costly("lm_str", format!("lm_read_file({}, {}, {})", ca[0], l, c)),
+            "write_file" => self.costly(
+                "void",
+                format!("lm_write_file({}, {}, {}, {})", ca[0], ca[1], l, c),
+            ),
+            "input_line" => self.costly("lm_str", format!("lm_input_line({}, {})", l, c)),
+            "env" => format!("lm_env({}, {}, {})", ca[0], l, c),
+            "now_ms" => "lm_now_ms()".into(),
+            "args" => format!("lm_args({}, {})", l, c),
             "assert" => {
                 let msg = ca.get(1).map_or("NULL", |s| s.as_str());
                 format!(

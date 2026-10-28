@@ -37,6 +37,49 @@ pub fn parse(toks: Vec<Token>) -> R<Program> {
             prog.imports.push((name, line, col));
             continue;
         }
+        if matches!(p.peek(), Tok::Ident(s) if s == "uses")
+            && matches!(p.toks.get(p.pos + 1).map(|t| &t.tok), Some(Tok::Ident(_)))
+        {
+            p.next();
+            loop {
+                let (line, col) = p.here();
+                let mut name = p.ident()?;
+                while p.eat(".") {
+                    name = format!("{}.{}", name, p.ident()?);
+                }
+                prog.uses.push((name, line, col));
+                if !p.eat(",") {
+                    break;
+                }
+            }
+            p.expect(";")?;
+            continue;
+        }
+        if matches!(p.peek(), Tok::Ident(s) if s == "test")
+            && matches!(p.toks.get(p.pos + 1).map(|t| &t.tok), Some(Tok::Str(_)))
+        {
+            p.next();
+            let Tok::Str(name) = p.next() else {
+                unreachable!()
+            };
+            // Item names cannot start with a digit, so this never collides.
+            let n = prog.funcs.iter().filter(|f| f.test.is_some()).count();
+            let body = p.block()?;
+            prog.funcs.push(Func {
+                name: format!("{}test", n),
+                public: false,
+                params: Vec::new(),
+                ret: None,
+                body,
+                requires: Vec::new(),
+                ensures: Vec::new(),
+                test: Some(name),
+                file: 0,
+                line,
+                col,
+            });
+            continue;
+        }
         let public = p.eat_kw("pub");
         if p.eat_kw("fn") {
             prog.funcs.push(p.func(public, line, col)?);
@@ -161,6 +204,17 @@ impl Parser {
         } else {
             None
         };
+        let (mut requires, mut ensures) = (Vec::new(), Vec::new());
+        loop {
+            let list = match self.peek() {
+                Tok::Ident(s) if s == "requires" => &mut requires,
+                Tok::Ident(s) if s == "ensures" => &mut ensures,
+                _ => break,
+            };
+            self.next();
+            list.push(self.head()?);
+            self.expect(";")?;
+        }
         let body = self.block()?;
         Ok(Func {
             name,
@@ -168,6 +222,9 @@ impl Parser {
             params,
             ret,
             body,
+            requires,
+            ensures,
+            test: None,
             file: 0,
             line,
             col,

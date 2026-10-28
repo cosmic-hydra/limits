@@ -1,0 +1,3 @@
+uses time;
+import a;
+fn main() { a.f(); }

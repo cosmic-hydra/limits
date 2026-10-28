@@ -1,0 +1,2 @@
+import m;
+test "root" { assert(m.sq(2) == 4, "two"); }

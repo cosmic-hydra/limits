@@ -1,0 +1,24 @@
+# Sieve of Eratosthenes.
+fn main() {
+    let n = 2000000;
+    let comp: [bool] = [];
+    for i in 0..n + 1 {
+        push(comp, false);
+    }
+    let count = 0;
+    let sum = 0;
+    let last = 0;
+    for i in 2..n + 1 {
+        if not comp[i] {
+            count = count + 1;
+            sum = sum + i;
+            last = i;
+            let j = i * i;
+            while j <= n {
+                comp[j] = true;
+                j = j + i;
+            }
+        }
+    }
+    print(count, sum, last);
+}

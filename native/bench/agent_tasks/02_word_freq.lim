@@ -1,0 +1,41 @@
+# Word frequency: top 10 words by count (ties by word).
+fn rnd(s: [int]) -> int {
+    s[0] = (s[0] * 1103515245 + 12345) % 2147483648;
+    return s[0] / 65536;
+}
+
+fn main() {
+    let vocab = split("the a of to and in is it you that he was for on are with as his they be at one have this from or had by hot word", " ");
+    let seed = [7];
+    let words: [str] = [];
+    for i in 0..300000 {
+        let a = rnd(seed) % len(vocab);
+        let b = rnd(seed) % len(vocab);
+        if b < a {
+            a = b;
+        }
+        push(words, vocab[a]);
+    }
+    let ws = split(join(words, " "), " ");
+    sort(ws);
+    let uniq: [str] = [];
+    let cnt: [int] = [];
+    for w in ws {
+        if len(uniq) > 0 and uniq[len(uniq) - 1] == w {
+            cnt[len(cnt) - 1] = cnt[len(cnt) - 1] + 1;
+        } else {
+            push(uniq, w);
+            push(cnt, 1);
+        }
+    }
+    for k in 0..10 {
+        let b = 0;
+        for i in 1..len(uniq) {
+            if cnt[i] > cnt[b] {
+                b = i;
+            }
+        }
+        print(uniq[b], cnt[b]);
+        cnt[b] = -1;
+    }
+}

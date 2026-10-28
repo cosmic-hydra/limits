@@ -1,0 +1,28 @@
+# Histogram with text bars.
+fn rnd(s: [int]) -> int {
+    s[0] = (s[0] * 1103515245 + 12345) % 2147483648;
+    return s[0] / 65536;
+}
+
+fn main() {
+    let seed = [41];
+    let buckets = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    for i in 0..500000 {
+        let a = rnd(seed) % 1000;
+        let v = (a + rnd(seed) % 1000) / 2;
+        buckets[v / 50] = buckets[v / 50] + 1;
+    }
+    let most = 0;
+    for b in buckets {
+        if b > most {
+            most = b;
+        }
+    }
+    for i in 0..20 {
+        let bar = "";
+        for k in 0..buckets[i] * 60 / most {
+            bar = bar + "#";
+        }
+        print(str(i * 50) + "-" + str(i * 50 + 49), buckets[i], bar);
+    }
+}

@@ -1,0 +1,63 @@
+# Dedupe and sort a list of ints.
+fn rnd(s: [int]) -> int {
+    s[0] = (s[0] * 1103515245 + 12345) % 2147483648;
+    return s[0] / 65536;
+}
+
+fn msort(a: [int]) {
+    let n = len(a);
+    let b: [int] = [];
+    for i in 0..n {
+        push(b, 0);
+    }
+    let w = 1;
+    while w < n {
+        let lo = 0;
+        while lo < n {
+            let mid = lo + w;
+            if mid > n {
+                mid = n;
+            }
+            let hi = lo + 2 * w;
+            if hi > n {
+                hi = n;
+            }
+            let i = lo;
+            let j = mid;
+            for k in lo..hi {
+                if j >= hi or (i < mid and a[i] <= a[j]) {
+                    b[k] = a[i];
+                    i = i + 1;
+                } else {
+                    b[k] = a[j];
+                    j = j + 1;
+                }
+            }
+            lo = hi;
+        }
+        for t in 0..n {
+            a[t] = b[t];
+        }
+        w = w * 2;
+    }
+}
+
+fn main() {
+    let seed = [3];
+    let xs: [int] = [];
+    for i in 0..300000 {
+        push(xs, rnd(seed) % 100000);
+    }
+    msort(xs);
+    let u: [int] = [];
+    for x in xs {
+        if len(u) == 0 or u[len(u) - 1] != x {
+            push(u, x);
+        }
+    }
+    let s = 0;
+    for x in u {
+        s = s + x;
+    }
+    print(len(u), u[0], u[1], u[2], u[len(u) - 1], s);
+}

@@ -88,11 +88,8 @@ and the call depth.
 - **fib, checked vs unchecked (3x):** every call pays a step check plus the
   depth increment, decrement and check, and the `+`/`-` are overflow
   checked. Unchecked limits runs at C speed (0.011 vs 0.014 s).
-- **sieve vs C (6x):** this is the list representation, not the checks
-  (unchecked is almost as slow). Every list element is an 8-byte `lm_val`, so
-  `[bool]` with 1e7 elements is 80 MB against C's 10 MB of `bool`. The C
-  sieve rewritten with an `int64_t` array runs in 0.29-0.31 s, the same as
-  limits. Packed element storage for `[bool]`/`[int]` is the obvious next step.
+- **sieve vs C:** fixed by packed lists (see the last section); it now runs
+  within about 1.15x of C -O2, checked or unchecked.
 - **loops:** gcc keeps both counters in registers. The checked overhead
   (about 25%) is the overflow checks on `*`, `+` and `%` plus one step per
   inner iteration.
@@ -162,3 +159,62 @@ Ad-hoc best-of-3 limits-only runs (same machine, run.sh's interpreter/Python col
 fib 0.026 / 0.009 / 0.074, loops 0.165 / 0.115 / 1.185, sieve 0.285 / 0.265 / 0.877,
 nbody 0.372 / 0.314 / 1.607, strings 0.166 / 0.154 / 0.215 (checked / unchecked / debug, seconds).
 All within noise of the table above, so the table is left unchanged.
+
+## Packed, typed lists
+
+Lists used to store every element as an 8-byte `lm_val` union. Now the element
+type picks the storage: `[bool]` 1 byte, `[int]`/`[float]` 8 bytes, `[str]`,
+struct and nested lists one pointer. The runtime defines typed accessors per
+storage type (`LM_LIST(b, bool)`, `(i, int64_t)`, `(f, double)`, `(p, void *)`:
+`lm_get_b`, `lm_set_b`, `lm_push_b`, ...), and codegen picks one statically.
+Bounds checks are unchanged: one unsigned compare against `len` with a cold
+out-of-line error. `for x in list` already reads elements without a per-access
+check (the loop compares `k < len` each iteration, which stays correct if the
+body pushes), so no further hoisting was added.
+
+Before/after, limits only, best of 5, same machine, run back to back with the
+binary built from the previous commit (milliseconds, checked / unchecked):
+
+| bench | before | after |
+|---|---|---|
+| fib | 24 / 12 | 25 / 8 |
+| loops | 158 / 118 | 160 / 116 |
+| sieve | **290 / 294** | **64 / 60** |
+| nbody | 345 / 344 | 363 / 346 |
+| strings | 193 / 156 | 168 / 146 |
+
+The C -O2 sieve measured 65 ms in that session and 59 ms in the full `run.sh`
+run below, so the sieve target (within 2x of C, unchecked) is met with room to
+spare; the checked build costs about the same. The other benches do not
+index lists in their hot loops and moved only within noise.
+
+Full `bench/run.sh` after the change (best of 3, seconds):
+
+| bench | limits (checked) | --unchecked | --debug | C -O2 | python3 | v0.1 interpreter |
+|---|---|---|---|---|---|---|
+| fib | 0.025 | 0.010 | 0.077 | 0.010 | 0.327 | 3.440 |
+| loops | 0.165 | 0.125 | 1.135 | - | 16.228 | 57.989 |
+| sieve | 0.068 | 0.069 | 0.351 | 0.059 | 4.536 | 23.846 |
+| nbody | 0.410 | 0.443 | 1.524 | - | 31.463 | - |
+| strings | 0.232 | 0.169 | 0.265 | - | 0.414 | 1.207 |
+
+nbody and strings came out 10-30% slower in this one run than in the
+back-to-back table above; neither bench's hot loop changed, so this is VM
+noise (re-running the binaries alone gave the numbers in the first table).
+Compile times in the same run were 100-270 ms for the small benches and
+8.2 s / 1.8 s (-O2 / -O0) for the 17k-line program, versus 6.4 s / 1.2 s
+earlier; not investigated further. The cc command line now carries `-Wall
+-Wextra`, which may add a little.
+
+Also in this stage: the generated C no longer needs `-w`. It compiles without
+warnings under `-Wall -Wextra` (gcc 13; clang also reports none apart from the
+pre-existing bracket-depth limit on 50000-deep nesting). Debug builds of
+limits (so `cargo test`) add `-Werror` to enforce that. Runtime helpers are
+marked `unused`, unused locals and parameters get `LM_U`, and conditions are
+emitted as `if ((bool)(...))` to avoid clang's `-Wparentheses-equality`.
+`-Wno-infinite-recursion` stays, since that warning is about the user's
+program, not the generated code.
+
+String building was not changed: the only real fix (in-place append when the
+left operand is a uniquely owned local) needs ownership analysis and is not a
+small change.

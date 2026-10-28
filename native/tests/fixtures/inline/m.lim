@@ -1,0 +1,2 @@
+pub fn sq(x: int) -> int { return x * x; }
+test "sq" { assert(sq(3) == 9); }

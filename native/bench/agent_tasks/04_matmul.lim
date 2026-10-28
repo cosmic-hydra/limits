@@ -1,0 +1,39 @@
+# Integer matrix multiply.
+fn rnd(s: [int]) -> int {
+    s[0] = (s[0] * 1103515245 + 12345) % 2147483648;
+    return s[0] / 65536;
+}
+
+fn rand_matrix(n: int, seed: [int]) -> [[int]] {
+    let m: [[int]] = [];
+    for i in 0..n {
+        let row: [int] = [];
+        for j in 0..n {
+            push(row, rnd(seed) % 10);
+        }
+        push(m, row);
+    }
+    return m;
+}
+
+fn main() {
+    let n = 150;
+    let seed = [11];
+    let a = rand_matrix(n, seed);
+    let b = rand_matrix(n, seed);
+    let trace = 0;
+    let total = 0;
+    for i in 0..n {
+        for j in 0..n {
+            let s = 0;
+            for k in 0..n {
+                s = s + a[i][k] * b[k][j];
+            }
+            total = total + s;
+            if i == j {
+                trace = trace + s;
+            }
+        }
+    }
+    print(trace, total);
+}

@@ -1,0 +1,45 @@
+# Merge overlapping intervals.
+fn rnd(s: [int]) -> int {
+    s[0] = (s[0] * 1103515245 + 12345) % 2147483648;
+    return s[0] / 65536;
+}
+
+fn main() {
+    let seed = [37];
+    let keys: [int] = [];
+    for i in 0..200000 {
+        let start = rnd(seed) * 300;
+        push(keys, start * 1000 + rnd(seed) % 1000);
+    }
+    sort(keys);
+    let merged = 0;
+    let covered = 0;
+    let longest = 0;
+    let cs = -1;
+    let ce = -1;
+    for k in keys {
+        let s = k / 1000;
+        let e = s + k % 1000;
+        if cs >= 0 and s <= ce {
+            if e > ce {
+                ce = e;
+            }
+        } else {
+            if cs >= 0 {
+                merged = merged + 1;
+                covered = covered + ce - cs;
+                if ce - cs > longest {
+                    longest = ce - cs;
+                }
+            }
+            cs = s;
+            ce = e;
+        }
+    }
+    merged = merged + 1;
+    covered = covered + ce - cs;
+    if ce - cs > longest {
+        longest = ce - cs;
+    }
+    print(merged, covered, longest);
+}
