@@ -1,0 +1,9 @@
+# The same report using bounded, pure data helpers.
+let job = {"attempt": nil};
+let steps = ["search", "read", "answer"];
+let costs = [3, 2, 4];
+let label = get(job, "title", "untitled");
+let has_attempt = has(job, "attempt");
+let route = join(steps, " -> ");
+let total = sum(costs);
+print(label, has_attempt, route, total);

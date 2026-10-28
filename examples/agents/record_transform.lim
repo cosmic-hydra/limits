@@ -1,0 +1,24 @@
+# Aggregate validated records into a predictable output schema.
+let records = [
+    {"id": "a", "status": "queued", "tokens": 12},
+    {"id": "b", "status": "done", "tokens": 7},
+    {"id": "c", "status": "done", "tokens": 5},
+];
+let summary = {"by_status": {}, "cost_units": 0, "ids": []};
+for record in records {
+    assert(type(record["id"]) == "string", "id must be a string");
+    assert(type(record["tokens"]) == "int", "tokens must be an int");
+    assert(record["tokens"] >= 0, "tokens must be nonnegative");
+    let status = record["status"];
+    assert(type(status) == "string", "status must be a string");
+    let groups = summary["by_status"];
+    if groups[status] == nil {
+        groups[status] = 0;
+    }
+    groups[status] = groups[status] + 1;
+    summary["cost_units"] = summary["cost_units"] + record["tokens"] * 2;
+    push(summary["ids"], record["id"]);
+}
+assert(summary["by_status"] == {"done": 2, "queued": 1});
+assert(summary["cost_units"] == 48);
+print(summary);

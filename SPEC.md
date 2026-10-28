@@ -65,7 +65,13 @@ fn name(a, b) { return a + b; }
 
 ## Builtins
 
-`print(...)`, `len(x)`, `push(list, v)`, `pop(list)`, `str(x)`, `int(x)`, `float(x)`, `type(x)`, `keys(map)`, `assert(cond, msg?)`.
+`print(...)`, `len(x)`, `push(list, v)`, `pop(list)`, `str(x)`, `int(x)`, `float(x)`, `type(x)`, `keys(map)`, `assert(cond, msg?)`,
+`get(map, key, default?)`, `has(map, key)`, `join(strings, separator)`, `sum(numbers)`.
+
+`get` preserves an existing nil value; only absent keys use the default. Arguments
+are eager. `join` accepts strings only; `sum` accepts numbers only and checks int
+overflow. Both inspect at most 1,000,000 elements; joined output is capped at
+16 MiB before allocation. Empty joins return `""`; empty sums return int `0`.
 
 ## Errors
 
@@ -75,4 +81,6 @@ Before running, `lim run` and `lim check` perform static checks and report **all
 
 ## Not yet in v0.1
 
-Modules/imports, error handling (`try`), structs/records, string methods, a standard library, static checking, a bytecode VM, a REPL, and an LSP. See `docs/next-prompts.md`.
+Modules/imports, error handling (`try`), structs/records, string methods, a general
+standard library, a REPL, and a native incremental LSP. The optional Python LSP
+bridge and semantic query CLI are documented in `docs/agent-platform.md`. See `docs/next-prompts.md`.

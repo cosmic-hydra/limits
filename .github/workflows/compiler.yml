@@ -1,9 +1,9 @@
 name: Limits compiler
 on:
   push:
-    paths: ['compiler/**', 'examples/**', '.github/workflows/compiler.yml']
+    paths: ['compiler/**', 'examples/**', 'tools/**', 'bench/**', '.github/workflows/compiler.yml']
   pull_request:
-    paths: ['compiler/**', 'examples/**', '.github/workflows/compiler.yml']
+    paths: ['compiler/**', 'examples/**', 'tools/**', 'bench/**', '.github/workflows/compiler.yml']
 permissions:
   contents: read
 jobs:
@@ -21,6 +21,8 @@ jobs:
           sparse-checkout: |
             compiler
             examples
+            bench
+            tools
             .github
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -35,3 +37,31 @@ jobs:
       - name: Release tests
         if: matrix.profile == 'release'
         run: cargo test --release --manifest-path compiler/Cargo.toml
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Agent protocol and LSP integration
+        env:
+          LIM_BIN: ./compiler/target/${{ matrix.profile == 'release' && 'release' || 'debug' }}/lim${{ runner.os == 'Windows' && '.exe' || '' }}
+        run: |
+          python tools/test_agent_cli.py
+          python tools/test_limits_lsp.py
+  authenticated-encryption:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            compiler
+            examples
+            bench
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install maintained age tools
+        run: sudo apt-get update && sudo apt-get install -y age
+      - name: Real authenticated-encryption and encrypted CLI tests
+        env:
+          LIMITS_AGE_BINARY: /usr/bin/age
+          LIMITS_AGE_KEYGEN: /usr/bin/age-keygen
+        run: cargo test --manifest-path compiler/Cargo.toml --test sealed -- --ignored
