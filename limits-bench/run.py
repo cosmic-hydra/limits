@@ -39,6 +39,13 @@ def norm(s):
     return s.replace("\r\n", "\n").rstrip("\n")
 
 
+def same_output(out, exp, mode="exact"):
+    """mode "exact" (default, tasks/): norm() equality; "tokens" (tasks-hard/): whitespace-split tokens equal."""
+    if mode == "tokens":
+        return out.split() == exp.split()
+    return norm(out) == norm(exp)
+
+
 def load_tasks(d, only):
     tasks = {}
     for f in sorted(os.listdir(d)):
@@ -115,7 +122,7 @@ def grade(task, src, lang, args):
                 st = "timeout"
             elif rc != 0:
                 st = "runtime_error"
-            elif norm(out) != norm(tc["stdout"]):
+            elif not same_output(out, tc["stdout"], task.get("compare", "exact")):
                 st = "wrong_answer"
             else:
                 st = "pass"
@@ -182,6 +189,8 @@ def main():
     ap.add_argument("--quiet", action="store_true")
     args = ap.parse_args()
     only = set(x for x in args.only.split(",") if x)
+    if not os.path.isdir(args.tasks) and os.path.isdir(os.path.join(HERE, args.tasks)):
+        args.tasks = os.path.join(HERE, args.tasks)  # e.g. --tasks tasks-hard from any cwd
     tasks = load_tasks(args.tasks, only)
     if not tasks:
         sys.exit("no tasks found in " + args.tasks)
