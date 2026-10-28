@@ -555,7 +555,11 @@ impl<'a> Interpreter<'a> {
                     let value = arg
                         .render()
                         .map_err(|m| LimError::new(Kind::Runtime, m, s))?;
-                    if line.len().saturating_add(value.len()).saturating_add(1)
+                    let framing_bytes = usize::from(i != 0) + 1; // separator and final newline
+                    if line
+                        .len()
+                        .saturating_add(value.len())
+                        .saturating_add(framing_bytes)
                         > crate::value::MAX_RENDER_BYTES
                     {
                         return rt("value rendering limit exceeded", s);

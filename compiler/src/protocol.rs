@@ -270,7 +270,7 @@ pub fn capabilities_json() -> String {
             "\"source_extension\":\".lim\",\"engines\":[\"tree\",\"vm\"],\"default_engine\":\"tree\",",
             "\"positions\":{{\"line_base\":1,\"column_base\":1,\"column_unit\":\"unicode_scalar\"}},",
             "\"defaults\":{{\"max_steps\":{steps},\"max_depth\":{depth},\"max_source_bytes\":{source_limit}}},",
-            "\"diagnostic_codes\":[\"LIM_LEX\",\"LIM_PARSE\",\"LIM_CHECK\",\"LIM_RUNTIME\"],",
+            "\"diagnostic_codes\":[\"LIM_LEX\",\"LIM_PARSE\",\"LIM_CHECK\",\"LIM_RUNTIME\",\"LIM_USAGE\",\"LIM_HOST\"],",
             "\"diagnostic_hints\":\"advisory_not_automatic_edits\",",
             "\"commands\":{commands},",
             "\"semantic_index\":{semantic},",

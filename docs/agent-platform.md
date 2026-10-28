@@ -14,16 +14,17 @@ lim run examples/agents/task_router.lim --engine vm --json --sandbox restricted
 ```
 
 Pass `-` instead of a file to supply bounded UTF-8 source through stdin. Ordinary
-human `run` output remains unchanged. `--json` returns exactly one JSON document
-on stdout, with program stdout inside the `stdout` string. Program output cannot
-inject envelope fields. Do not parse printed Limits maps as JSON.
+human `run` output remains unchanged. With writable stdout, `--json` returns one
+JSON document, with program stdout inside the `stdout` string. Program output
+cannot inject envelope fields. Do not parse printed Limits maps as JSON.
 
-Responses have `schema_version: 1`, `command`, `ok`, `source`, `diagnostics`,
+Result envelopes have `schema_version: 1`, `command`, `ok`, `source`, `diagnostics`,
 `diagnostic_count`, and `diagnostics_truncated`. Run responses also have `engine`
 and `stdout`; `engine` is null for host/usage failures before execution starts.
 Query responses store results in `data`. Exit codes: 0 success, 1 program/static
-error, 2 host or usage error. Index queries may return useful `data` alongside
-static errors and exit 1. A lexer/parser error returns `data: null`.
+error, 2 host or usage error. `capabilities` emits a versioned discovery catalog
+directly, without a result envelope. Index queries may return useful `data`
+alongside static errors and exit 1. A lexer/parser error returns `data: null`.
 
 Diagnostics include kind, stable code, severity, message, 1-based Unicode-scalar
 line/column, and an advisory hint. Host/usage failures have null positions. Codes
@@ -50,8 +51,9 @@ lim complete example.lim --line 4 --col 12 --prefix act --limit 20
 `index` returns the full deterministic symbol/scope/reference graph. Other
 queries default to 100 results and accept `--limit 1..10000`; their result includes
 `truncated`. Positions are 1-based Unicode scalar columns; ranges are end
-exclusive. Builtins have no source declaration range. Identifiers in comments,
-strings and map keys are not falsely treated as references.
+exclusive. LF, CRLF and CR each count as one line break. Builtins have no source
+declaration range. Identifiers in comments, strings and map keys are not falsely
+treated as references.
 
 The index follows lexical scopes, shadowing, function parameters and loop
 variables. Definitions expose **lexical candidates**, including late-declaration
@@ -74,6 +76,9 @@ rather than temporary source files. It invokes indexing only: editing never
 executes a Limits program. Incomplete syntax produces parse diagnostics; this is
 not an incremental recovery parser or a full IDE refactoring engine. See
 [agents.md](agents.md) for the bridge's framing and resource limits.
+Both editor messages and backend JSON responses are limited to 128 nested
+objects/arrays before JSON decoding. This transport bound is separate from the
+language's grammar and AST nesting guards.
 
 ## Capability sandbox
 
@@ -115,7 +120,10 @@ language layer is not an OS sandbox. See [production.md](production.md).
 
 `join`/`sum` accept at most one million elements. Joined strings are capped at
 16 MiB before allocation. Empty joins return `""`; empty sums return integer 0.
-All use ordinary call accounting and capability checks, and preserve aliases.
+Source-level calls use ordinary call accounting and capability checks, and
+preserve aliases. Element traversal does not charge one execution step per
+element; its independent guard does not make a native call interruptible by the
+cooperative deadline.
 
 The matched report in `bench/agent_compact` falls from 28 to 8 non-comment source
 lines and 143 to 83 Limits lexer tokens. Those are language tokens, not model

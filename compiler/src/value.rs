@@ -10,6 +10,35 @@ use std::rc::Rc;
 const MAX_VALUE_WORK: usize = 1_000_000;
 pub(crate) const MAX_RENDER_BYTES: usize = 16 * 1024 * 1024;
 
+// Formatting strings with Debug can expand them (for example, quotes and
+// control characters). Enforce the byte bound on each write, before String
+// reserves memory, rather than checking only after formatting has finished.
+struct RenderBuffer {
+    text: String,
+    limit: usize,
+}
+
+impl fmt::Write for RenderBuffer {
+    fn write_str(&mut self, text: &str) -> fmt::Result {
+        let required = self
+            .text
+            .len()
+            .checked_add(text.len())
+            .filter(|&n| n <= self.limit)
+            .ok_or(fmt::Error)?;
+        if required > self.text.capacity() {
+            let capacity = required
+                .max(self.text.capacity().saturating_mul(2))
+                .min(self.limit);
+            self.text
+                .try_reserve_exact(capacity - self.text.len())
+                .map_err(|_| fmt::Error)?;
+        }
+        self.text.push_str(text);
+        Ok(())
+    }
+}
+
 #[derive(Clone)]
 pub enum Value {
     Int(i64),
@@ -103,97 +132,116 @@ impl Value {
     pub(crate) fn render(&self) -> Result<String, &'static str> {
         enum Part {
             Value(Value, bool),
-            Text(String),
+            Text(&'static str),
+            Key(String),
             End((u8, usize), char),
         }
-        let mut out = String::new();
+        let limit = |_| "value rendering limit exceeded";
+        let mut out = RenderBuffer {
+            text: String::new(),
+            limit: MAX_RENDER_BYTES,
+        };
         let mut work = vec![Part::Value(self.clone(), false)];
         let mut active = HashSet::new();
         let mut count = 0;
+        let mut pending_key_bytes = 0;
         while let Some(part) = work.pop() {
             count += 1;
             if count > MAX_VALUE_WORK {
                 return Err("value rendering limit exceeded");
             }
+            out.limit = MAX_RENDER_BYTES - pending_key_bytes;
             match part {
-                Part::Text(s) => out.push_str(&s),
+                Part::Text(s) => out.write_str(s).map_err(limit)?,
+                Part::Key(key) => {
+                    pending_key_bytes -= key.len();
+                    out.limit = MAX_RENDER_BYTES - pending_key_bytes;
+                    write!(out, "{key:?}: ").map_err(limit)?;
+                }
                 Part::End(id, c) => {
                     active.remove(&id);
-                    out.push(c);
+                    out.write_char(c).map_err(limit)?;
                 }
                 Part::Value(v, quote) => match v {
                     Self::Int(n) => {
-                        write!(out, "{n}").unwrap();
+                        write!(out, "{n}").map_err(limit)?;
                     }
                     Self::Float(x) if x.fract() == 0.0 && x.is_finite() => {
-                        write!(out, "{x:.1}").unwrap();
+                        write!(out, "{x:.1}").map_err(limit)?;
                     }
                     Self::Float(x) => {
-                        write!(out, "{x}").unwrap();
+                        write!(out, "{x}").map_err(limit)?;
                     }
                     Self::Str(s) if quote => {
-                        write!(out, "{s:?}").unwrap();
+                        if s.len() > out.limit - out.text.len() {
+                            return Err("value rendering limit exceeded");
+                        }
+                        write!(out, "{s:?}").map_err(limit)?;
                     }
-                    Self::Str(s) => out.push_str(&s),
+                    Self::Str(s) => out.write_str(&s).map_err(limit)?,
                     Self::Bool(b) => {
-                        write!(out, "{b}").unwrap();
+                        write!(out, "{b}").map_err(limit)?;
                     }
-                    Self::Nil => out.push_str("nil"),
+                    Self::Nil => out.write_str("nil").map_err(limit)?,
                     Self::Func(f) => {
-                        write!(out, "<fn {}>", f.name).unwrap();
+                        write!(out, "<fn {}>", f.name).map_err(limit)?;
                     }
                     Self::VmFunc(f) => {
-                        write!(out, "<fn {}>", f.function.name).unwrap();
+                        write!(out, "<fn {}>", f.function.name).map_err(limit)?;
                     }
                     Self::Builtin(n) => {
-                        write!(out, "<builtin {n}>").unwrap();
+                        write!(out, "<builtin {n}>").map_err(limit)?;
                     }
                     Self::List(v) => {
                         let id = (0, Rc::as_ptr(&v) as usize);
                         if !active.insert(id) {
-                            out.push_str("[...]");
+                            out.write_str("[...]").map_err(limit)?;
                             continue;
                         }
                         let v = v.borrow();
                         if v.len() > (MAX_VALUE_WORK.saturating_sub(count + work.len())) / 2 {
                             return Err("value rendering limit exceeded");
                         }
-                        out.push('[');
+                        out.write_char('[').map_err(limit)?;
                         work.push(Part::End(id, ']'));
                         for (i, v) in v.iter().enumerate().rev() {
                             work.push(Part::Value(v.clone(), true));
                             if i > 0 {
-                                work.push(Part::Text(", ".into()));
+                                work.push(Part::Text(", "));
                             }
                         }
                     }
                     Self::Map(v) => {
                         let id = (1, Rc::as_ptr(&v) as usize);
                         if !active.insert(id) {
-                            out.push_str("{...}");
+                            out.write_str("{...}").map_err(limit)?;
                             continue;
                         }
                         let v = v.borrow();
                         if v.len() > (MAX_VALUE_WORK.saturating_sub(count + work.len())) / 3 {
                             return Err("value rendering limit exceeded");
                         }
-                        out.push('{');
+                        out.write_char('{').map_err(limit)?;
                         work.push(Part::End(id, '}'));
                         for (i, (k, v)) in v.iter().enumerate().rev() {
+                            // Raw keys are a lower bound on their quoted output.
+                            // Bound all pending key copies before cloning them;
+                            // escaping itself is deferred to the bounded writer.
+                            if k.len() > MAX_RENDER_BYTES - out.text.len() - pending_key_bytes {
+                                return Err("value rendering limit exceeded");
+                            }
+                            pending_key_bytes += k.len();
                             work.push(Part::Value(v.clone(), true));
-                            work.push(Part::Text(format!("{k:?}: ")));
+                            work.push(Part::Key(k.clone()));
                             if i > 0 {
-                                work.push(Part::Text(", ".into()));
+                                work.push(Part::Text(", "));
                             }
                         }
                     }
                 },
             }
-            if out.len() > MAX_RENDER_BYTES {
-                return Err("value rendering limit exceeded");
-            }
         }
-        Ok(out)
+        Ok(out.text)
     }
 }
 impl PartialEq for Value {

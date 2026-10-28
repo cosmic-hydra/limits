@@ -144,8 +144,13 @@ impl Compiler {
         }
     }
     fn condition(&mut self, e: &Expr, s: Span) -> usize {
+        let start = self.chunk.code.len();
         self.expr(e, s);
-        if matches!(self.chunk.code.last(), Some(Op::BinaryConstant(..))) {
+        // The entire condition must be fused: a short-circuit expression can
+        // end in BinaryConstant while another path jumps past that instruction.
+        if self.chunk.code.len() == start + 1
+            && matches!(self.chunk.code.last(), Some(Op::BinaryConstant(..)))
+        {
             let Op::BinaryConstant(b, sp, op, i) = self.chunk.code.pop().unwrap() else {
                 unreachable!()
             };

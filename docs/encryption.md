@@ -77,9 +77,13 @@ it with the capability policy and supervised worker limits documented in
 Source is capped at 16 MiB, ciphertext at 16 MiB plus 64 KiB, and the identity
 file at 64 KiB. The age child has a ten-second deadline by default, concurrent
 bounded input/output handling, no shell, and discarded stderr. On timeout or
-failure the owned age child is killed/reaped. Host file access and executable
-startup still rely on a healthy trusted local filesystem and OS; this adapter
-is not a process-group sandbox for an attacker-controlled executable.
+failure the owned age child is killed/reaped, and both I/O workers are joined
+before the operation returns. This relies on the trusted executable closing its
+pipe descriptors when it exits: a descendant retaining inherited descriptors
+can delay worker cleanup beyond the child deadline. The adapter does not kill a
+process group; a host supervisor must own any descendant cleanup. Host file
+access and executable startup also rely on a healthy trusted local filesystem
+and OS. Do not configure an attacker-controlled executable.
 
 Plaintext returned by a streaming decryptor is held privately until `age`
 finishes successfully. Tampered/truncated ciphertext or a wrong identity returns
@@ -96,11 +100,15 @@ explicitly marked ignored instead of pretending to perform cryptography when
 `age` is absent. Enable them with:
 
 ```sh
-cargo test --manifest-path compiler/Cargo.toml --test sealed -- --ignored
+cargo test --manifest-path compiler/Cargo.toml -- --ignored
 ```
 
+CI configures a separate Linux job with real `age` and `age-keygen` to run all
+ignored authenticated-encryption integration tests, including maximum-size source
+round trips, final-chunk authentication and wrong-key rejection across CLI commands.
+
 When the binaries are not on `PATH`, set `LIMITS_AGE_BINARY` and
-`LIMITS_AGE_KEYGEN` to their trusted paths for this integration test. It verifies
+`LIMITS_AGE_KEYGEN` to their trusted paths for these integration tests. They verify
 randomized encryption, Unicode and empty-source round trips, wrong-key and
 ciphertext-tampering rejection, direct encrypted run/check/index, explicit
 plaintext export, owner-only Unix output modes, and refusal to overwrite files.

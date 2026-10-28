@@ -206,20 +206,21 @@ fn invoke(
     let stdout = child.stdout.take().ok_or(SealedError::OperationFailed)?;
     let (send, receive) = mpsc::channel();
     let writer = send.clone();
-    if std::thread::Builder::new()
+    let input_thread = match std::thread::Builder::new()
         .name("limits-age-input".into())
         .spawn(move || {
             let ok = stdin.write_all(&input).is_ok();
             drop(stdin);
             let _ = writer.send(Event::Written(ok));
-        })
-        .is_err()
-    {
-        let _ = child.kill();
-        let _ = child.wait();
-        return Err(SealedError::OperationFailed);
-    }
-    if std::thread::Builder::new()
+        }) {
+        Ok(thread) => thread,
+        Err(_) => {
+            let _ = child.kill();
+            let _ = child.wait();
+            return Err(SealedError::OperationFailed);
+        }
+    };
+    let output_thread = match std::thread::Builder::new()
         .name("limits-age-output".into())
         .spawn(move || {
             let mut out = Vec::new();
@@ -231,19 +232,32 @@ fn invoke(
                 Ok(out)
             };
             let _ = send.send(Event::Read(result));
-        })
-        .is_err()
-    {
-        let _ = child.kill();
-        let _ = child.wait();
-        return Err(SealedError::OperationFailed);
-    }
+        }) {
+        Ok(thread) => thread,
+        Err(_) => {
+            let _ = child.kill();
+            let _ = child.wait();
+            let _ = input_thread.join();
+            return Err(SealedError::OperationFailed);
+        }
+    };
     let result = wait(&mut child, receive, deadline);
     if result.is_err() {
         let _ = child.kill();
         let _ = child.wait();
     }
-    result
+    // Own the pipe workers through their completion, including their buffered
+    // input/output. Reaping the trusted age child closes the other pipe ends,
+    // so workers blocked on I/O can finish before we join them. An executable
+    // that passes these descriptors to descendants is outside this adapter's
+    // trusted-executable model; this is not a process-group sandbox.
+    let input_finished = input_thread.join().is_ok();
+    let output_finished = output_thread.join().is_ok();
+    if input_finished && output_finished {
+        result
+    } else {
+        Err(SealedError::OperationFailed)
+    }
 }
 fn wait(
     child: &mut std::process::Child,
@@ -298,8 +312,15 @@ mod tests {
                 std::thread::sleep(Duration::from_secs(2));
             }
             Ok("fail") => {
+                let _ = std::io::stdout().write_all(b"private-unauthenticated-source");
                 eprintln!("private-key-and-plaintext-must-not-escape");
                 std::process::exit(7);
+            }
+            Ok("duplex") => {
+                std::io::stdout().write_all(&vec![b'y'; 262_144]).unwrap();
+                let mut input = Vec::new();
+                std::io::stdin().read_to_end(&mut input).unwrap();
+                assert_eq!(input, vec![b'x'; 262_144]);
             }
             _ => {}
         }
@@ -319,6 +340,34 @@ mod tests {
             invoke(helper("overflow"), vec![], 128, Duration::from_secs(5)),
             Err(SealedError::OutputTooLarge)
         );
+    }
+    #[test]
+    fn deadline_releases_a_writer_blocked_by_child_backpressure() {
+        let before = Instant::now();
+        assert_eq!(
+            invoke(
+                helper("wait"),
+                vec![b'x'; 2 * 1024 * 1024],
+                4096,
+                Duration::from_millis(30),
+            ),
+            Err(SealedError::Timeout)
+        );
+        assert!(before.elapsed() < Duration::from_secs(2));
+    }
+    #[test]
+    fn concurrent_pipe_io_handles_output_before_child_reads_input() {
+        let output = invoke(
+            helper("duplex"),
+            vec![b'x'; 262_144],
+            270_000,
+            Duration::from_secs(5),
+        )
+        .unwrap();
+        let expected = vec![b'y'; 262_144];
+        assert!(output
+            .windows(expected.len())
+            .any(|chunk| chunk == expected.as_slice()));
     }
     #[test]
     fn child_failure_does_not_expose_stderr_or_output() {

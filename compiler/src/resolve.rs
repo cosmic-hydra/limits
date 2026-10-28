@@ -13,6 +13,12 @@ use crate::error::{Kind, LimError, Span};
 use crate::interp::BUILTINS;
 
 pub fn check(prog: &Program) -> Vec<LimError> {
+    // This entry point is public: callers need not have passed through the
+    // parser's shape and nesting guards. Reject malformed or overdeep ASTs
+    // before the recursive lexical walk, just as the execution engines do.
+    if let Err(error) = crate::ast::validate(prog) {
+        return vec![error];
+    }
     let mut r = Resolver {
         scopes: vec![BUILTINS.iter().map(|b| b.to_string()).collect()],
         loops: 0,
