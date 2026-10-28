@@ -1,0 +1,13 @@
+let n = 10000000
+var is: [bool] = []
+for i in 0..n + 1:
+    push(is, true)
+var count = 0
+for i in 2..n + 1:
+    if is[i]:
+        count += 1
+        var j = i * i
+        while j <= n:
+            is[j] = false
+            j += i
+print(count)

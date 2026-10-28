@@ -1,0 +1,39 @@
+{
+ "id": "he_027",
+ "source": "HumanEval/27",
+ "description": "For a given string, flip lowercase characters to uppercase and uppercase to lowercase.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `string`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nOutput (stdout): the result, a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nExample 1\nstdin:\n```\n\n```\nstdout:\n```\n\n```\n\nExample 2\nstdin:\n```\nHello!\n```\nstdout:\n```\nhELLO!\n```",
+ "params": [
+  {
+   "name": "string",
+   "type": "str"
+  }
+ ],
+ "output_type": "str",
+ "tests": [
+  {
+   "stdin": "\n",
+   "stdout": "\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "Hello!\n",
+   "stdout": "hELLO!\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "These violent delights have violent ends\n",
+   "stdout": "tHESE VIOLENT DELIGHTS HAVE VIOLENT ENDS\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "lohgna naotTi!!THeoenhohth\n",
+   "stdout": "LOHGNA NAOTtI!!thEOENHOHTH\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "ogeTglT \n",
+   "stdout": "OGEtGLt \n",
+   "origin": "generated"
+  }
+ ]
+}

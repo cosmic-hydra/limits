@@ -1,0 +1,12 @@
+uses stdin
+fn woodall(x: int) -> bool:
+    if x < 1: return false
+    let t = x + 1
+    var n = 1
+    var p = 2
+    while n * p <= t:
+        if n * p == t: return true
+        n += 1
+        p *= 2
+    false
+print(woodall(unwrap(parse_int(env.stdin.read_line()))))

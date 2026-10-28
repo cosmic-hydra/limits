@@ -1,0 +1,19 @@
+uses stdin
+
+# True when a and b differ in exactly one bit position (two's complement).
+fn differ_at_one_bit(a: int, b: int) -> bool:
+    var a = a
+    var b = b
+    var diff = 0
+    for i in 0..64:
+        let abit = ((a % 2) + 2) % 2
+        let bbit = ((b % 2) + 2) % 2
+        if abit != bbit:
+            diff += 1
+        a = (a - abit) / 2
+        b = (b - bbit) / 2
+    diff == 1
+
+let a = int(env.stdin.read_line())
+let b = int(env.stdin.read_line())
+print(differ_at_one_bit(a, b))

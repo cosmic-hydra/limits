@@ -1,0 +1,11 @@
+uses stdin
+
+fn beats(note: str) -> int:
+    match note:
+        "o": 4
+        "o|": 2
+        ".|": 1
+        _: 0
+
+let notes = [beats(x) for x in split(env.stdin.read_line(), " ") if x != ""]
+print(join([str(b) for b in notes], " "))

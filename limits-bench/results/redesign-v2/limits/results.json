@@ -1,0 +1,7492 @@
+{
+ "soldir": "solutions",
+ "limits_bin": "/home/user/limits/native/target/release/limits",
+ "cc": null,
+ "timeout": 10.0,
+ "summary": {
+  "first_attempt": {
+   "tasks": 60,
+   "token_unit": "tiktoken cl100k_base tokens",
+   "pass": 60,
+   "compile_error": 0,
+   "runtime_error": 0,
+   "timeout": 0,
+   "wrong_answer": 0,
+   "missing": 0,
+   "toolchain_error": 0,
+   "pass@1": 1.0,
+   "compile_error_rate": 0.0,
+   "runtime_error_rate": 0.0,
+   "timeout_rate": 0.0,
+   "wrong_answer_rate": 0.0,
+   "mean_tokens_passing": 78.0,
+   "mean_tokens_all": 78.0
+  },
+  "final": {
+   "tasks": 60,
+   "token_unit": "tiktoken cl100k_base tokens",
+   "pass": 60,
+   "compile_error": 0,
+   "runtime_error": 0,
+   "timeout": 0,
+   "wrong_answer": 0,
+   "missing": 0,
+   "toolchain_error": 0,
+   "pass@1": 1.0,
+   "compile_error_rate": 0.0,
+   "runtime_error_rate": 0.0,
+   "timeout_rate": 0.0,
+   "wrong_answer_rate": 0.0,
+   "mean_tokens_passing": 78.0,
+   "mean_tokens_all": 78.0
+  },
+  "repair_rounds": [
+   {
+    "round": 2,
+    "failing_before": 0,
+    "repair_submitted": 0,
+    "fixed": 0,
+    "repair_success": null
+   },
+   {
+    "round": 3,
+    "failing_before": 0,
+    "repair_submitted": 0,
+    "fixed": 0,
+    "repair_success": null
+   }
+  ],
+  "pass@attempt": {
+   "1": 1.0,
+   "2": 1.0,
+   "3": 1.0
+  }
+ },
+ "tasks": {
+  "he_001": {
+   "attempts": [
+    {
+     "file": "solutions/he_001.attempt1.lim",
+     "lang": "limits",
+     "tokens": 108,
+     "chars": 354,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 5,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 6,
+       "status": "pass",
+       "secs": 0.0016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_001.attempt1.lim",
+    "lang": "limits",
+    "tokens": 108,
+    "chars": 354,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 6,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_001.attempt1.lim",
+    "lang": "limits",
+    "tokens": 108,
+    "chars": 354,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 6,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_003": {
+   "attempts": [
+    {
+     "file": "solutions/he_003.attempt1.lim",
+     "lang": "limits",
+     "tokens": 59,
+     "chars": 202,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0023
+      },
+      {
+       "i": 5,
+       "status": "pass",
+       "secs": 0.0016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_003.attempt1.lim",
+    "lang": "limits",
+    "tokens": 59,
+    "chars": 202,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0023
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_003.attempt1.lim",
+    "lang": "limits",
+    "tokens": 59,
+    "chars": 202,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0023
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_005": {
+   "attempts": [
+    {
+     "file": "solutions/he_005.attempt1.lim",
+     "lang": "limits",
+     "tokens": 78,
+     "chars": 285,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0021
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0015
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_005.attempt1.lim",
+    "lang": "limits",
+    "tokens": 78,
+    "chars": 285,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_005.attempt1.lim",
+    "lang": "limits",
+    "tokens": 78,
+    "chars": 285,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_006": {
+   "attempts": [
+    {
+     "file": "solutions/he_006.attempt1.lim",
+     "lang": "limits",
+     "tokens": 101,
+     "chars": 344,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0014
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0064
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.002
+      },
+      {
+       "i": 5,
+       "status": "pass",
+       "secs": 0.0018
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_006.attempt1.lim",
+    "lang": "limits",
+    "tokens": 101,
+    "chars": 344,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0014
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0064
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0018
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_006.attempt1.lim",
+    "lang": "limits",
+    "tokens": 101,
+    "chars": 344,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0014
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0064
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0018
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_007": {
+   "attempts": [
+    {
+     "file": "solutions/he_007.attempt1.lim",
+     "lang": "limits",
+     "tokens": 75,
+     "chars": 242,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0014
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0017
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_007.attempt1.lim",
+    "lang": "limits",
+    "tokens": 75,
+    "chars": 242,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0014
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0017
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_007.attempt1.lim",
+    "lang": "limits",
+    "tokens": 75,
+    "chars": 242,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0014
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0017
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_009": {
+   "attempts": [
+    {
+     "file": "solutions/he_009.attempt1.lim",
+     "lang": "limits",
+     "tokens": 85,
+     "chars": 285,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0027
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_009.attempt1.lim",
+    "lang": "limits",
+    "tokens": 85,
+    "chars": 285,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0027
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_009.attempt1.lim",
+    "lang": "limits",
+    "tokens": 85,
+    "chars": 285,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0027
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_010": {
+   "attempts": [
+    {
+     "file": "solutions/he_010.attempt1.lim",
+     "lang": "limits",
+     "tokens": 155,
+     "chars": 419,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0021
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_010.attempt1.lim",
+    "lang": "limits",
+    "tokens": 155,
+    "chars": 419,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_010.attempt1.lim",
+    "lang": "limits",
+    "tokens": 155,
+    "chars": 419,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_011": {
+   "attempts": [
+    {
+     "file": "solutions/he_011.attempt1.lim",
+     "lang": "limits",
+     "tokens": 69,
+     "chars": 215,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 5,
+       "status": "pass",
+       "secs": 0.0018
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_011.attempt1.lim",
+    "lang": "limits",
+    "tokens": 69,
+    "chars": 215,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0018
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_011.attempt1.lim",
+    "lang": "limits",
+    "tokens": 69,
+    "chars": 215,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0018
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_013": {
+   "attempts": [
+    {
+     "file": "solutions/he_013.attempt1.lim",
+     "lang": "limits",
+     "tokens": 52,
+     "chars": 170,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0021
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_013.attempt1.lim",
+    "lang": "limits",
+    "tokens": 52,
+    "chars": 170,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_013.attempt1.lim",
+    "lang": "limits",
+    "tokens": 52,
+    "chars": 170,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_014": {
+   "attempts": [
+    {
+     "file": "solutions/he_014.attempt1.lim",
+     "lang": "limits",
+     "tokens": 37,
+     "chars": 127,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0015
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_014.attempt1.lim",
+    "lang": "limits",
+    "tokens": 37,
+    "chars": 127,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_014.attempt1.lim",
+    "lang": "limits",
+    "tokens": 37,
+    "chars": 127,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_015": {
+   "attempts": [
+    {
+     "file": "solutions/he_015.attempt1.lim",
+     "lang": "limits",
+     "tokens": 33,
+     "chars": 105,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0058
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0021
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_015.attempt1.lim",
+    "lang": "limits",
+    "tokens": 33,
+    "chars": 105,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0058
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0021
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_015.attempt1.lim",
+    "lang": "limits",
+    "tokens": 33,
+    "chars": 105,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0058
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0021
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_017": {
+   "attempts": [
+    {
+     "file": "solutions/he_017.attempt1.lim",
+     "lang": "limits",
+     "tokens": 74,
+     "chars": 209,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0029
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0017
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_017.attempt1.lim",
+    "lang": "limits",
+    "tokens": 74,
+    "chars": 209,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0029
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0017
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_017.attempt1.lim",
+    "lang": "limits",
+    "tokens": 74,
+    "chars": 209,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0029
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0017
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_018": {
+   "attempts": [
+    {
+     "file": "solutions/he_018.attempt1.lim",
+     "lang": "limits",
+     "tokens": 102,
+     "chars": 324,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0014
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_018.attempt1.lim",
+    "lang": "limits",
+    "tokens": 102,
+    "chars": 324,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0014
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_018.attempt1.lim",
+    "lang": "limits",
+    "tokens": 102,
+    "chars": 324,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0014
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_019": {
+   "attempts": [
+    {
+     "file": "solutions/he_019.attempt1.lim",
+     "lang": "limits",
+     "tokens": 87,
+     "chars": 274,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0027
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0037
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.002
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.002
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_019.attempt1.lim",
+    "lang": "limits",
+    "tokens": 87,
+    "chars": 274,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0027
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0037
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.002
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_019.attempt1.lim",
+    "lang": "limits",
+    "tokens": 87,
+    "chars": 274,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0027
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0037
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.002
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_023": {
+   "attempts": [
+    {
+     "file": "solutions/he_023.attempt1.lim",
+     "lang": "limits",
+     "tokens": 10,
+     "chars": 45,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0026
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_023.attempt1.lim",
+    "lang": "limits",
+    "tokens": 10,
+    "chars": 45,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0026
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_023.attempt1.lim",
+    "lang": "limits",
+    "tokens": 10,
+    "chars": 45,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0026
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_024": {
+   "attempts": [
+    {
+     "file": "solutions/he_024.attempt1.lim",
+     "lang": "limits",
+     "tokens": 44,
+     "chars": 122,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0025
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0024
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_024.attempt1.lim",
+    "lang": "limits",
+    "tokens": 44,
+    "chars": 122,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0025
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0024
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_024.attempt1.lim",
+    "lang": "limits",
+    "tokens": 44,
+    "chars": 122,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0025
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0024
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_026": {
+   "attempts": [
+    {
+     "file": "solutions/he_026.attempt1.lim",
+     "lang": "limits",
+     "tokens": 84,
+     "chars": 253,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.002
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0015
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_026.attempt1.lim",
+    "lang": "limits",
+    "tokens": 84,
+    "chars": 253,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_026.attempt1.lim",
+    "lang": "limits",
+    "tokens": 84,
+    "chars": 253,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_027": {
+   "attempts": [
+    {
+     "file": "solutions/he_027.attempt1.lim",
+     "lang": "limits",
+     "tokens": 97,
+     "chars": 354,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0023
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0021
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0022
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0015
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_027.attempt1.lim",
+    "lang": "limits",
+    "tokens": 97,
+    "chars": 354,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0023
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0022
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_027.attempt1.lim",
+    "lang": "limits",
+    "tokens": 97,
+    "chars": 354,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0023
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0022
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_028": {
+   "attempts": [
+    {
+     "file": "solutions/he_028.attempt1.lim",
+     "lang": "limits",
+     "tokens": 38,
+     "chars": 133,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_028.attempt1.lim",
+    "lang": "limits",
+    "tokens": 38,
+    "chars": 133,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_028.attempt1.lim",
+    "lang": "limits",
+    "tokens": 38,
+    "chars": 133,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_029": {
+   "attempts": [
+    {
+     "file": "solutions/he_029.attempt1.lim",
+     "lang": "limits",
+     "tokens": 139,
+     "chars": 424,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.002
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_029.attempt1.lim",
+    "lang": "limits",
+    "tokens": 139,
+    "chars": 424,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_029.attempt1.lim",
+    "lang": "limits",
+    "tokens": 139,
+    "chars": 424,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_030": {
+   "attempts": [
+    {
+     "file": "solutions/he_030.attempt1.lim",
+     "lang": "limits",
+     "tokens": 80,
+     "chars": 248,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0027
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0027
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_030.attempt1.lim",
+    "lang": "limits",
+    "tokens": 80,
+    "chars": 248,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0027
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0027
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_030.attempt1.lim",
+    "lang": "limits",
+    "tokens": 80,
+    "chars": 248,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0027
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0027
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_034": {
+   "attempts": [
+    {
+     "file": "solutions/he_034.attempt1.lim",
+     "lang": "limits",
+     "tokens": 100,
+     "chars": 303,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0021
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0023
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0022
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_034.attempt1.lim",
+    "lang": "limits",
+    "tokens": 100,
+    "chars": 303,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0023
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0022
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_034.attempt1.lim",
+    "lang": "limits",
+    "tokens": 100,
+    "chars": 303,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0023
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0022
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_035": {
+   "attempts": [
+    {
+     "file": "solutions/he_035.attempt1.lim",
+     "lang": "limits",
+     "tokens": 65,
+     "chars": 215,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0023
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0019
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_035.attempt1.lim",
+    "lang": "limits",
+    "tokens": 65,
+    "chars": 215,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0023
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0019
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_035.attempt1.lim",
+    "lang": "limits",
+    "tokens": 65,
+    "chars": 215,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0023
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0019
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_036": {
+   "attempts": [
+    {
+     "file": "solutions/he_036.attempt1.lim",
+     "lang": "limits",
+     "tokens": 75,
+     "chars": 207,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 5,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 6,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 7,
+       "status": "pass",
+       "secs": 0.0043
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_036.attempt1.lim",
+    "lang": "limits",
+    "tokens": 75,
+    "chars": 207,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 6,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 7,
+      "status": "pass",
+      "secs": 0.0043
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_036.attempt1.lim",
+    "lang": "limits",
+    "tokens": 75,
+    "chars": 207,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 6,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 7,
+      "status": "pass",
+      "secs": 0.0043
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_039": {
+   "attempts": [
+    {
+     "file": "solutions/he_039.attempt1.lim",
+     "lang": "limits",
+     "tokens": 132,
+     "chars": 357,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0033
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0061
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0023
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0022
+      },
+      {
+       "i": 5,
+       "status": "pass",
+       "secs": 0.0022
+      },
+      {
+       "i": 6,
+       "status": "pass",
+       "secs": 0.0021
+      },
+      {
+       "i": 7,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 8,
+       "status": "pass",
+       "secs": 0.002
+      },
+      {
+       "i": 9,
+       "status": "pass",
+       "secs": 0.0024
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_039.attempt1.lim",
+    "lang": "limits",
+    "tokens": 132,
+    "chars": 357,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0033
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0061
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0023
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0022
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0022
+     },
+     {
+      "i": 6,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 7,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 8,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 9,
+      "status": "pass",
+      "secs": 0.0024
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_039.attempt1.lim",
+    "lang": "limits",
+    "tokens": 132,
+    "chars": 357,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0033
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0061
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0023
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0022
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0022
+     },
+     {
+      "i": 6,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 7,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 8,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 9,
+      "status": "pass",
+      "secs": 0.0024
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_040": {
+   "attempts": [
+    {
+     "file": "solutions/he_040.attempt1.lim",
+     "lang": "limits",
+     "tokens": 131,
+     "chars": 375,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0014
+      },
+      {
+       "i": 5,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 6,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 7,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 8,
+       "status": "pass",
+       "secs": 0.0015
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_040.attempt1.lim",
+    "lang": "limits",
+    "tokens": 131,
+    "chars": 375,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0014
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 6,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 7,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 8,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_040.attempt1.lim",
+    "lang": "limits",
+    "tokens": 131,
+    "chars": 375,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0014
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 6,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 7,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 8,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_041": {
+   "attempts": [
+    {
+     "file": "solutions/he_041.attempt1.lim",
+     "lang": "limits",
+     "tokens": 19,
+     "chars": 73,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_041.attempt1.lim",
+    "lang": "limits",
+    "tokens": 19,
+    "chars": 73,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_041.attempt1.lim",
+    "lang": "limits",
+    "tokens": 19,
+    "chars": 73,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_042": {
+   "attempts": [
+    {
+     "file": "solutions/he_042.attempt1.lim",
+     "lang": "limits",
+     "tokens": 74,
+     "chars": 233,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0015
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_042.attempt1.lim",
+    "lang": "limits",
+    "tokens": 74,
+    "chars": 233,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_042.attempt1.lim",
+    "lang": "limits",
+    "tokens": 74,
+    "chars": 233,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_043": {
+   "attempts": [
+    {
+     "file": "solutions/he_043.attempt1.lim",
+     "lang": "limits",
+     "tokens": 116,
+     "chars": 337,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0014
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0014
+      },
+      {
+       "i": 5,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 6,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 7,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 8,
+       "status": "pass",
+       "secs": 0.0018
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_043.attempt1.lim",
+    "lang": "limits",
+    "tokens": 116,
+    "chars": 337,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0014
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0014
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 6,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 7,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 8,
+      "status": "pass",
+      "secs": 0.0018
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_043.attempt1.lim",
+    "lang": "limits",
+    "tokens": 116,
+    "chars": 337,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0014
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0014
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 6,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 7,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 8,
+      "status": "pass",
+      "secs": 0.0018
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_046": {
+   "attempts": [
+    {
+     "file": "solutions/he_046.attempt1.lim",
+     "lang": "limits",
+     "tokens": 81,
+     "chars": 183,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0021
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.002
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_046.attempt1.lim",
+    "lang": "limits",
+    "tokens": 81,
+    "chars": 183,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_046.attempt1.lim",
+    "lang": "limits",
+    "tokens": 81,
+    "chars": 183,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_003": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_003.attempt1.lim",
+     "lang": "limits",
+     "tokens": 54,
+     "chars": 153,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.002
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_003.attempt1.lim",
+    "lang": "limits",
+    "tokens": 54,
+    "chars": 153,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_003.attempt1.lim",
+    "lang": "limits",
+    "tokens": 54,
+    "chars": 153,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_004": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_004.attempt1.lim",
+     "lang": "limits",
+     "tokens": 127,
+     "chars": 386,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0026
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0026
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0018
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_004.attempt1.lim",
+    "lang": "limits",
+    "tokens": 127,
+    "chars": 386,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0026
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0026
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0018
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_004.attempt1.lim",
+    "lang": "limits",
+    "tokens": 127,
+    "chars": 386,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0026
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0026
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0018
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_006": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_006.attempt1.lim",
+     "lang": "limits",
+     "tokens": 117,
+     "chars": 305,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 5,
+       "status": "pass",
+       "secs": 0.0015
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_006.attempt1.lim",
+    "lang": "limits",
+    "tokens": 117,
+    "chars": 305,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_006.attempt1.lim",
+    "lang": "limits",
+    "tokens": 117,
+    "chars": 305,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_008": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_008.attempt1.lim",
+     "lang": "limits",
+     "tokens": 73,
+     "chars": 233,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0024
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.002
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_008.attempt1.lim",
+    "lang": "limits",
+    "tokens": 73,
+    "chars": 233,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0024
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.002
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_008.attempt1.lim",
+    "lang": "limits",
+    "tokens": 73,
+    "chars": 233,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0024
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.002
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_009": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_009.attempt1.lim",
+     "lang": "limits",
+     "tokens": 84,
+     "chars": 237,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0022
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0021
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0015
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_009.attempt1.lim",
+    "lang": "limits",
+    "tokens": 84,
+    "chars": 237,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0022
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_009.attempt1.lim",
+    "lang": "limits",
+    "tokens": 84,
+    "chars": 237,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0022
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_011": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_011.attempt1.lim",
+     "lang": "limits",
+     "tokens": 104,
+     "chars": 317,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0023
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0015
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_011.attempt1.lim",
+    "lang": "limits",
+    "tokens": 104,
+    "chars": 317,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0023
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_011.attempt1.lim",
+    "lang": "limits",
+    "tokens": 104,
+    "chars": 317,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0023
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_012": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_012.attempt1.lim",
+     "lang": "limits",
+     "tokens": 174,
+     "chars": 524,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0023
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0021
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_012.attempt1.lim",
+    "lang": "limits",
+    "tokens": 174,
+    "chars": 524,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0023
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0021
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_012.attempt1.lim",
+    "lang": "limits",
+    "tokens": 174,
+    "chars": 524,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0023
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0021
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_016": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_016.attempt1.lim",
+     "lang": "limits",
+     "tokens": 111,
+     "chars": 333,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0017
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_016.attempt1.lim",
+    "lang": "limits",
+    "tokens": 111,
+    "chars": 333,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0017
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_016.attempt1.lim",
+    "lang": "limits",
+    "tokens": 111,
+    "chars": 333,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0017
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_017": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_017.attempt1.lim",
+     "lang": "limits",
+     "tokens": 15,
+     "chars": 63,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0014
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_017.attempt1.lim",
+    "lang": "limits",
+    "tokens": 15,
+    "chars": 63,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0014
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_017.attempt1.lim",
+    "lang": "limits",
+    "tokens": 15,
+    "chars": 63,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0014
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_018": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_018.attempt1.lim",
+     "lang": "limits",
+     "tokens": 41,
+     "chars": 148,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0021
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0014
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_018.attempt1.lim",
+    "lang": "limits",
+    "tokens": 41,
+    "chars": 148,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0014
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_018.attempt1.lim",
+    "lang": "limits",
+    "tokens": 41,
+    "chars": 148,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0014
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_019": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_019.attempt1.lim",
+     "lang": "limits",
+     "tokens": 102,
+     "chars": 309,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0022
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0015
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_019.attempt1.lim",
+    "lang": "limits",
+    "tokens": 102,
+    "chars": 309,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0022
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_019.attempt1.lim",
+    "lang": "limits",
+    "tokens": 102,
+    "chars": 309,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0022
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_020": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_020.attempt1.lim",
+     "lang": "limits",
+     "tokens": 94,
+     "chars": 266,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.002
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0028
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0017
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_020.attempt1.lim",
+    "lang": "limits",
+    "tokens": 94,
+    "chars": 266,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0028
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0017
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_020.attempt1.lim",
+    "lang": "limits",
+    "tokens": 94,
+    "chars": 266,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0028
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0017
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_056": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_056.attempt1.lim",
+     "lang": "limits",
+     "tokens": 78,
+     "chars": 205,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0022
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0019
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_056.attempt1.lim",
+    "lang": "limits",
+    "tokens": 78,
+    "chars": 205,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0022
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0019
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_056.attempt1.lim",
+    "lang": "limits",
+    "tokens": 78,
+    "chars": 205,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0022
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0019
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_057": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_057.attempt1.lim",
+     "lang": "limits",
+     "tokens": 103,
+     "chars": 288,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0015
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_057.attempt1.lim",
+    "lang": "limits",
+    "tokens": 103,
+    "chars": 288,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_057.attempt1.lim",
+    "lang": "limits",
+    "tokens": 103,
+    "chars": 288,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_058": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_058.attempt1.lim",
+     "lang": "limits",
+     "tokens": 49,
+     "chars": 157,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0015
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_058.attempt1.lim",
+    "lang": "limits",
+    "tokens": 49,
+    "chars": 157,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_058.attempt1.lim",
+    "lang": "limits",
+    "tokens": 49,
+    "chars": 157,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_059": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_059.attempt1.lim",
+     "lang": "limits",
+     "tokens": 27,
+     "chars": 85,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0031
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0014
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.002
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_059.attempt1.lim",
+    "lang": "limits",
+    "tokens": 27,
+    "chars": 85,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0031
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0014
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.002
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_059.attempt1.lim",
+    "lang": "limits",
+    "tokens": 27,
+    "chars": 85,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0031
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0014
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.002
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_061": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_061.attempt1.lim",
+     "lang": "limits",
+     "tokens": 87,
+     "chars": 247,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0042
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0021
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_061.attempt1.lim",
+    "lang": "limits",
+    "tokens": 87,
+    "chars": 247,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0042
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0021
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_061.attempt1.lim",
+    "lang": "limits",
+    "tokens": 87,
+    "chars": 247,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0042
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0021
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_062": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_062.attempt1.lim",
+     "lang": "limits",
+     "tokens": 58,
+     "chars": 195,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.002
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0014
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.002
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_062.attempt1.lim",
+    "lang": "limits",
+    "tokens": 58,
+    "chars": 195,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0014
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_062.attempt1.lim",
+    "lang": "limits",
+    "tokens": 58,
+    "chars": 195,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0014
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_066": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_066.attempt1.lim",
+     "lang": "limits",
+     "tokens": 68,
+     "chars": 217,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0015
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_066.attempt1.lim",
+    "lang": "limits",
+    "tokens": 68,
+    "chars": 217,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_066.attempt1.lim",
+    "lang": "limits",
+    "tokens": 68,
+    "chars": 217,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_068": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_068.attempt1.lim",
+     "lang": "limits",
+     "tokens": 115,
+     "chars": 331,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_068.attempt1.lim",
+    "lang": "limits",
+    "tokens": 115,
+    "chars": 331,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_068.attempt1.lim",
+    "lang": "limits",
+    "tokens": 115,
+    "chars": 331,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_069": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_069.attempt1.lim",
+     "lang": "limits",
+     "tokens": 146,
+     "chars": 446,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0014
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_069.attempt1.lim",
+    "lang": "limits",
+    "tokens": 146,
+    "chars": 446,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0014
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_069.attempt1.lim",
+    "lang": "limits",
+    "tokens": 146,
+    "chars": 446,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0014
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_071": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_071.attempt1.lim",
+     "lang": "limits",
+     "tokens": 74,
+     "chars": 240,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0017
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_071.attempt1.lim",
+    "lang": "limits",
+    "tokens": 74,
+    "chars": 240,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0017
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_071.attempt1.lim",
+    "lang": "limits",
+    "tokens": 74,
+    "chars": 240,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0017
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_072": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_072.attempt1.lim",
+     "lang": "limits",
+     "tokens": 31,
+     "chars": 94,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0021
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_072.attempt1.lim",
+    "lang": "limits",
+    "tokens": 31,
+    "chars": 94,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_072.attempt1.lim",
+    "lang": "limits",
+    "tokens": 31,
+    "chars": 94,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_074": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_074.attempt1.lim",
+     "lang": "limits",
+     "tokens": 127,
+     "chars": 383,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0024
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 5,
+       "status": "pass",
+       "secs": 0.0024
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_074.attempt1.lim",
+    "lang": "limits",
+    "tokens": 127,
+    "chars": 383,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0024
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0024
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_074.attempt1.lim",
+    "lang": "limits",
+    "tokens": 127,
+    "chars": 383,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0024
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0024
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_077": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_077.attempt1.lim",
+     "lang": "limits",
+     "tokens": 20,
+     "chars": 69,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0021
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.002
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0021
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0018
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0018
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_077.attempt1.lim",
+    "lang": "limits",
+    "tokens": 20,
+    "chars": 69,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0018
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_077.attempt1.lim",
+    "lang": "limits",
+    "tokens": 20,
+    "chars": 69,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0018
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0018
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_079": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_079.attempt1.lim",
+     "lang": "limits",
+     "tokens": 17,
+     "chars": 54,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.002
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0014
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0015
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_079.attempt1.lim",
+    "lang": "limits",
+    "tokens": 17,
+    "chars": 54,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0014
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_079.attempt1.lim",
+    "lang": "limits",
+    "tokens": 17,
+    "chars": 54,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.002
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0014
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_083": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_083.attempt1.lim",
+     "lang": "limits",
+     "tokens": 74,
+     "chars": 230,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0015
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0015
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_083.attempt1.lim",
+    "lang": "limits",
+    "tokens": 74,
+    "chars": 230,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_083.attempt1.lim",
+    "lang": "limits",
+    "tokens": 74,
+    "chars": 230,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_084": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_084.attempt1.lim",
+     "lang": "limits",
+     "tokens": 63,
+     "chars": 154,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0022
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_084.attempt1.lim",
+    "lang": "limits",
+    "tokens": 63,
+    "chars": 154,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0022
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_084.attempt1.lim",
+    "lang": "limits",
+    "tokens": 63,
+    "chars": 154,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0022
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_086": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_086.attempt1.lim",
+     "lang": "limits",
+     "tokens": 30,
+     "chars": 87,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0024
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0021
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0016
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0014
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_086.attempt1.lim",
+    "lang": "limits",
+    "tokens": 30,
+    "chars": 87,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0024
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0014
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_086.attempt1.lim",
+    "lang": "limits",
+    "tokens": 30,
+    "chars": 87,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0024
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0021
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0016
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0014
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_089": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_089.attempt1.lim",
+     "lang": "limits",
+     "tokens": 17,
+     "chars": 63,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0019
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0022
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0017
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0022
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_089.attempt1.lim",
+    "lang": "limits",
+    "tokens": 17,
+    "chars": 63,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0022
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0022
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_089.attempt1.lim",
+    "lang": "limits",
+    "tokens": 17,
+    "chars": 63,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0022
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0022
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  }
+ }
+}

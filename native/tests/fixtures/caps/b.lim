@@ -1,0 +1,3 @@
+uses env
+pub fn g(vars: Vars):
+    print(vars.get("HOME"))

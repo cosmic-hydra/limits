@@ -1,0 +1,33 @@
+# Order build steps: stdin lines "task: dep dep ...". Prints a deterministic topological order or the cycle members.
+uses stdin
+
+struct Task:
+    name: str
+    deps: [str]
+
+fn has(xs: [str], x: str) -> bool:
+    is_some(find(xs, x))
+
+fn main(env: Env):
+    var tasks: [Task] = []
+    var line = env.stdin.read_line()
+    while line != "":
+        let p = split(line, ":")
+        push(tasks, Task { name: p[0], deps: [d for d in split(p[1], " ") if d != ""] })
+        line = env.stdin.read_line()
+    let declared = tasks
+    for t in declared:
+        for d in t.deps:
+            if not has([x.name for x in tasks], d):
+                push(tasks, Task { name: d, deps: [] })
+    var done: [str] = []
+    while len(done) < len(tasks):
+        var ready = [t.name for t in tasks if not has(done, t.name) and all([has(done, d) for d in t.deps])]
+        if len(ready) == 0:
+            var left = [t.name for t in tasks if not has(done, t.name)]
+            sort(left)
+            print("cycle among:", join(left, " "))
+            break
+        sort(ready)
+        push(done, ready[0])
+    print("order:", join(done, " "))

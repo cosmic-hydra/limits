@@ -1,0 +1,39 @@
+{
+ "id": "he_010",
+ "source": "HumanEval/10",
+ "description": "Find the shortest palindrome that begins with a supplied string.\nAlgorithm idea is simple:\n- Find the longest postfix of supplied string that is a palindrome.\n- Append to the end of the string reverse of a string prefix that comes before the palindromic suffix.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `string`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nOutput (stdout): the result, a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nExample 1\nstdin:\n```\n\n```\nstdout:\n```\n\n```\n\nExample 2\nstdin:\n```\nx\n```\nstdout:\n```\nx\n```",
+ "params": [
+  {
+   "name": "string",
+   "type": "str"
+  }
+ ],
+ "output_type": "str",
+ "tests": [
+  {
+   "stdin": "\n",
+   "stdout": "\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "x\n",
+   "stdout": "x\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "xyz\n",
+   "stdout": "xyzyx\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "xyx\n",
+   "stdout": "xyx\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "jerry\n",
+   "stdout": "jerryrrej\n",
+   "origin": "official"
+  }
+ ]
+}

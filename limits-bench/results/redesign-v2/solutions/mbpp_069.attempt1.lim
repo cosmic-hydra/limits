@@ -1,0 +1,16 @@
+uses stdin
+fn ints(line: str) -> [int]:
+    var out: [int] = []
+    for w in split(line, " "):
+        if w != "": push(out, unwrap(parse_int(w)))
+    out
+let l = ints(env.stdin.read_line())
+let s = ints(env.stdin.read_line())
+var found = len(s) == 0
+if len(s) <= len(l):
+    for i in 0..(len(l) - len(s) + 1):
+        var ok = true
+        for j in 0..len(s):
+            if l[i + j] != s[j]: ok = false
+        if ok: found = true
+print(found)

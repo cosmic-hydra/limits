@@ -1,0 +1,16 @@
+uses stdin
+
+fn string_xor(a: str, b: str) -> str:
+    let xs = split(a, "")
+    let ys = split(b, "")
+    var out: [str] = []
+    for i in 0..min(len(xs), len(ys)):
+        if xs[i] == ys[i]:
+            push(out, "0")
+        else:
+            push(out, "1")
+    join(out, "")
+
+let a = env.stdin.read_line()
+let b = env.stdin.read_line()
+print(string_xor(a, b))

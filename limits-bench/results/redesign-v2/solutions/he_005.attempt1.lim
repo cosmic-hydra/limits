@@ -1,0 +1,11 @@
+uses stdin
+let line = env.stdin.read_line()
+let d = unwrap(parse_int(env.stdin.read_line()))
+var out: [str] = []
+if line != "":
+    var first = true
+    for w in split(line, " "):
+        if not first: push(out, str(d))
+        push(out, w)
+        first = false
+print(join(out, " "))

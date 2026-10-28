@@ -1,0 +1,8 @@
+uses stdin
+let s = env.stdin.read_line()
+var out: [str] = []
+for w in split(s, " "):
+    if w == "o": push(out, "4")
+    elif w == "o|": push(out, "2")
+    elif w == ".|": push(out, "1")
+print(join(out, " "))

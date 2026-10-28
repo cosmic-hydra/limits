@@ -1,0 +1,16 @@
+# Sieve of Eratosthenes.
+let n = 2000000
+var comp = [false for i in 0..n + 1]
+var count = 0
+var sum = 0
+var last = 0
+for i in 2..n + 1:
+    if not comp[i]:
+        count += 1
+        sum += i
+        last = i
+        var j = i * i
+        while j <= n:
+            comp[j] = true
+            j += i
+print(count, sum, last)

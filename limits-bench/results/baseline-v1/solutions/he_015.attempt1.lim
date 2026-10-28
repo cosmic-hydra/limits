@@ -1,0 +1,7 @@
+uses stdin;
+fn main() {
+  let n = int(input_line());
+  let parts: [str] = [];
+  for i in 0..n + 1 { push(parts, str(i)); }
+  print(join(parts, " "));
+}

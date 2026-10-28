@@ -1,0 +1,10 @@
+uses stdin
+fn rev(n: int) -> int:
+    var m = n
+    var r = 0
+    while m > 0:
+        r = r * 10 + m % 10
+        m /= 10
+    r
+let n = unwrap(parse_int(env.stdin.read_line()))
+print(2 * rev(n) == n + 1)

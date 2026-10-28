@@ -1,0 +1,64 @@
+{
+ "id": "he_039",
+ "source": "HumanEval/39",
+ "description": "prime_fib returns n-th number that is a Fibonacci number and it's also prime.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `n`: an integer, written as one line holding the integer in decimal (e.g. `-12`).\n\nOutput (stdout): the result, an integer, written as one line holding the integer in decimal (e.g. `-12`).\n\nExample 1\nstdin:\n```\n1\n```\nstdout:\n```\n2\n```\n\nExample 2\nstdin:\n```\n2\n```\nstdout:\n```\n3\n```",
+ "params": [
+  {
+   "name": "n",
+   "type": "int"
+  }
+ ],
+ "output_type": "int",
+ "tests": [
+  {
+   "stdin": "1\n",
+   "stdout": "2\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "2\n",
+   "stdout": "3\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "3\n",
+   "stdout": "5\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "4\n",
+   "stdout": "13\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "5\n",
+   "stdout": "89\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "6\n",
+   "stdout": "233\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "7\n",
+   "stdout": "1597\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "8\n",
+   "stdout": "28657\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "9\n",
+   "stdout": "514229\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "10\n",
+   "stdout": "433494437\n",
+   "origin": "official"
+  }
+ ]
+}

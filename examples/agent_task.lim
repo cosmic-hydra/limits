@@ -1,0 +1,20 @@
+# A toy "agent" step: score candidate actions and pick the best,
+# skipping any that exceed a budget.
+let budget = 10;
+let actions = [
+    {"name": "search", "cost": 3, "value": 5},
+    {"name": "browse", "cost": 12, "value": 9},
+    {"name": "summarize", "cost": 2, "value": 4},
+];
+
+let best = nil;
+for a in actions {
+    if a["cost"] > budget {
+        continue;
+    }
+    if best == nil or a["value"] > best["value"] {
+        best = a;
+    }
+}
+assert(best != nil, "no affordable action");
+print("chosen:", best["name"]);

@@ -1,0 +1,39 @@
+{
+ "id": "he_028",
+ "source": "HumanEval/28",
+ "description": "Concatenate list of strings into a single string\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `strings`: a list of strings, written as one line with the count n, then n lines, one string per line.\n\nOutput (stdout): the result, a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nExample 1\nstdin:\n```\n0\n```\nstdout:\n```\n\n```\n\nExample 2\nstdin:\n```\n3\nx\ny\nz\n```\nstdout:\n```\nxyz\n```",
+ "params": [
+  {
+   "name": "strings",
+   "type": "[str]"
+  }
+ ],
+ "output_type": "str",
+ "tests": [
+  {
+   "stdin": "0\n",
+   "stdout": "\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "3\nx\ny\nz\n",
+   "stdout": "xyz\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "5\nx\ny\nz\nw\nk\n",
+   "stdout": "xyzwk\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "5\nk\nw\nk\ny\nk\n",
+   "stdout": "kwkyk\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "5\nk\nx\nz\ny\nz\n",
+   "stdout": "kxzyz\n",
+   "origin": "generated"
+  }
+ ]
+}

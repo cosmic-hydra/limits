@@ -1,0 +1,39 @@
+{
+ "id": "mbpp_017",
+ "source": "MBPP/17",
+ "description": "Write a program that returns the perimeter of a square given its side length as input.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `a`: an integer, written as one line holding the integer in decimal (e.g. `-12`).\n\nOutput (stdout): the result, an integer, written as one line holding the integer in decimal (e.g. `-12`).\n\nExample 1\nstdin:\n```\n10\n```\nstdout:\n```\n40\n```\n\nExample 2\nstdin:\n```\n5\n```\nstdout:\n```\n20\n```\n\nExample 3\nstdin:\n```\n4\n```\nstdout:\n```\n16\n```",
+ "params": [
+  {
+   "name": "a",
+   "type": "int"
+  }
+ ],
+ "output_type": "int",
+ "tests": [
+  {
+   "stdin": "10\n",
+   "stdout": "40\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "5\n",
+   "stdout": "20\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "4\n",
+   "stdout": "16\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "6\n",
+   "stdout": "24\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "8\n",
+   "stdout": "32\n",
+   "origin": "generated"
+  }
+ ]
+}

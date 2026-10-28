@@ -1,0 +1,2 @@
+scheme=https host=api.test port=443 path=/v1/items
+scheme=http host=a port=80 path=/b://c

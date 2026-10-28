@@ -1,0 +1,2 @@
+import m
+m.f(1)

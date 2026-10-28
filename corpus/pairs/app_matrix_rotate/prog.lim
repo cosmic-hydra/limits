@@ -1,0 +1,27 @@
+# Read an N x N matrix from stdin and rotate it 90 degrees clockwise K times, in place.
+uses stdin
+
+fn rotate(m: inout [[int]]):
+    let n = len(m)
+    for i in 0..n:
+        for j in i + 1..n:
+            let t = m[i][j]
+            m[i][j] = m[j][i]
+            m[j][i] = t
+    for i in 0..n:
+        for j in 0..n / 2:
+            let t = m[i][j]
+            m[i][j] = m[i][n - 1 - j]
+            m[i][n - 1 - j] = t
+
+let head = split(env.stdin.read_line(), " ")
+let n = int(head[0])
+let k = int(head[1])
+var m: [[int]] = []
+for i in 0..n:
+    push(m, [int(x) for x in split(env.stdin.read_line(), " ")])
+for r in 0..k % 4:
+    rotate(&m)
+for row in m:
+    print(join([str(x) for x in row], " "))
+print("trace", sum([m[i][i] for i in 0..n]))

@@ -1,0 +1,13 @@
+uses stdin
+let s = split(env.stdin.read_line(), "")
+let t = split(env.stdin.read_line(), "")
+var cnt = 0
+if len(t) > 0:
+    for i in 0..len(s) - len(t) + 1:
+        var ok = true
+        for j in 0..len(t):
+            if s[i + j] != t[j]:
+                ok = false
+                break
+        if ok: cnt += 1
+print(cnt)

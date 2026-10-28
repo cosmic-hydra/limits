@@ -1,0 +1,11 @@
+uses stdin
+
+fn pairs_sum_to_zero(xs: [int]) -> bool:
+    for i in 0..len(xs):
+        for j in i + 1..len(xs):
+            if xs[i] + xs[j] == 0:
+                return true
+    false
+
+let xs = [int(p) for p in split(env.stdin.read_line(), " ") if p != ""]
+print(pairs_sum_to_zero(xs))

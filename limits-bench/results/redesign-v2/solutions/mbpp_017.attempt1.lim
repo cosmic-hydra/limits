@@ -1,0 +1,2 @@
+uses stdin
+print(4 * unwrap(parse_int(env.stdin.read_line())))

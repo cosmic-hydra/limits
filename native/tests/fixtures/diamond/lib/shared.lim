@@ -1,0 +1,2 @@
+pub struct Counter:
+    n: int

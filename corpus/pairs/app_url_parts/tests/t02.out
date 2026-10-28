@@ -1,0 +1,3 @@
+invalid: example.com/no/scheme
+invalid: http://:80/x
+invalid: http://h:abc/

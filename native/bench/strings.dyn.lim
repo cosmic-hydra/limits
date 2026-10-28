@@ -1,0 +1,15 @@
+let total = 0;
+for r in 0..20 {
+    let s = "";
+    for i in 0..2000 {
+        s = s + str(i) + ",";
+    }
+    total = total + len(s);
+}
+let parts = [];
+for i in 0..1000000 {
+    push(parts, "item" + str(i));
+}
+let n = 0;
+for p in parts { n = n + len(p); }
+print(total, n);

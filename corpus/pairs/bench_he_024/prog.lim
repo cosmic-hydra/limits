@@ -1,0 +1,11 @@
+uses stdin
+
+fn largest_divisor(n: int) -> int:
+    var i = n - 1
+    while i > 1:
+        if n % i == 0:
+            return i
+        i -= 1
+    1
+
+print(largest_divisor(int(env.stdin.read_line())))

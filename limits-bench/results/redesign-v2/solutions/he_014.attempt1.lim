@@ -1,0 +1,7 @@
+uses stdin
+let cs = split(env.stdin.read_line(), "")
+print(len(cs))
+var cur = ""
+for c in cs:
+    cur = cur + c
+    print(cur)

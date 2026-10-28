@@ -1,0 +1,12 @@
+uses stdin
+fn ints(line: str) -> [int]:
+    var out: [int] = []
+    for w in split(line, " "):
+        if w != "": push(out, unwrap(parse_int(w)))
+    out
+let xs = ints(env.stdin.read_line())
+var dup = false
+for i in 0..len(xs):
+    for j in (i + 1)..len(xs):
+        if xs[i] == xs[j]: dup = true
+print(dup)

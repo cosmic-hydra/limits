@@ -1,0 +1,39 @@
+{
+ "id": "mbpp_056",
+ "source": "MBPP/56",
+ "description": "Write a program to check if a given number is one less than twice its reverse.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `n`: an integer, written as one line holding the integer in decimal (e.g. `-12`).\n\nOutput (stdout): the result, a boolean, written as one line, `true` or `false`.\n\nExample 1\nstdin:\n```\n70\n```\nstdout:\n```\nfalse\n```\n\nExample 2\nstdin:\n```\n23\n```\nstdout:\n```\nfalse\n```\n\nExample 3\nstdin:\n```\n73\n```\nstdout:\n```\ntrue\n```",
+ "params": [
+  {
+   "name": "n",
+   "type": "int"
+  }
+ ],
+ "output_type": "bool",
+ "tests": [
+  {
+   "stdin": "70\n",
+   "stdout": "false\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "23\n",
+   "stdout": "false\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "73\n",
+   "stdout": "true\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "25\n",
+   "stdout": "false\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "36\n",
+   "stdout": "false\n",
+   "origin": "generated"
+  }
+ ]
+}

@@ -1,0 +1,26 @@
+# wc for the files named on the command line: lines, words, chars, then a total.
+uses fs.read, args
+
+struct Counts:
+    lines: int
+    words: int
+    chars: int
+
+fn count(text: str) -> Counts:
+    let lines = split(text, "\n")
+    var words = 0
+    for l in lines:
+        words += len([w for w in split(l, " ") if w != ""])
+    Counts { lines: len(lines) - 1, words: words, chars: len(text) }
+
+fn main(env: Env):
+    let paths = env.args.list()
+    var total = Counts { lines: 0, words: 0, chars: 0 }
+    for p in paths:
+        let c = count(env.fs.read(p))
+        total.lines += c.lines
+        total.words += c.words
+        total.chars += c.chars
+        print(c.lines, c.words, c.chars, p)
+    if len(paths) > 1:
+        print(total.lines, total.words, total.chars, "total")

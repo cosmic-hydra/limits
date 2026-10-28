@@ -1,0 +1,6 @@
+pub struct P:
+    v: str
+pub fn helper() -> str:
+    "a"
+pub fn wrap(n: int) -> P:
+    P { v: str(n) + "!" }

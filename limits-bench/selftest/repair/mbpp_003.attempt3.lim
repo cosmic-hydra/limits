@@ -1,0 +1,13 @@
+uses stdin
+
+fn is_not_prime(n: int) -> bool:
+    if n < 2:
+        return true
+    var i = 2
+    while i * i <= n:
+        if n % i == 0:
+            return true
+        i += 1
+    false
+
+print(is_not_prime(int(env.stdin.read_line())))

@@ -1,0 +1,4 @@
+1 0 / = error: divide by zero
++ = error: not enough operands for +
+1 2 = error: 2 values left
+x 1 + = error: bad token x

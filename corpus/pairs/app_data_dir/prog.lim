@@ -1,0 +1,15 @@
+# Sum the numbers in every file listed in data/index.txt (paths relative to data/).
+uses fs.read
+
+fn numbers(fs: Fs, name: str) -> [int]:
+    [int(x) for x in split(fs.read(name), "\n") if x != ""]
+
+fn main(env: Env):
+    let data = env.fs.sub("data")
+    var total = 0
+    for name in split(data.read("index.txt"), "\n"):
+        if name == "": continue
+        let nums = numbers(data, name)
+        print(name, len(nums), sum(nums))
+        total += sum(nums)
+    print("total", total)

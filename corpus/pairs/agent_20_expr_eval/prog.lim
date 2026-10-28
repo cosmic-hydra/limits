@@ -1,0 +1,63 @@
+# Evaluate arithmetic expressions (mod 1000003) with two stacks.
+fn rnd(s: inout [int]) -> int:
+    s[0] = (s[0] * 1103515245 + 12345) % 2147483648
+    s[0] / 65536
+
+fn gen(seed: inout [int], toks: inout [str], depth: int):
+    let n = 1 + rnd(&seed) % 3
+    for i in 0..n:
+        if i > 0:
+            push(toks, ["+", "-", "*"][rnd(&seed) % 3])
+        if depth < 3 and rnd(&seed) % 3 == 0:
+            push(toks, "(")
+            gen(&seed, &toks, depth + 1)
+            push(toks, ")")
+        else:
+            push(toks, str(1 + rnd(&seed) % 9))
+
+fn prec(op: str) -> int:
+    if op == "*":
+        return 2
+    if op == "(":
+        return 0
+    1
+
+fn apply(nums: inout [int], ops: inout [str]):
+    let m = 1000003
+    let op = pop(ops)
+    let b = pop(nums)
+    let a = pop(nums)
+    if op == "+":
+        push(nums, (a + b) % m)
+    elif op == "-":
+        push(nums, ((a - b) % m + m) % m)
+    else:
+        push(nums, a * b % m)
+
+fn eval(text: str) -> int:
+    var nums: [int] = []
+    var ops: [str] = []
+    for t in split(text, " "):
+        if t == "(":
+            push(ops, t)
+        elif t == ")":
+            while ops[len(ops) - 1] != "(":
+                apply(&nums, &ops)
+            pop(ops)
+        elif t == "+" or t == "-" or t == "*":
+            while len(ops) > 0 and prec(ops[len(ops) - 1]) >= prec(t):
+                apply(&nums, &ops)
+            push(ops, t)
+        else:
+            push(nums, int(t))
+    while len(ops) > 0:
+        apply(&nums, &ops)
+    nums[0]
+
+var seed = [53]
+var total = 0
+for i in 0..40000:
+    var toks: [str] = []
+    gen(&seed, &toks, 0)
+    total += eval(join(toks, " "))
+print(total)

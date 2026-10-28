@@ -1,0 +1,22 @@
+[
+ {
+  "name": "t01",
+  "stdin": "hello\nl\n"
+ },
+ {
+  "name": "t02",
+  "stdin": "abcda\na\n"
+ },
+ {
+  "name": "t03",
+  "stdin": "PHP\nP\n"
+ },
+ {
+  "name": "t04",
+  "stdin": "HHab\na\n"
+ },
+ {
+  "name": "t05",
+  "stdin": "bhd\nP\n"
+ }
+]

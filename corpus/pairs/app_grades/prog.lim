@@ -1,0 +1,47 @@
+# Read "name,score,score,..." rows from stdin; rank students by average (x100, truncated).
+uses stdin
+
+struct Student:
+    name: str
+    avg100: int
+    best: int
+
+fn grade(avg100: int) -> str:
+    if avg100 >= 9000: return "A"
+    if avg100 >= 8000: return "B"
+    if avg100 >= 7000: return "C"
+    "F"
+
+fn two_digits(n: int) -> str:
+    if n < 10: return "0" + str(n)
+    str(n)
+
+# true when a should come before b: higher average first, then name
+fn before(a: Student, b: Student) -> bool:
+    if a.avg100 != b.avg100: return a.avg100 > b.avg100
+    a.name < b.name
+
+fn main(env: Env):
+    var rows: [Student] = []
+    var line = env.stdin.read_line()
+    while line != "":
+        let parts = split(line, ",")
+        let scores = [int(parts[i]) for i in 1..len(parts)]
+        var avg = 0
+        var best = 0
+        if len(scores) > 0:
+            avg = sum(scores) * 100 / len(scores)
+            best = max(scores)
+        push(rows, Student { name: parts[0], avg100: avg, best: best })
+        line = env.stdin.read_line()
+    for i in 1..len(rows):
+        var j = i
+        while j > 0 and before(rows[j], rows[j - 1]):
+            let t = rows[j]
+            rows[j] = rows[j - 1]
+            rows[j - 1] = t
+            j -= 1
+    for i in 0..len(rows):
+        let r = rows[i]
+        print(str(i + 1) + ". " + r.name, str(r.avg100 / 100) + "." + two_digits(r.avg100 % 100), "best=" + str(r.best), grade(r.avg100))
+    print("passed:", len([r for r in rows if r.avg100 >= 7000]), "of", len(rows))

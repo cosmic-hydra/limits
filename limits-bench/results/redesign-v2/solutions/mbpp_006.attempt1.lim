@@ -1,0 +1,12 @@
+uses stdin
+fn low(x: int) -> int: ((x % 2) + 2) % 2
+var a = unwrap(parse_int(env.stdin.read_line()))
+var b = unwrap(parse_int(env.stdin.read_line()))
+var diff = 0
+for k in 0..64:
+    let ba = low(a)
+    let bb = low(b)
+    if ba != bb: diff += 1
+    a = (a - ba) / 2
+    b = (b - bb) / 2
+print(diff == 1)

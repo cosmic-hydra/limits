@@ -1,0 +1,22 @@
+[
+ {
+  "name": "t01",
+  "stdin": "\nx\n"
+ },
+ {
+  "name": "t02",
+  "stdin": "xyxyxyx\nx\n"
+ },
+ {
+  "name": "t03",
+  "stdin": "cacacacac\ncac\n"
+ },
+ {
+  "name": "t04",
+  "stdin": "john doe\njohn\n"
+ },
+ {
+  "name": "t05",
+  "stdin": "h\nxjoa\n"
+ }
+]

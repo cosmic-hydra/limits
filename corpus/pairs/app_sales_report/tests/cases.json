@@ -1,0 +1,3 @@
+[{"name": "t01", "files": {"sales.csv": "region,item,units,cents\nwest,pen,10,150\neast,ink,2,999\nwest,pad,1,5\n"}},
+ {"name": "t02", "files": {"sales.csv": "region,item,units,cents\n"}},
+ {"name": "t03", "files": {"sales.csv": "region,item,units,cents\nnorth,x,3,3\nsouth,y,1,100000\nnorth,z,0,7\n"}}]

@@ -1,0 +1,43 @@
+# uniq-like filter over stdin lines. Flags: -c (prefix counts), -d (only repeated), -i (ignore case).
+uses stdin, args
+
+struct Run:
+    key: str
+    first: str
+    n: int
+
+fn lower(s: str) -> str:
+    let lo = split("abcdefghijklmnopqrstuvwxyz", "")
+    let up = split("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "")
+    var out = ""
+    for c in split(s, ""):
+        match find(up, c):
+            Some(i): out += lo[i]
+            None: out += c
+    out
+
+fn main(env: Env):
+    let flags = env.args.list()
+    let count = is_some(find(flags, "-c"))
+    let only_dup = is_some(find(flags, "-d"))
+    let icase = is_some(find(flags, "-i"))
+    var runs: [Run] = []
+    var line = env.stdin.read_line()
+    while line != "":
+        var key = line
+        if icase: key = lower(line)
+        let last = len(runs) - 1
+        if last >= 0 and runs[last].key == key:
+            runs[last].n += 1
+        else:
+            push(runs, Run { key: key, first: line, n: 1 })
+        line = env.stdin.read_line()
+    for r in runs:
+        if only_dup and r.n < 2: continue
+        if count:
+            var num = str(r.n)
+            while len(num) < 4:
+                num = " " + num
+            print(num, r.first)
+        else:
+            print(r.first)

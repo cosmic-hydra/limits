@@ -1,0 +1,12 @@
+[package]
+name = "limits-sandbox"
+version = "0.1.0"
+edition = "2021"
+description = "OS-level sandbox launcher (rlimits + Landlock + seccomp-BPF) for compiled Limits programs"
+license = "MIT"
+
+[[bin]]
+name = "limits-sandbox"
+path = "src/main.rs"
+
+[dependencies]

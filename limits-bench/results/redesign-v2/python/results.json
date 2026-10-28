@@ -1,0 +1,7453 @@
+{
+ "soldir": "solutions",
+ "limits_bin": "/home/user/limits/native/target/release/limits",
+ "cc": null,
+ "timeout": 10.0,
+ "summary": {
+  "first_attempt": {
+   "tasks": 60,
+   "token_unit": "tiktoken cl100k_base tokens",
+   "pass": 60,
+   "compile_error": 0,
+   "runtime_error": 0,
+   "timeout": 0,
+   "wrong_answer": 0,
+   "missing": 0,
+   "toolchain_error": 0,
+   "pass@1": 1.0,
+   "compile_error_rate": 0.0,
+   "runtime_error_rate": 0.0,
+   "timeout_rate": 0.0,
+   "wrong_answer_rate": 0.0,
+   "mean_tokens_passing": 61.233333333333334,
+   "mean_tokens_all": 61.233333333333334
+  }
+ },
+ "tasks": {
+  "he_001": {
+   "attempts": [
+    {
+     "file": "solutions/he_001.py",
+     "lang": "python",
+     "tokens": 70,
+     "chars": 180,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0167
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0168
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0165
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0167
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.016
+      },
+      {
+       "i": 5,
+       "status": "pass",
+       "secs": 0.0146
+      },
+      {
+       "i": 6,
+       "status": "pass",
+       "secs": 0.0144
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_001.py",
+    "lang": "python",
+    "tokens": 70,
+    "chars": 180,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0167
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0168
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0165
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0167
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.016
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0146
+     },
+     {
+      "i": 6,
+      "status": "pass",
+      "secs": 0.0144
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_001.py",
+    "lang": "python",
+    "tokens": 70,
+    "chars": 180,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0167
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0168
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0165
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0167
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.016
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0146
+     },
+     {
+      "i": 6,
+      "status": "pass",
+      "secs": 0.0144
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_003": {
+   "attempts": [
+    {
+     "file": "solutions/he_003.py",
+     "lang": "python",
+     "tokens": 51,
+     "chars": 145,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.015
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0154
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.015
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0158
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0147
+      },
+      {
+       "i": 5,
+       "status": "pass",
+       "secs": 0.0149
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_003.py",
+    "lang": "python",
+    "tokens": 51,
+    "chars": 145,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.015
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0154
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0147
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0149
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_003.py",
+    "lang": "python",
+    "tokens": 51,
+    "chars": 145,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.015
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0154
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0147
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0149
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_005": {
+   "attempts": [
+    {
+     "file": "solutions/he_005.py",
+     "lang": "python",
+     "tokens": 44,
+     "chars": 161,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0145
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0142
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0154
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0147
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0275
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_005.py",
+    "lang": "python",
+    "tokens": 44,
+    "chars": 161,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0145
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0142
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0154
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0147
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0275
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_005.py",
+    "lang": "python",
+    "tokens": 44,
+    "chars": 161,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0145
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0142
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0154
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0147
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0275
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_006": {
+   "attempts": [
+    {
+     "file": "solutions/he_006.py",
+     "lang": "python",
+     "tokens": 58,
+     "chars": 160,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.016
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0182
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0151
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0181
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0154
+      },
+      {
+       "i": 5,
+       "status": "pass",
+       "secs": 0.0176
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_006.py",
+    "lang": "python",
+    "tokens": 58,
+    "chars": 160,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.016
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0182
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0151
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0181
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0154
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0176
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_006.py",
+    "lang": "python",
+    "tokens": 58,
+    "chars": 160,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.016
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0182
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0151
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0181
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0154
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0176
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_007": {
+   "attempts": [
+    {
+     "file": "solutions/he_007.py",
+     "lang": "python",
+     "tokens": 64,
+     "chars": 163,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0174
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0161
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0183
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0305
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0164
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_007.py",
+    "lang": "python",
+    "tokens": 64,
+    "chars": 163,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0174
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0161
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0183
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0305
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0164
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_007.py",
+    "lang": "python",
+    "tokens": 64,
+    "chars": 163,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0174
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0161
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0183
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0305
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0164
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_009": {
+   "attempts": [
+    {
+     "file": "solutions/he_009.py",
+     "lang": "python",
+     "tokens": 46,
+     "chars": 133,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0164
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0155
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0166
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0157
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0144
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_009.py",
+    "lang": "python",
+    "tokens": 46,
+    "chars": 133,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0164
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0166
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0157
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0144
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_009.py",
+    "lang": "python",
+    "tokens": 46,
+    "chars": 133,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0164
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0166
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0157
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0144
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_010": {
+   "attempts": [
+    {
+     "file": "solutions/he_010.py",
+     "lang": "python",
+     "tokens": 37,
+     "chars": 78,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0142
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0261
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0147
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0175
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0168
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_010.py",
+    "lang": "python",
+    "tokens": 37,
+    "chars": 78,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0142
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0261
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0147
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0175
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0168
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_010.py",
+    "lang": "python",
+    "tokens": 37,
+    "chars": 78,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0142
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0261
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0147
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0175
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0168
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_011": {
+   "attempts": [
+    {
+     "file": "solutions/he_011.py",
+     "lang": "python",
+     "tokens": 29,
+     "chars": 77,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0152
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0152
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0154
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0169
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0156
+      },
+      {
+       "i": 5,
+       "status": "pass",
+       "secs": 0.0144
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_011.py",
+    "lang": "python",
+    "tokens": 29,
+    "chars": 77,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0152
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0152
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0154
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0169
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0156
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0144
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_011.py",
+    "lang": "python",
+    "tokens": 29,
+    "chars": 77,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0152
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0152
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0154
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0169
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0156
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0144
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_013": {
+   "attempts": [
+    {
+     "file": "solutions/he_013.py",
+     "lang": "python",
+     "tokens": 20,
+     "chars": 57,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0173
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0158
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.025
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0187
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_013.py",
+    "lang": "python",
+    "tokens": 20,
+    "chars": 57,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0173
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.025
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0187
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_013.py",
+    "lang": "python",
+    "tokens": 20,
+    "chars": 57,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0173
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.025
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0187
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_014": {
+   "attempts": [
+    {
+     "file": "solutions/he_014.py",
+     "lang": "python",
+     "tokens": 23,
+     "chars": 64,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0185
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0158
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0161
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0174
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0158
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_014.py",
+    "lang": "python",
+    "tokens": 23,
+    "chars": 64,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0185
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0161
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0174
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0158
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_014.py",
+    "lang": "python",
+    "tokens": 23,
+    "chars": 64,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0185
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0161
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0174
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0158
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_015": {
+   "attempts": [
+    {
+     "file": "solutions/he_015.py",
+     "lang": "python",
+     "tokens": 19,
+     "chars": 59,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0169
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0154
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0176
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0163
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0218
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_015.py",
+    "lang": "python",
+    "tokens": 19,
+    "chars": 59,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0169
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0154
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0176
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0163
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0218
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_015.py",
+    "lang": "python",
+    "tokens": 19,
+    "chars": 59,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0169
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0154
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0176
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0163
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0218
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_017": {
+   "attempts": [
+    {
+     "file": "solutions/he_017.py",
+     "lang": "python",
+     "tokens": 34,
+     "chars": 87,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0144
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0162
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0152
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0153
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0187
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_017.py",
+    "lang": "python",
+    "tokens": 34,
+    "chars": 87,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0144
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0162
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0152
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0153
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0187
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_017.py",
+    "lang": "python",
+    "tokens": 34,
+    "chars": 87,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0144
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0162
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0152
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0153
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0187
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_018": {
+   "attempts": [
+    {
+     "file": "solutions/he_018.py",
+     "lang": "python",
+     "tokens": 55,
+     "chars": 142,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0153
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0175
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0163
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0155
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0275
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_018.py",
+    "lang": "python",
+    "tokens": 55,
+    "chars": 142,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0153
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0175
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0163
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0275
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_018.py",
+    "lang": "python",
+    "tokens": 55,
+    "chars": 142,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0153
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0175
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0163
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0275
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_019": {
+   "attempts": [
+    {
+     "file": "solutions/he_019.py",
+     "lang": "python",
+     "tokens": 28,
+     "chars": 115,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0216
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0162
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0228
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0161
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0216
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_019.py",
+    "lang": "python",
+    "tokens": 28,
+    "chars": 115,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0216
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0162
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0228
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0161
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0216
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_019.py",
+    "lang": "python",
+    "tokens": 28,
+    "chars": 115,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0216
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0162
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0228
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0161
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0216
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_023": {
+   "attempts": [
+    {
+     "file": "solutions/he_023.py",
+     "lang": "python",
+     "tokens": 4,
+     "chars": 20,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0156
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.017
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0178
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.017
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0156
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_023.py",
+    "lang": "python",
+    "tokens": 4,
+    "chars": 20,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0156
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.017
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0178
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.017
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0156
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_023.py",
+    "lang": "python",
+    "tokens": 4,
+    "chars": 20,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0156
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.017
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0178
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.017
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0156
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_024": {
+   "attempts": [
+    {
+     "file": "solutions/he_024.py",
+     "lang": "python",
+     "tokens": 28,
+     "chars": 70,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0163
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0155
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0191
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0154
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0151
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_024.py",
+    "lang": "python",
+    "tokens": 28,
+    "chars": 70,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0163
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0191
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0154
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0151
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_024.py",
+    "lang": "python",
+    "tokens": 28,
+    "chars": 70,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0163
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0191
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0154
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0151
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_026": {
+   "attempts": [
+    {
+     "file": "solutions/he_026.py",
+     "lang": "python",
+     "tokens": 21,
+     "chars": 68,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0201
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0168
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0151
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0174
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0156
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_026.py",
+    "lang": "python",
+    "tokens": 21,
+    "chars": 68,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0201
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0168
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0151
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0174
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0156
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_026.py",
+    "lang": "python",
+    "tokens": 21,
+    "chars": 68,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0201
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0168
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0151
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0174
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0156
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_027": {
+   "attempts": [
+    {
+     "file": "solutions/he_027.py",
+     "lang": "python",
+     "tokens": 6,
+     "chars": 26,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0166
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0169
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0163
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0154
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0181
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_027.py",
+    "lang": "python",
+    "tokens": 6,
+    "chars": 26,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0166
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0169
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0163
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0154
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0181
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_027.py",
+    "lang": "python",
+    "tokens": 6,
+    "chars": 26,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0166
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0169
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0163
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0154
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0181
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_028": {
+   "attempts": [
+    {
+     "file": "solutions/he_028.py",
+     "lang": "python",
+     "tokens": 29,
+     "chars": 79,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0166
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0158
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0152
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0159
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0145
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_028.py",
+    "lang": "python",
+    "tokens": 29,
+    "chars": 79,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0166
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0152
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0145
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_028.py",
+    "lang": "python",
+    "tokens": 29,
+    "chars": 79,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0166
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0152
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0145
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_029": {
+   "attempts": [
+    {
+     "file": "solutions/he_029.py",
+     "lang": "python",
+     "tokens": 64,
+     "chars": 168,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0154
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0158
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0198
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0176
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0166
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_029.py",
+    "lang": "python",
+    "tokens": 64,
+    "chars": 168,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0154
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0198
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0176
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0166
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_029.py",
+    "lang": "python",
+    "tokens": 64,
+    "chars": 168,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0154
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0198
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0176
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0166
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_030": {
+   "attempts": [
+    {
+     "file": "solutions/he_030.py",
+     "lang": "python",
+     "tokens": 69,
+     "chars": 202,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.019
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0235
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0195
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0159
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0146
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_030.py",
+    "lang": "python",
+    "tokens": 69,
+    "chars": 202,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0235
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0195
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0146
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_030.py",
+    "lang": "python",
+    "tokens": 69,
+    "chars": 202,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.019
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0235
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0195
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0146
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_034": {
+   "attempts": [
+    {
+     "file": "solutions/he_034.py",
+     "lang": "python",
+     "tokens": 62,
+     "chars": 195,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0151
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.017
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.016
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0248
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0174
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_034.py",
+    "lang": "python",
+    "tokens": 62,
+    "chars": 195,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0151
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.017
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0248
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0174
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_034.py",
+    "lang": "python",
+    "tokens": 62,
+    "chars": 195,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0151
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.017
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.016
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0248
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0174
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_035": {
+   "attempts": [
+    {
+     "file": "solutions/he_035.py",
+     "lang": "python",
+     "tokens": 60,
+     "chars": 190,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0175
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0223
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0165
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.022
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0147
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_035.py",
+    "lang": "python",
+    "tokens": 60,
+    "chars": 190,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0175
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0223
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0165
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.022
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0147
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_035.py",
+    "lang": "python",
+    "tokens": 60,
+    "chars": 190,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0175
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0223
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0165
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.022
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0147
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_036": {
+   "attempts": [
+    {
+     "file": "solutions/he_036.py",
+     "lang": "python",
+     "tokens": 90,
+     "chars": 258,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0188
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0147
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.015
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0182
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0147
+      },
+      {
+       "i": 5,
+       "status": "pass",
+       "secs": 0.0155
+      },
+      {
+       "i": 6,
+       "status": "pass",
+       "secs": 0.0179
+      },
+      {
+       "i": 7,
+       "status": "pass",
+       "secs": 0.026
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_036.py",
+    "lang": "python",
+    "tokens": 90,
+    "chars": 258,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0188
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0147
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0182
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0147
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 6,
+      "status": "pass",
+      "secs": 0.0179
+     },
+     {
+      "i": 7,
+      "status": "pass",
+      "secs": 0.026
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_036.py",
+    "lang": "python",
+    "tokens": 90,
+    "chars": 258,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0188
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0147
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.015
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0182
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0147
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 6,
+      "status": "pass",
+      "secs": 0.0179
+     },
+     {
+      "i": 7,
+      "status": "pass",
+      "secs": 0.026
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_039": {
+   "attempts": [
+    {
+     "file": "solutions/he_039.py",
+     "lang": "python",
+     "tokens": 118,
+     "chars": 312,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0155
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0158
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0157
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0159
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0144
+      },
+      {
+       "i": 5,
+       "status": "pass",
+       "secs": 0.0169
+      },
+      {
+       "i": 6,
+       "status": "pass",
+       "secs": 0.0157
+      },
+      {
+       "i": 7,
+       "status": "pass",
+       "secs": 0.0207
+      },
+      {
+       "i": 8,
+       "status": "pass",
+       "secs": 0.0201
+      },
+      {
+       "i": 9,
+       "status": "pass",
+       "secs": 0.0175
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_039.py",
+    "lang": "python",
+    "tokens": 118,
+    "chars": 312,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0157
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0144
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0169
+     },
+     {
+      "i": 6,
+      "status": "pass",
+      "secs": 0.0157
+     },
+     {
+      "i": 7,
+      "status": "pass",
+      "secs": 0.0207
+     },
+     {
+      "i": 8,
+      "status": "pass",
+      "secs": 0.0201
+     },
+     {
+      "i": 9,
+      "status": "pass",
+      "secs": 0.0175
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_039.py",
+    "lang": "python",
+    "tokens": 118,
+    "chars": 312,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0157
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0144
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0169
+     },
+     {
+      "i": 6,
+      "status": "pass",
+      "secs": 0.0157
+     },
+     {
+      "i": 7,
+      "status": "pass",
+      "secs": 0.0207
+     },
+     {
+      "i": 8,
+      "status": "pass",
+      "secs": 0.0201
+     },
+     {
+      "i": 9,
+      "status": "pass",
+      "secs": 0.0175
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_040": {
+   "attempts": [
+    {
+     "file": "solutions/he_040.py",
+     "lang": "python",
+     "tokens": 78,
+     "chars": 252,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0157
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0164
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0195
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0169
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0156
+      },
+      {
+       "i": 5,
+       "status": "pass",
+       "secs": 0.0167
+      },
+      {
+       "i": 6,
+       "status": "pass",
+       "secs": 0.0166
+      },
+      {
+       "i": 7,
+       "status": "pass",
+       "secs": 0.0155
+      },
+      {
+       "i": 8,
+       "status": "pass",
+       "secs": 0.016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_040.py",
+    "lang": "python",
+    "tokens": 78,
+    "chars": 252,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0157
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0164
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0195
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0169
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0156
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0167
+     },
+     {
+      "i": 6,
+      "status": "pass",
+      "secs": 0.0166
+     },
+     {
+      "i": 7,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 8,
+      "status": "pass",
+      "secs": 0.016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_040.py",
+    "lang": "python",
+    "tokens": 78,
+    "chars": 252,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0157
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0164
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0195
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0169
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0156
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0167
+     },
+     {
+      "i": 6,
+      "status": "pass",
+      "secs": 0.0166
+     },
+     {
+      "i": 7,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 8,
+      "status": "pass",
+      "secs": 0.016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_041": {
+   "attempts": [
+    {
+     "file": "solutions/he_041.py",
+     "lang": "python",
+     "tokens": 61,
+     "chars": 189,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0153
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0155
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0151
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0148
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0154
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_041.py",
+    "lang": "python",
+    "tokens": 61,
+    "chars": 189,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0153
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0151
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0148
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0154
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_041.py",
+    "lang": "python",
+    "tokens": 61,
+    "chars": 189,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0153
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0151
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0148
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0154
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_042": {
+   "attempts": [
+    {
+     "file": "solutions/he_042.py",
+     "lang": "python",
+     "tokens": 67,
+     "chars": 197,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0154
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0153
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0158
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0159
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0158
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_042.py",
+    "lang": "python",
+    "tokens": 67,
+    "chars": 197,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0154
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0153
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0158
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_042.py",
+    "lang": "python",
+    "tokens": 67,
+    "chars": 197,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0154
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0153
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0158
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_043": {
+   "attempts": [
+    {
+     "file": "solutions/he_043.py",
+     "lang": "python",
+     "tokens": 78,
+     "chars": 252,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0172
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0166
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0161
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0178
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0181
+      },
+      {
+       "i": 5,
+       "status": "pass",
+       "secs": 0.0212
+      },
+      {
+       "i": 6,
+       "status": "pass",
+       "secs": 0.0178
+      },
+      {
+       "i": 7,
+       "status": "pass",
+       "secs": 0.0223
+      },
+      {
+       "i": 8,
+       "status": "pass",
+       "secs": 0.0182
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_043.py",
+    "lang": "python",
+    "tokens": 78,
+    "chars": 252,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0172
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0166
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0161
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0178
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0181
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0212
+     },
+     {
+      "i": 6,
+      "status": "pass",
+      "secs": 0.0178
+     },
+     {
+      "i": 7,
+      "status": "pass",
+      "secs": 0.0223
+     },
+     {
+      "i": 8,
+      "status": "pass",
+      "secs": 0.0182
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_043.py",
+    "lang": "python",
+    "tokens": 78,
+    "chars": 252,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0172
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0166
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0161
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0178
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0181
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0212
+     },
+     {
+      "i": 6,
+      "status": "pass",
+      "secs": 0.0178
+     },
+     {
+      "i": 7,
+      "status": "pass",
+      "secs": 0.0223
+     },
+     {
+      "i": 8,
+      "status": "pass",
+      "secs": 0.0182
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "he_046": {
+   "attempts": [
+    {
+     "file": "solutions/he_046.py",
+     "lang": "python",
+     "tokens": 101,
+     "chars": 262,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.023
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0222
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0155
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0234
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0192
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/he_046.py",
+    "lang": "python",
+    "tokens": 101,
+    "chars": 262,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.023
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0222
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0234
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0192
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/he_046.py",
+    "lang": "python",
+    "tokens": 101,
+    "chars": 262,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.023
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0222
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0234
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0192
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_003": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_003.py",
+     "lang": "python",
+     "tokens": 87,
+     "chars": 247,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0224
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0158
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0227
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0153
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.02
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_003.py",
+    "lang": "python",
+    "tokens": 87,
+    "chars": 247,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0224
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0227
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0153
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.02
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_003.py",
+    "lang": "python",
+    "tokens": 87,
+    "chars": 247,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0224
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0227
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0153
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.02
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_004": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_004.py",
+     "lang": "python",
+     "tokens": 69,
+     "chars": 215,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0168
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0176
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0193
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0223
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0161
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_004.py",
+    "lang": "python",
+    "tokens": 69,
+    "chars": 215,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0168
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0176
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0193
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0223
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0161
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_004.py",
+    "lang": "python",
+    "tokens": 69,
+    "chars": 215,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0168
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0176
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0193
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0223
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0161
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_006": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_006.py",
+     "lang": "python",
+     "tokens": 78,
+     "chars": 214,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.015
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0223
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0158
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0245
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0152
+      },
+      {
+       "i": 5,
+       "status": "pass",
+       "secs": 0.0222
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_006.py",
+    "lang": "python",
+    "tokens": 78,
+    "chars": 214,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.015
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0223
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0245
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0152
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0222
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_006.py",
+    "lang": "python",
+    "tokens": 78,
+    "chars": 214,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.015
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0223
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0245
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0152
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0222
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_008": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_008.py",
+     "lang": "python",
+     "tokens": 66,
+     "chars": 197,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0149
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0221
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0282
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0158
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0168
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_008.py",
+    "lang": "python",
+    "tokens": 66,
+    "chars": 197,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0149
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0221
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0282
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0168
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_008.py",
+    "lang": "python",
+    "tokens": 66,
+    "chars": 197,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0149
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0221
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0282
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0168
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_009": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_009.py",
+     "lang": "python",
+     "tokens": 94,
+     "chars": 255,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0293
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0249
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0195
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0175
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0165
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_009.py",
+    "lang": "python",
+    "tokens": 94,
+    "chars": 255,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0293
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0249
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0195
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0175
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0165
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_009.py",
+    "lang": "python",
+    "tokens": 94,
+    "chars": 255,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0293
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0249
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0195
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0175
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0165
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_011": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_011.py",
+     "lang": "python",
+     "tokens": 107,
+     "chars": 267,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0153
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0149
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0158
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0155
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0156
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_011.py",
+    "lang": "python",
+    "tokens": 107,
+    "chars": 267,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0153
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0149
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0156
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_011.py",
+    "lang": "python",
+    "tokens": 107,
+    "chars": 267,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0153
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0149
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0156
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_012": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_012.py",
+     "lang": "python",
+     "tokens": 89,
+     "chars": 257,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0173
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0164
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0203
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0172
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0161
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_012.py",
+    "lang": "python",
+    "tokens": 89,
+    "chars": 257,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0173
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0164
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0203
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0172
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0161
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_012.py",
+    "lang": "python",
+    "tokens": 89,
+    "chars": 257,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0173
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0164
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0203
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0172
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0161
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_016": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_016.py",
+     "lang": "python",
+     "tokens": 72,
+     "chars": 217,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0235
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0354
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0279
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0352
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0236
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_016.py",
+    "lang": "python",
+    "tokens": 72,
+    "chars": 217,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0235
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0354
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0279
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0352
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0236
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_016.py",
+    "lang": "python",
+    "tokens": 72,
+    "chars": 217,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0235
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0354
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0279
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0352
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0236
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_017": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_017.py",
+     "lang": "python",
+     "tokens": 62,
+     "chars": 188,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0224
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0236
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0185
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.024
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0164
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_017.py",
+    "lang": "python",
+    "tokens": 62,
+    "chars": 188,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0224
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0236
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0185
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.024
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0164
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_017.py",
+    "lang": "python",
+    "tokens": 62,
+    "chars": 188,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0224
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0236
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0185
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.024
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0164
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_018": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_018.py",
+     "lang": "python",
+     "tokens": 73,
+     "chars": 218,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0205
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0159
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0175
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.017
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0154
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_018.py",
+    "lang": "python",
+    "tokens": 73,
+    "chars": 218,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0205
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0175
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.017
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0154
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_018.py",
+    "lang": "python",
+    "tokens": 73,
+    "chars": 218,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0205
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0175
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.017
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0154
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_019": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_019.py",
+     "lang": "python",
+     "tokens": 57,
+     "chars": 169,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0171
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0174
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0183
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0227
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0162
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_019.py",
+    "lang": "python",
+    "tokens": 57,
+    "chars": 169,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0171
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0174
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0183
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0227
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0162
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_019.py",
+    "lang": "python",
+    "tokens": 57,
+    "chars": 169,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0171
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0174
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0183
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0227
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0162
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_020": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_020.py",
+     "lang": "python",
+     "tokens": 91,
+     "chars": 223,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0189
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0171
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0207
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0157
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0182
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_020.py",
+    "lang": "python",
+    "tokens": 91,
+    "chars": 223,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0189
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0171
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0207
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0157
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0182
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_020.py",
+    "lang": "python",
+    "tokens": 91,
+    "chars": 223,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0189
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0171
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0207
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0157
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0182
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_056": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_056.py",
+     "lang": "python",
+     "tokens": 66,
+     "chars": 182,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0173
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0169
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.017
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0166
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0173
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_056.py",
+    "lang": "python",
+    "tokens": 66,
+    "chars": 182,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0173
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0169
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0166
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0173
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_056.py",
+    "lang": "python",
+    "tokens": 66,
+    "chars": 182,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0173
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0169
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0166
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0173
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_057": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_057.py",
+     "lang": "python",
+     "tokens": 71,
+     "chars": 201,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0159
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0188
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0201
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0182
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.016
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_057.py",
+    "lang": "python",
+    "tokens": 71,
+    "chars": 201,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0188
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0201
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0182
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_057.py",
+    "lang": "python",
+    "tokens": 71,
+    "chars": 201,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0188
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0201
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0182
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.016
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_058": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_058.py",
+     "lang": "python",
+     "tokens": 64,
+     "chars": 173,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0193
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0145
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0155
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0182
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0223
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_058.py",
+    "lang": "python",
+    "tokens": 64,
+    "chars": 173,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0193
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0145
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0182
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0223
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_058.py",
+    "lang": "python",
+    "tokens": 64,
+    "chars": 173,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0193
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0145
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0182
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0223
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_059": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_059.py",
+     "lang": "python",
+     "tokens": 56,
+     "chars": 162,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0183
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0222
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0175
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0196
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0144
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_059.py",
+    "lang": "python",
+    "tokens": 56,
+    "chars": 162,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0183
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0222
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0175
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0196
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0144
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_059.py",
+    "lang": "python",
+    "tokens": 56,
+    "chars": 162,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0183
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0222
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0175
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0196
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0144
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_061": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_061.py",
+     "lang": "python",
+     "tokens": 106,
+     "chars": 290,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0153
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0185
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0188
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0151
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0154
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_061.py",
+    "lang": "python",
+    "tokens": 106,
+    "chars": 290,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0153
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0185
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0188
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0151
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0154
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_061.py",
+    "lang": "python",
+    "tokens": 106,
+    "chars": 290,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0153
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0185
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0188
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0151
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0154
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_062": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_062.py",
+     "lang": "python",
+     "tokens": 49,
+     "chars": 155,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.015
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0169
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0235
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0164
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0198
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_062.py",
+    "lang": "python",
+    "tokens": 49,
+    "chars": 155,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.015
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0169
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0235
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0164
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0198
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_062.py",
+    "lang": "python",
+    "tokens": 49,
+    "chars": 155,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.015
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0169
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0235
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0164
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0198
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_066": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_066.py",
+     "lang": "python",
+     "tokens": 58,
+     "chars": 173,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0167
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0174
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0169
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0163
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0154
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_066.py",
+    "lang": "python",
+    "tokens": 58,
+    "chars": 173,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0167
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0174
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0169
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0163
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0154
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_066.py",
+    "lang": "python",
+    "tokens": 58,
+    "chars": 173,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0167
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0174
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0169
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0163
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0154
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_068": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_068.py",
+     "lang": "python",
+     "tokens": 86,
+     "chars": 238,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0161
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0157
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0157
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0171
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.015
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_068.py",
+    "lang": "python",
+    "tokens": 86,
+    "chars": 238,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0161
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0157
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0157
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0171
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_068.py",
+    "lang": "python",
+    "tokens": 86,
+    "chars": 238,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0161
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0157
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0157
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0171
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.015
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_069": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_069.py",
+     "lang": "python",
+     "tokens": 77,
+     "chars": 217,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0159
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0159
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0165
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0159
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0178
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_069.py",
+    "lang": "python",
+    "tokens": 77,
+    "chars": 217,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0165
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0178
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_069.py",
+    "lang": "python",
+    "tokens": 77,
+    "chars": 217,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0165
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0178
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_071": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_071.py",
+     "lang": "python",
+     "tokens": 56,
+     "chars": 177,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.016
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0173
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0181
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0181
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.023
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_071.py",
+    "lang": "python",
+    "tokens": 56,
+    "chars": 177,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.016
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0173
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0181
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0181
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.023
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_071.py",
+    "lang": "python",
+    "tokens": 56,
+    "chars": 177,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.016
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0173
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0181
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0181
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.023
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_072": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_072.py",
+     "lang": "python",
+     "tokens": 52,
+     "chars": 150,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.022
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0219
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0152
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0218
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0156
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_072.py",
+    "lang": "python",
+    "tokens": 52,
+    "chars": 150,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.022
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0219
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0152
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0218
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0156
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_072.py",
+    "lang": "python",
+    "tokens": 52,
+    "chars": 150,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.022
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0219
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0152
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0218
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0156
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_074": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_074.py",
+     "lang": "python",
+     "tokens": 107,
+     "chars": 277,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0158
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0163
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0161
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0159
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0157
+      },
+      {
+       "i": 5,
+       "status": "pass",
+       "secs": 0.0241
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_074.py",
+    "lang": "python",
+    "tokens": 107,
+    "chars": 277,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0163
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0161
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0157
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0241
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_074.py",
+    "lang": "python",
+    "tokens": 107,
+    "chars": 277,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0163
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0161
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0157
+     },
+     {
+      "i": 5,
+      "status": "pass",
+      "secs": 0.0241
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_077": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_077.py",
+     "lang": "python",
+     "tokens": 52,
+     "chars": 151,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0204
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0152
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.021
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0213
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0195
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_077.py",
+    "lang": "python",
+    "tokens": 52,
+    "chars": 151,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0204
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0152
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.021
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0213
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0195
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_077.py",
+    "lang": "python",
+    "tokens": 52,
+    "chars": 151,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0204
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0152
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.021
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0213
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0195
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_079": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_079.py",
+     "lang": "python",
+     "tokens": 52,
+     "chars": 150,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0155
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0229
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0153
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0191
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0273
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_079.py",
+    "lang": "python",
+    "tokens": 52,
+    "chars": 150,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0229
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0153
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0191
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0273
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_079.py",
+    "lang": "python",
+    "tokens": 52,
+    "chars": 150,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0155
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0229
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0153
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0191
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0273
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_083": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_083.py",
+     "lang": "python",
+     "tokens": 71,
+     "chars": 201,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0231
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0164
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0233
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0153
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0228
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_083.py",
+    "lang": "python",
+    "tokens": 71,
+    "chars": 201,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0231
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0164
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0233
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0153
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0228
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_083.py",
+    "lang": "python",
+    "tokens": 71,
+    "chars": 201,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0231
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0164
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0233
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0153
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0228
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_084": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_084.py",
+     "lang": "python",
+     "tokens": 85,
+     "chars": 222,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0212
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0228
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0173
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0158
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0171
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_084.py",
+    "lang": "python",
+    "tokens": 85,
+    "chars": 222,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0212
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0228
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0173
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0171
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_084.py",
+    "lang": "python",
+    "tokens": 85,
+    "chars": 222,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0212
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0228
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0173
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0158
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0171
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_086": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_086.py",
+     "lang": "python",
+     "tokens": 58,
+     "chars": 164,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.015
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0151
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.017
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0156
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0157
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_086.py",
+    "lang": "python",
+    "tokens": 58,
+    "chars": 164,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.015
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0151
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0156
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0157
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_086.py",
+    "lang": "python",
+    "tokens": 58,
+    "chars": 164,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.015
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0151
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.017
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0156
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0157
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  },
+  "mbpp_089": {
+   "attempts": [
+    {
+     "file": "solutions/mbpp_089.py",
+     "lang": "python",
+     "tokens": 49,
+     "chars": 151,
+     "tests": [
+      {
+       "i": 0,
+       "status": "pass",
+       "secs": 0.0159
+      },
+      {
+       "i": 1,
+       "status": "pass",
+       "secs": 0.0153
+      },
+      {
+       "i": 2,
+       "status": "pass",
+       "secs": 0.0184
+      },
+      {
+       "i": 3,
+       "status": "pass",
+       "secs": 0.0154
+      },
+      {
+       "i": 4,
+       "status": "pass",
+       "secs": 0.0154
+      }
+     ],
+     "diagnostics": [],
+     "feedback": "",
+     "status": "pass",
+     "attempt": 1
+    }
+   ],
+   "first": {
+    "file": "solutions/mbpp_089.py",
+    "lang": "python",
+    "tokens": 49,
+    "chars": 151,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0153
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0184
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0154
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0154
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "final": {
+    "file": "solutions/mbpp_089.py",
+    "lang": "python",
+    "tokens": 49,
+    "chars": 151,
+    "tests": [
+     {
+      "i": 0,
+      "status": "pass",
+      "secs": 0.0159
+     },
+     {
+      "i": 1,
+      "status": "pass",
+      "secs": 0.0153
+     },
+     {
+      "i": 2,
+      "status": "pass",
+      "secs": 0.0184
+     },
+     {
+      "i": 3,
+      "status": "pass",
+      "secs": 0.0154
+     },
+     {
+      "i": 4,
+      "status": "pass",
+      "secs": 0.0154
+     }
+    ],
+    "diagnostics": [],
+    "feedback": "",
+    "status": "pass",
+    "attempt": 1
+   },
+   "status": "pass",
+   "final_status": "pass",
+   "solved_at_attempt": 1
+  }
+ }
+}

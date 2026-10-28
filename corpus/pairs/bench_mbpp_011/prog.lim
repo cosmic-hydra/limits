@@ -1,0 +1,24 @@
+uses stdin
+
+fn remove_first_last(s: str, ch: str) -> str:
+    var cs = split(s, "")
+    var first: Option[int] = None
+    for i in 0..len(cs):
+        if cs[i] == ch:
+            first = Some(i)
+            break
+    match first:
+        Some(i): cs = [cs[j] for j in 0..len(cs) if j != i]
+        None: pass
+    var i = len(cs) - 1
+    while i >= 0:
+        if cs[i] == ch:
+            let k = i
+            cs = [cs[j] for j in 0..len(cs) if j != k]
+            break
+        i -= 1
+    join(cs, "")
+
+let s = env.stdin.read_line()
+let ch = env.stdin.read_line()
+print(remove_first_last(s, ch))

@@ -1,0 +1,8 @@
+[[access Foo in]] { dg-error "expected string" } 
+
+begin prio // = 8;
+      op (int,int)int // = lala;
+      proc lala = (int a, b) int: a + b;
+      proc void jeje = skip;
+      skip
+end

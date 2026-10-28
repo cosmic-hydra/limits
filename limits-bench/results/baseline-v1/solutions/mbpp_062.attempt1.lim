@@ -1,0 +1,14 @@
+uses stdin;
+fn read_ints() -> [int] {
+  let line = input_line();
+  let xs: [int] = [];
+  if line == "" { return xs; }
+  for p in split(line, " ") { push(xs, int(p)); }
+  return xs;
+}
+fn main() {
+  let xs = read_ints();
+  let m = xs[0];
+  for v in xs { if v < m { m = v; } }
+  print(m);
+}

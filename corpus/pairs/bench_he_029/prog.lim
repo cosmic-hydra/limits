@@ -1,0 +1,18 @@
+uses stdin
+
+fn starts_with(s: str, prefix: str) -> bool:
+    let cs = split(s, "")
+    let ps = split(prefix, "")
+    if len(ps) > len(cs):
+        return false
+    all([cs[i] == ps[i] for i in 0..len(ps)])
+
+let n = int(env.stdin.read_line())
+var xs: [str] = []
+for i in 0..n:
+    push(xs, env.stdin.read_line())
+let prefix = env.stdin.read_line()
+let kept = [x for x in xs if starts_with(x, prefix)]
+print(len(kept))
+for x in kept:
+    print(x)

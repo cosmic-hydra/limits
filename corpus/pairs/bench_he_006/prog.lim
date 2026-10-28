@@ -1,0 +1,16 @@
+uses stdin
+
+fn max_depth(group: str) -> int:
+    var depth = 0
+    var best = 0
+    for c in split(group, ""):
+        if c == "(":
+            depth += 1
+            best = max(best, depth)
+        else:
+            depth -= 1
+    best
+
+let line = env.stdin.read_line()
+let depths = [max_depth(g) for g in split(line, " ") if g != ""]
+print(join([str(d) for d in depths], " "))

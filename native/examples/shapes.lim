@@ -1,0 +1,33 @@
+# Sum types: enums with payloads, Option/Result, match and `?`.
+enum Shape:
+    Circle(r: float)
+    Rect(w: float, h: float)
+    Empty
+
+fn area(s: Shape) -> float:
+    match s:
+        Circle(r): 3.14159 * r * r
+        Rect(w, h): w * h
+        Empty: 0.0
+
+# "circle 2" -> Ok(Circle(2.0)); errors carry a message instead of aborting.
+fn parse_shape(line: str) -> Result[Shape, str]:
+    let p = split(line, " ")
+    match p[0]:
+        "circle": Ok(Circle(num(p, 1)?))
+        "rect": Ok(Rect(num(p, 1)?, num(p, 2)?))
+        "empty": Ok(Empty)
+        _: Err("unknown shape '" + p[0] + "'")
+
+fn num(p: [str], i: int) -> Result[float, str]:
+    match get(p, i):
+        Some(s):
+            match parse_float(s):
+                Some(x): Ok(x)
+                None: Err("not a number: '" + s + "'")
+        None: Err("missing value " + str(i))
+
+for line in ["circle 2.0", "rect 2.0 3.5", "empty", "hexagon 1.0", "rect 1.0", "circle x"]:
+    match parse_shape(line):
+        Ok(s): print(s, area(s))
+        Err(m): print("error:", m)

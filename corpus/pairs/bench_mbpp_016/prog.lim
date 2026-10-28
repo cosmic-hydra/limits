@@ -1,0 +1,16 @@
+uses stdin
+
+fn is_lower(c: str) -> bool:
+    is_some(find(split("abcdefghijklmnopqrstuvwxyz", ""), c))
+
+# matches ^[a-z]+_[a-z]+$
+fn lower_underscore(text: str) -> bool:
+    let parts = split(text, "_")
+    if len(parts) != 2:
+        return false
+    for p in parts:
+        if p == "" or not all([is_lower(c) for c in split(p, "")]):
+            return false
+    true
+
+print(lower_underscore(env.stdin.read_line()))

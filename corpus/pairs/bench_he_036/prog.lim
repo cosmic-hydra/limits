@@ -1,0 +1,10 @@
+uses stdin
+
+fn sevens(n: int) -> int:
+    var count = 0
+    for i in 0..n:
+        if i % 11 == 0 or i % 13 == 0:
+            count += len([c for c in split(str(i), "") if c == "7"])
+    count
+
+print(sevens(int(env.stdin.read_line())))

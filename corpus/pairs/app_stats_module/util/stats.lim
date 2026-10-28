@@ -1,0 +1,27 @@
+# Integer statistics helpers.
+pub fn mean100(xs: [int]) -> int:
+    requires len(xs) > 0
+    sum(xs) * 100 / len(xs)
+
+# twice the median, so it stays an int
+pub fn median2(xs: [int]) -> int:
+    requires len(xs) > 0
+    var s = xs
+    sort(s)
+    let n = len(s)
+    if n % 2 == 1:
+        return 2 * s[n / 2]
+    s[n / 2 - 1] + s[n / 2]
+
+pub fn mode(xs: [int]) -> int:
+    requires len(xs) > 0
+    var s = xs
+    sort(s)
+    var best = s[0]
+    var best_n = 0
+    for x in s:
+        let c = len([y for y in xs if y == x])
+        if c > best_n:
+            best = x
+            best_n = c
+    best

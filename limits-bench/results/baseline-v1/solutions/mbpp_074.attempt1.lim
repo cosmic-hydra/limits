@@ -1,0 +1,28 @@
+uses stdin;
+fn read_strs() -> [str] {
+  let n = int(input_line());
+  let xs: [str] = [];
+  for i in 0..n { push(xs, input_line()); }
+  return xs;
+}
+fn count_distinct(xs: [str]) -> int {
+  let seen: [str] = [];
+  for x in xs {
+    let f = false;
+    for y in seen { if y == x { f = true; } }
+    if not f { push(seen, x); }
+  }
+  return len(seen);
+}
+fn main() {
+  let c = read_strs();
+  let p = read_strs();
+  if len(c) != len(p) { print(false); return; }
+  if count_distinct(c) != count_distinct(p) { print(false); return; }
+  for i in 0..len(p) {
+    for j in i + 1..len(p) {
+      if p[i] == p[j] and c[i] != c[j] { print(false); return; }
+    }
+  }
+  print(true);
+}

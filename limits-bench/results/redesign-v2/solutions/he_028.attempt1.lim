@@ -1,0 +1,5 @@
+uses stdin
+let n = unwrap(parse_int(env.stdin.read_line()))
+var out = ""
+for i in 0..n: out = out + env.stdin.read_line()
+print(out)

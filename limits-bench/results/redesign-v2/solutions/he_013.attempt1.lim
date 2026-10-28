@@ -1,0 +1,8 @@
+uses stdin
+var a = unwrap(parse_int(env.stdin.read_line()))
+var b = unwrap(parse_int(env.stdin.read_line()))
+while b != 0:
+    let t = a % b
+    a = b
+    b = t
+print(a)

@@ -1,0 +1,2 @@
+uses stdin;
+fn main() { print(len(input_line())); }

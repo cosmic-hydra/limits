@@ -1,0 +1,20 @@
+uses stdin
+fn is_pal(cs: [str], start: int) -> bool:
+    var i = start
+    var j = len(cs) - 1
+    while i < j:
+        if cs[i] != cs[j]: return false
+        i += 1
+        j -= 1
+    true
+let s = env.stdin.read_line()
+let cs = split(s, "")
+var k = 0
+while k < len(cs) and not is_pal(cs, k):
+    k += 1
+var out: [str] = [c for c in cs]
+var i = k - 1
+while i >= 0:
+    push(out, cs[i])
+    i -= 1
+print(join(out, ""))

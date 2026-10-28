@@ -1,0 +1,21 @@
+uses stdin;
+fn read_ints() -> [int] {
+  let line = input_line();
+  let xs: [int] = [];
+  if line == "" { return xs; }
+  for p in split(line, " ") { push(xs, int(p)); }
+  return xs;
+}
+fn main() {
+  let l = read_ints();
+  let s = read_ints();
+  let found = len(s) == 0;
+  if len(s) <= len(l) {
+    for i in 0..len(l) - len(s) + 1 {
+      let ok = true;
+      for j in 0..len(s) { if l[i + j] != s[j] { ok = false; break; } }
+      if ok { found = true; }
+    }
+  }
+  print(found);
+}

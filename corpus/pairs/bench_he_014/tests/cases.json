@@ -1,0 +1,22 @@
+[
+ {
+  "name": "t01",
+  "stdin": "\n"
+ },
+ {
+  "name": "t02",
+  "stdin": "asdfgh\n"
+ },
+ {
+  "name": "t03",
+  "stdin": "WWW\n"
+ },
+ {
+  "name": "t04",
+  "stdin": "fh\n"
+ },
+ {
+  "name": "t05",
+  "stdin": "dhd\n"
+ }
+]

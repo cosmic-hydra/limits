@@ -1,0 +1,35 @@
+# Parse "key=int;key=int" records from stdin; print the sum per record or the first error.
+uses stdin
+
+struct Field:
+    key: str
+    value: int
+
+fn parse_field(field: str) -> Result[Field, str]:
+    let kv = split(field, "=")
+    if len(kv) != 2 or kv[0] == "":
+        return Err("bad field '" + field + "'")
+    match parse_int(kv[1]):
+        Some(v): Ok(Field { key: kv[0], value: v })
+        None: Err("not a number: " + kv[1])
+
+fn parse_record(line: str) -> Result[[Field], str]:
+    var fields: [Field] = []
+    for part in split(line, ";"):
+        let f = parse_field(part)?
+        if any([g.key == f.key for g in fields]):
+            return Err("duplicate key " + f.key)
+        push(fields, f)
+    Ok(fields)
+
+var n = 1
+var line = env.stdin.read_line()
+while line != "":
+    match parse_record(line):
+        Ok(fields):
+            var keys = [f.key for f in fields]
+            sort(keys)
+            print(n, join(keys, ","), sum([f.value for f in fields]))
+        Err(e): print(n, "error:", e)
+    n += 1
+    line = env.stdin.read_line()

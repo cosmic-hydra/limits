@@ -1,0 +1,28 @@
+uses stdin;
+fn read_strs() -> [str] {
+  let n = int(input_line());
+  let out: [str] = [];
+  for i in 0..n { push(out, input_line()); }
+  return out;
+}
+fn show_strs(xs: [str]) {
+  print(len(xs));
+  for x in xs { print(x); }
+}
+
+fn sub(cs: [str], a: int, b: int) -> str {
+  let parts: [str] = [];
+  for i in a..b { push(parts, cs[i]); }
+  return join(parts, "");
+}
+
+fn main() {
+  let xs = read_strs();
+  let p = input_line();
+  let lp = len(p);
+  let out: [str] = [];
+  for x in xs {
+    if len(x) >= lp and sub(split(x, ""), 0, lp) == p { push(out, x); }
+  }
+  show_strs(out);
+}

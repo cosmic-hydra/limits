@@ -1,0 +1,3 @@
+uses time
+import a
+a.f(env.clock, env.vars)

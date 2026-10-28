@@ -1,0 +1,4 @@
+0 -> error: out of range: 0
+4000 -> error: out of range: 4000
+IIII -> error: not canonical: IIII
+ABC -> error: bad digit: A

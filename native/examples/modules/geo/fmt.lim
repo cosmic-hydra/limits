@@ -1,0 +1,2 @@
+pub fn pair(name: str, a: int, b: int) -> str:
+    name + "(" + str(a) + "x" + str(b) + ")"

@@ -1,0 +1,12 @@
+import fmt  # resolves to geo/fmt.lim (relative to this file)
+
+pub struct Rect:
+    w: int
+    h: int
+
+pub fn square(n: int) -> Rect:
+    Rect { w: n, h: n }
+pub fn area(r: Rect) -> int:
+    r.w * r.h
+pub fn describe(r: Rect) -> str:
+    fmt.pair("rect", r.w, r.h)

@@ -1,0 +1,4 @@
+uses stdin
+
+let n = int(env.stdin.read_line())
+print(3 * n * (n - 1) + 1)

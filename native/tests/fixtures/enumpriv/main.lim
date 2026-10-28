@@ -1,0 +1,4 @@
+import tok
+
+let h = tok.H
+let n: tok.Hidden = tok.H

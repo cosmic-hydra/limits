@@ -1,0 +1,10 @@
+uses stdin
+
+let letters = split("abcdefghijklmnopqrstuvwxyz", "")
+var total = 0
+for c in split(env.stdin.read_line(), ""):
+    total += unwrap(find(letters, c)) + 1
+if total % 26 == 0:
+    print(122)  # Python returns ord('z') here
+else:
+    print(letters[total % 26 - 1])

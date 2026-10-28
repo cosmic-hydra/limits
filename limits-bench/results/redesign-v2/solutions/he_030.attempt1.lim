@@ -1,0 +1,6 @@
+uses stdin
+fn parse_list(line: str) -> [int]:
+    [unwrap(parse_int(w)) for w in split(line, " ") if w != ""]
+fn show(xs: [int]) -> str: join([str(x) for x in xs], " ")
+let l = parse_list(env.stdin.read_line())
+print(show([x for x in l if x > 0]))

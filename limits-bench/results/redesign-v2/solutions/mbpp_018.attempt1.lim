@@ -1,0 +1,4 @@
+uses stdin
+let s = split(env.stdin.read_line(), "")
+let t = split(env.stdin.read_line(), "")
+print(join([c for c in s if is_none(find(t, c))], ""))

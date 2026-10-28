@@ -1,0 +1,12 @@
+import geo.tok
+
+# Variants of an imported enum are qualified by the module alias.
+let ts = tok.lex("1 + 22")
+var total = 0
+for t in ts:
+    match t:
+        tok.Num(n): total += n
+        tok.End: break
+        _: continue
+let first: tok.Tok = ts[0]
+print(ts, total, first, tok.Op("-"))

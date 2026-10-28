@@ -1,0 +1,20 @@
+# FizzBuzz variant with 3/5/7.
+var lines: [str] = []
+var words = 0
+for i in 1..500001:
+    var s = ""
+    if i % 3 == 0:
+        s += "Fizz"
+    if i % 5 == 0:
+        s += "Buzz"
+    if i % 7 == 0:
+        s += "Bazz"
+    if s == "":
+        s = str(i)
+    else:
+        words += 1
+    push(lines, s)
+var total = len(lines) - 1
+for l in lines:
+    total += len(l)
+print(words, total, lines[104])

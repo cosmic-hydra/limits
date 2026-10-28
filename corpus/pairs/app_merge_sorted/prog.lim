@@ -1,0 +1,28 @@
+# Merge the sorted number files named in argv into one sorted stream; print it and the duplicates.
+uses fs.read, args
+
+fn load(fs: Fs, path: str) -> [int]:
+    [int(x) for x in split(fs.read(path), "\n") if x != ""]
+
+fn main(env: Env):
+    let lists = [load(env.fs, p) for p in env.args.list()]
+    var pos = [0 for xs in lists]
+    var merged: [int] = []
+    while true:
+        var best = -1
+        for i in 0..len(lists):
+            if pos[i] < len(lists[i]):
+                if best < 0 or lists[i][pos[i]] < lists[best][pos[best]]:
+                    best = i
+        if best < 0: break
+        push(merged, lists[best][pos[best]])
+        pos[best] += 1
+    print(join([str(x) for x in merged], " "))
+    var dups: [int] = []
+    for i in 1..len(merged):
+        if merged[i - 1] == merged[i] and is_none(find(dups, merged[i])):
+            push(dups, merged[i])
+    if len(dups) == 0:
+        print("duplicates:", "none")
+    else:
+        print("duplicates:", join([str(x) for x in dups], " "))

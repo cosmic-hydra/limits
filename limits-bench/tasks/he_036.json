@@ -1,0 +1,54 @@
+{
+ "id": "he_036",
+ "source": "HumanEval/36",
+ "description": "Return the number of times the digit 7 appears in integers less than n which are divisible by 11 or 13.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `n`: an integer, written as one line holding the integer in decimal (e.g. `-12`).\n\nOutput (stdout): the result, an integer, written as one line holding the integer in decimal (e.g. `-12`).\n\nExample 1\nstdin:\n```\n50\n```\nstdout:\n```\n0\n```\n\nExample 2\nstdin:\n```\n78\n```\nstdout:\n```\n2\n```",
+ "params": [
+  {
+   "name": "n",
+   "type": "int"
+  }
+ ],
+ "output_type": "int",
+ "tests": [
+  {
+   "stdin": "50\n",
+   "stdout": "0\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "78\n",
+   "stdout": "2\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "79\n",
+   "stdout": "3\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "100\n",
+   "stdout": "3\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "200\n",
+   "stdout": "6\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "4000\n",
+   "stdout": "192\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "10000\n",
+   "stdout": "639\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "100000\n",
+   "stdout": "8026\n",
+   "origin": "official"
+  }
+ ]
+}

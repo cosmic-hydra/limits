@@ -1,0 +1,41 @@
+# Check bracket balance of each stdin line; report the first error column (1-based).
+uses stdin
+
+struct Open:
+    ch: str
+    col: int
+
+fn opener(c: str) -> Option[str]:
+    match c:
+        ")": Some("(")
+        "]": Some("[")
+        "}": Some("{")
+        _: None
+
+fn check(s: str) -> Option[int]:
+    var stack: [Open] = []
+    let cs = split(s, "")
+    for i in 0..len(cs):
+        let c = cs[i]
+        if c == "(" or c == "[" or c == "{":
+            push(stack, Open { ch: c, col: i + 1 })
+            continue
+        match opener(c):
+            None: pass
+            Some(want):
+                if len(stack) == 0 or stack[len(stack) - 1].ch != want:
+                    return Some(i + 1)
+                pop(stack)
+    if len(stack) > 0:
+        return Some(stack[len(stack) - 1].col)
+    None
+
+test "balanced": assert(is_none(check("f(a[1], {b})")))
+test "unclosed": assert(unwrap(check("((x)")) == 1)
+
+var line = env.stdin.read_line()
+while line != "":
+    match check(line):
+        None: print("ok", line)
+        Some(col): print("error at " + str(col), line)
+    line = env.stdin.read_line()

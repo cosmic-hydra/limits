@@ -1,0 +1,7 @@
+DEBUG 1
+INFO 1
+WARN 1
+ERROR 2
+unparsed 0
+! db down now
+! retry failed

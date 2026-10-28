@@ -1,0 +1,182 @@
+//! Module loader: resolves `import a.b;` to `a/b.lim` relative to the importing
+//! file, lexes and parses each file exactly once (cached by canonical path) and
+//! detects import cycles.
+
+use crate::ast::Program;
+use crate::{lexer, parser, Error};
+use std::collections::HashMap;
+use std::path::{Path, PathBuf};
+
+pub struct Module {
+    /// Qualifier for this module's items ("" for the root, else e.g. "util.strings").
+    pub name: String,
+    /// Path shown in errors ("" for the root file).
+    pub file: String,
+    pub prog: Program,
+    /// Import chain from the root, e.g. "main.lim -> a.lim -> b.lim".
+    pub chain: String,
+    /// Import alias (last path segment) -> module index.
+    pub aliases: HashMap<String, usize>,
+}
+
+struct Loader {
+    mods: Vec<Module>,
+    cache: HashMap<PathBuf, usize>,
+    stack: Vec<PathBuf>,
+    base: PathBuf,
+    errs: Vec<Error>,
+    /// Source text of the root file when it does not come from disk.
+    root_src: Option<String>,
+}
+
+/// Load the root file and everything it imports. Module 0 is the root.
+pub fn load(root: &Path) -> Result<Vec<Module>, Vec<Error>> {
+    load_with(root, None)
+}
+
+/// Like `load`, but with the root file's text given (`src`, e.g. read from
+/// stdin; `root` then only locates imports and need not exist).
+pub fn load_with(root: &Path, src: Option<String>) -> Result<Vec<Module>, Vec<Error>> {
+    let canon = match &src {
+        Some(_) => std::path::absolute(root).unwrap_or_else(|_| root.to_path_buf()),
+        None => std::fs::canonicalize(root).unwrap_or_else(|e| {
+            eprintln!("limits: cannot read '{}': {}", root.display(), e);
+            std::process::exit(2)
+        }),
+    };
+    let mut l = Loader {
+        mods: Vec::new(),
+        cache: HashMap::new(),
+        stack: Vec::new(),
+        base: canon.parent().map(Path::to_path_buf).unwrap_or_default(),
+        errs: Vec::new(),
+        root_src: src,
+    };
+    l.file(canon, String::new());
+    if l.errs.is_empty() {
+        Ok(l.mods)
+    } else {
+        Err(l.errs)
+    }
+}
+
+impl Loader {
+    fn show(&self, p: &Path) -> String {
+        p.strip_prefix(&self.base)
+            .unwrap_or(p)
+            .display()
+            .to_string()
+    }
+
+    fn err(&mut self, mut e: Error, file: &str) {
+        e.file = file.to_string();
+        self.errs.push(e);
+    }
+
+    fn file(&mut self, path: PathBuf, name: String) -> Option<usize> {
+        let file = if name.is_empty() {
+            String::new()
+        } else {
+            self.show(&path)
+        };
+        let given = if name.is_empty() {
+            self.root_src.take()
+        } else {
+            None
+        };
+        let read = match given {
+            Some(s) => Ok(Ok(s)),
+            None => std::fs::read(&path).map(String::from_utf8),
+        };
+        let src = match read {
+            Ok(Ok(s)) => s,
+            Ok(Err(e)) => {
+                self.err(utf8_error(&e).0, &file);
+                return None;
+            }
+            Err(e) => {
+                eprintln!("limits: cannot read '{}': {}", path.display(), e);
+                std::process::exit(2)
+            }
+        };
+        let prog = match lexer::lex(&src).and_then(parser::parse) {
+            Ok(p) => p,
+            Err(e) => {
+                self.err(e, &file);
+                return None;
+            }
+        };
+        let imports = prog.imports.clone();
+        let idx = self.mods.len();
+        let chain: Vec<String> = self
+            .stack
+            .iter()
+            .chain([&path])
+            .map(|p| self.show(p))
+            .collect();
+        self.mods.push(Module {
+            chain: chain.join(" -> "),
+            name,
+            file: file.clone(),
+            prog,
+            aliases: HashMap::new(),
+        });
+        self.cache.insert(path.clone(), idx);
+        self.stack.push(path.clone());
+        let dir = path.parent().map(Path::to_path_buf).unwrap_or_default();
+        for (imp, line, col) in imports {
+            let target = dir.join(imp.replace('.', "/") + ".lim");
+            let alias = imp.rsplit('.').next().unwrap().to_string();
+            let cerr = |m: String| Error::new("check", line, col, m);
+            let Ok(canon) = std::fs::canonicalize(&target) else {
+                let m = format!(
+                    "cannot find module '{}' (no file {})",
+                    imp,
+                    self.show(&target)
+                );
+                self.err(cerr(m), &file);
+                continue;
+            };
+            if let Some(pos) = self.stack.iter().position(|p| *p == canon) {
+                let mut cyc: Vec<String> = self.stack[pos..].iter().map(|p| self.show(p)).collect();
+                cyc.push(self.show(&canon));
+                let m = format!("import cycle: {}", cyc.join(" -> "));
+                self.err(cerr(m), &file);
+                continue;
+            }
+            let m = match self.cache.get(&canon) {
+                Some(&m) => Some(m),
+                None => {
+                    // Qualifier: the import path, made unique if another file
+                    // was already imported under the same path text.
+                    let mut q = imp.clone();
+                    let mut n = 2;
+                    while self.mods.iter().any(|m| m.name == q) {
+                        q = format!("{}{}", imp, n);
+                        n += 1;
+                    }
+                    self.file(canon, q)
+                }
+            };
+            let Some(m) = m else { continue };
+            if self.mods[idx].aliases.insert(alias.clone(), m).is_some() {
+                let m = format!("module name '{}' imported twice", alias);
+                self.err(cerr(m), &file);
+            }
+        }
+        self.stack.pop();
+        Some(idx)
+    }
+}
+
+/// A located lex error for a source that is not UTF-8 (so `--json` covers
+/// it too), and the valid prefix it points into.
+pub fn utf8_error(e: &std::string::FromUtf8Error) -> (Error, &str) {
+    let ok = &e.as_bytes()[..e.utf8_error().valid_up_to()];
+    let ok = std::str::from_utf8(ok).unwrap_or_default();
+    let last = ok.rsplit('\n').next().unwrap_or("");
+    let line = ok.matches('\n').count() as u32 + 1;
+    let col = last.chars().count() as u32 + 1;
+    let msg = "invalid UTF-8 in source file".to_string();
+    (Error::new("lex", line, col, msg), ok)
+}

@@ -1,0 +1,18 @@
+let n = 10000000;
+let is = [];
+let i = 0;
+while i <= n { push(is, true); i = i + 1; }
+let count = 0;
+i = 2;
+while i <= n {
+    if is[i] {
+        count = count + 1;
+        let j = i * i;
+        while j <= n {
+            is[j] = false;
+            j = j + i;
+        }
+    }
+    i = i + 1;
+}
+print(count);

@@ -1,0 +1,43 @@
+{
+ "id": "he_029",
+ "source": "HumanEval/29",
+ "description": "Filter an input list of strings only for ones that start with a given prefix.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `strings`: a list of strings, written as one line with the count n, then n lines, one string per line.\n- `prefix`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nOutput (stdout): the result, a list of strings, written as one line with the count n, then n lines, one string per line.\n\nExample 1\nstdin:\n```\n0\njohn\n```\nstdout:\n```\n0\n```\n\nExample 2\nstdin:\n```\n6\nxxx\nasd\nxxy\njohn doe\nxxxAAA\nxxx\nxxx\n```\nstdout:\n```\n3\nxxx\nxxxAAA\nxxx\n```",
+ "params": [
+  {
+   "name": "strings",
+   "type": "[str]"
+  },
+  {
+   "name": "prefix",
+   "type": "str"
+  }
+ ],
+ "output_type": "[str]",
+ "tests": [
+  {
+   "stdin": "0\njohn\n",
+   "stdout": "0\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "6\nxxx\nasd\nxxy\njohn doe\nxxxAAA\nxxx\nxxx\n",
+   "stdout": "3\nxxx\nxxxAAA\nxxx\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "5\nxdAa\nhxysxon\nd xa h\nynayna\nxh no \nxhn\n",
+   "stdout": "0\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "6\nhn jno\nenAnA\nyAdAa\njjj\njsAA \noadxe\nnoxh\n",
+   "stdout": "0\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "2\njoxeyo\noox osa\nnoxn\n",
+   "stdout": "0\n",
+   "origin": "generated"
+  }
+ ]
+}

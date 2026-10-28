@@ -1,0 +1,13 @@
+uses stdin
+
+fn intersperse(xs: [int], delim: int) -> [int]:
+    var out: [int] = []
+    for i in 0..len(xs):
+        if i > 0:
+            push(out, delim)
+        push(out, xs[i])
+    out
+
+let xs = [int(p) for p in split(env.stdin.read_line(), " ") if p != ""]
+let delim = int(env.stdin.read_line())
+print(join([str(x) for x in intersperse(xs, delim)], " "))

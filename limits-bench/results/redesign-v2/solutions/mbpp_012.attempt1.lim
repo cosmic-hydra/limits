@@ -1,0 +1,18 @@
+uses stdin
+fn parse_list(line: str) -> [int]:
+    [unwrap(parse_int(w)) for w in split(line, " ") if w != ""]
+fn show(xs: [int]) -> str: join([str(x) for x in xs], " ")
+let m = unwrap(parse_int(env.stdin.read_line()))
+var rows: [[int]] = []
+for i in 0..m:
+    push(rows, parse_list(env.stdin.read_line()))
+for i in 1..m:
+    var j = i
+    while j > 0 and sum(rows[j - 1]) > sum(rows[j]):
+        let t = rows[j]
+        rows[j] = rows[j - 1]
+        rows[j - 1] = t
+        j -= 1
+print(m)
+for r in rows:
+    print(show(r))

@@ -1,0 +1,39 @@
+{
+ "id": "he_014",
+ "source": "HumanEval/14",
+ "description": "Return list of all prefixes from shortest to longest of the input string\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `string`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nOutput (stdout): the result, a list of strings, written as one line with the count n, then n lines, one string per line.\n\nExample 1\nstdin:\n```\n\n```\nstdout:\n```\n0\n```\n\nExample 2\nstdin:\n```\nasdfgh\n```\nstdout:\n```\n6\na\nas\nasd\nasdf\nasdfg\nasdfgh\n```",
+ "params": [
+  {
+   "name": "string",
+   "type": "str"
+  }
+ ],
+ "output_type": "[str]",
+ "tests": [
+  {
+   "stdin": "\n",
+   "stdout": "0\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "asdfgh\n",
+   "stdout": "6\na\nas\nasd\nasdf\nasdfg\nasdfgh\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "WWW\n",
+   "stdout": "3\nW\nWW\nWWW\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "fh\n",
+   "stdout": "2\nf\nfh\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "dhd\n",
+   "stdout": "3\nd\ndh\ndhd\n",
+   "origin": "generated"
+  }
+ ]
+}

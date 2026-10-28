@@ -1,0 +1,5 @@
+uses time
+import b
+pub fn f(clock: Clock, vars: Vars):
+    print(clock.now_ms() > 0)
+    b.g(vars)

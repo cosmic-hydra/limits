@@ -1,0 +1,27 @@
+# Deal 4 hands of 5 cards from a deck shuffled with a seeded LCG (Fisher-Yates), then score high cards.
+fn rnd(seed: inout int, n: int) -> int:
+    requires n > 0
+    seed = (seed * 1103515245 + 12345) % 2147483648
+    (seed / 65536) % n
+
+fn shuffle(deck: inout [str], seed: inout int):
+    var i = len(deck) - 1
+    while i > 0:
+        let j = rnd(&seed, i + 1)
+        let t = deck[i]
+        deck[i] = deck[j]
+        deck[j] = t
+        i -= 1
+
+let ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
+var deck: [str] = []
+for s in ["c", "d", "h", "s"]:
+    for r in ranks:
+        push(deck, r + s)
+var seed = 2024
+shuffle(&deck, &seed)
+for h in 0..4:
+    let hand = [deck[h * 5 + k] for k in 0..5]
+    let points = sum([max(0, unwrap(find(ranks, split(c, "")[0])) - 8) for c in hand])
+    print("hand", h + 1, join(hand, " "), "points", points)
+print("left", len(deck) - 20)

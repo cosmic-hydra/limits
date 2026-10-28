@@ -1,0 +1,17 @@
+uses stdin;
+fn main() {
+  let table = split(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~", "");
+  let letters = split("abcdefghijklmnopqrstuvwxyz", "");
+  let s = input_line();
+  let sum = 0;
+  if s != "" {
+    for c in split(s, "") {
+      let code = 0;
+      for k in 0..len(table) { if table[k] == c { code = k + 32; } }
+      sum = sum + code - 96;
+    }
+  }
+  if sum % 26 == 0 { print("z"); return; }
+  let m = ((sum % 26) + 26) % 26;
+  print(letters[m - 1]);
+}

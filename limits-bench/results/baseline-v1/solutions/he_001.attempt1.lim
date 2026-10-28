@@ -1,0 +1,26 @@
+uses stdin;
+fn read_strs() -> [str] {
+  let n = int(input_line());
+  let out: [str] = [];
+  for i in 0..n { push(out, input_line()); }
+  return out;
+}
+fn show_strs(xs: [str]) {
+  print(len(xs));
+  for x in xs { print(x); }
+}
+
+fn main() {
+  let cs = split(input_line(), "");
+  let out: [str] = [];
+  let cur: [str] = [];
+  let depth = 0;
+  for c in cs {
+    if c == "(" { depth = depth + 1; push(cur, c); }
+    else if c == ")" {
+      depth = depth - 1; push(cur, c);
+      if depth == 0 { push(out, join(cur, "")); cur = []; }
+    }
+  }
+  show_strs(out);
+}

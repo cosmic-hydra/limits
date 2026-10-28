@@ -1,0 +1,91 @@
+HumanEval/0	skipped: parameter numbers has an unsupported type
+HumanEval/1	kept as he_001
+HumanEval/2	skipped: a test checks the result in a non-equality form (e.g. set(...), tolerance) or with non-literal args
+HumanEval/3	kept as he_003
+HumanEval/4	skipped: a test checks the result in a non-equality form (e.g. set(...), tolerance) or with non-literal args
+HumanEval/5	kept as he_005
+HumanEval/6	kept as he_006
+HumanEval/7	kept as he_007
+HumanEval/8	skipped: return type unsupported (float, tuple, dict, None, mixed...)
+HumanEval/9	kept as he_009
+HumanEval/10	kept as he_010
+HumanEval/11	kept as he_011
+HumanEval/12	skipped: return type unsupported (float, tuple, dict, None, mixed...)
+HumanEval/13	kept as he_013
+HumanEval/14	kept as he_014
+HumanEval/15	kept as he_015
+HumanEval/16	skipped: a test checks the result in a non-equality form (e.g. set(...), tolerance) or with non-literal args
+HumanEval/17	kept as he_017
+HumanEval/18	kept as he_018
+HumanEval/19	kept as he_019
+HumanEval/20	skipped: parameter numbers has an unsupported type
+HumanEval/21	skipped: parameter numbers has an unsupported type
+HumanEval/22	skipped: parameter values has an unsupported type
+HumanEval/23	kept as he_023
+HumanEval/24	kept as he_024
+HumanEval/25	skipped: a test checks the result in a non-equality form (e.g. set(...), tolerance) or with non-literal args
+HumanEval/26	kept as he_026
+HumanEval/27	kept as he_027
+HumanEval/28	kept as he_028
+HumanEval/29	kept as he_029
+HumanEval/30	kept as he_030
+HumanEval/31	skipped: a test checks the result in a non-equality form (e.g. set(...), tolerance) or with non-literal args
+HumanEval/32	excluded: float coefficients and tolerance-based check
+HumanEval/33	skipped: a test checks the result in a non-equality form (e.g. set(...), tolerance) or with non-literal args
+HumanEval/34	kept as he_034
+HumanEval/35	kept as he_035
+HumanEval/36	kept as he_036
+HumanEval/37	skipped: a test checks the result in a non-equality form (e.g. set(...), tolerance) or with non-literal args
+HumanEval/38	excluded: input is produced by an encoder in the prompt (cyclic encode/decode pair)
+HumanEval/39	kept as he_039
+HumanEval/40	kept as he_040
+HumanEval/41	kept as he_041
+HumanEval/42	kept as he_042
+HumanEval/43	kept as he_043
+HumanEval/44	skipped: a test checks the result in a non-equality form (e.g. set(...), tolerance) or with non-literal args
+HumanEval/45	skipped: return type unsupported (float, tuple, dict, None, mixed...)
+HumanEval/46	kept as he_046
+MBPP/2	skipped: a test checks the result in a non-equality form (e.g. set(...), tolerance) or with non-literal args
+MBPP/3	kept as mbpp_003
+MBPP/4	kept as mbpp_004
+MBPP/6	kept as mbpp_006
+MBPP/7	skipped: a test checks the result in a non-equality form (e.g. set(...), tolerance) or with non-literal args
+MBPP/8	kept as mbpp_008
+MBPP/9	kept as mbpp_009
+MBPP/11	kept as mbpp_011
+MBPP/12	kept as mbpp_012
+MBPP/14	skipped: return type unsupported (float, tuple, dict, None, mixed...)
+MBPP/16	kept as mbpp_016
+MBPP/17	kept as mbpp_017
+MBPP/18	kept as mbpp_018
+MBPP/19	kept as mbpp_019
+MBPP/20	kept as mbpp_020
+MBPP/56	kept as mbpp_056
+MBPP/57	kept as mbpp_057
+MBPP/58	kept as mbpp_058
+MBPP/59	kept as mbpp_059
+MBPP/61	kept as mbpp_061
+MBPP/62	kept as mbpp_062
+MBPP/63	skipped: parameter test_list has an unsupported type
+MBPP/64	skipped: parameter subjectmarks has an unsupported type
+MBPP/65	skipped: parameter data_list has an unsupported type
+MBPP/66	kept as mbpp_066
+MBPP/67	skipped: return type unsupported (float, tuple, dict, None, mixed...)
+MBPP/68	kept as mbpp_068
+MBPP/69	kept as mbpp_069
+MBPP/70	skipped: parameter Input has an unsupported type
+MBPP/71	kept as mbpp_071
+MBPP/72	kept as mbpp_072
+MBPP/74	kept as mbpp_074
+MBPP/75	skipped: parameter test_list has an unsupported type
+MBPP/77	kept as mbpp_077
+MBPP/79	kept as mbpp_079
+MBPP/80	skipped: return type unsupported (float, tuple, dict, None, mixed...)
+MBPP/82	skipped: a test checks the result in a non-equality form (e.g. set(...), tolerance) or with non-literal args
+MBPP/83	kept as mbpp_083
+MBPP/84	kept as mbpp_084
+MBPP/85	skipped: a test checks the result in a non-equality form (e.g. set(...), tolerance) or with non-literal args
+MBPP/86	kept as mbpp_086
+MBPP/87	skipped: parameter dict1 has an unsupported type
+MBPP/88	skipped: reference fails on an official input
+MBPP/89	kept as mbpp_089

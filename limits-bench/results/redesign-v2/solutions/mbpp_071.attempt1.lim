@@ -1,0 +1,9 @@
+uses stdin
+fn ints(line: str) -> [int]:
+    var out: [int] = []
+    for w in split(line, " "):
+        if w != "": push(out, unwrap(parse_int(w)))
+    out
+var xs = ints(env.stdin.read_line())
+sort(xs)
+print(join([str(x) for x in xs], " "))

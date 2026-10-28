@@ -1,0 +1,3 @@
+[{"name": "t01", "args": ["users.csv", "orders.csv"], "files": {"users.csv": "id,name\n1,ann\n2,bob\n3,cy\n", "orders.csv": "id,user_id,cents\n10,1,500\n11,2,1500\n12,1,250\n13,9,100\n"}},
+ {"name": "t02", "args": ["u.csv", "o.csv"], "files": {"u.csv": "id,name\n7,zoe\n8,amy\n", "o.csv": "id,user_id,cents\n"}},
+ {"name": "t03", "args": ["u.csv", "o.csv"], "files": {"u.csv": "id,name\n1,x\n", "o.csv": "id,user_id,cents\n1,1,99999\n2,1,1\n"}}]

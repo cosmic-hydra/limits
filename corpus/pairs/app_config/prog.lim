@@ -1,0 +1,48 @@
+# Read KEY=VALUE config from a file named on the command line; report typed settings.
+uses fs.read, args
+
+struct Entry:
+    key: str
+    value: str
+
+fn starts_hash(line: str) -> bool:
+    split(line, "")[0] == "#"
+
+fn parse(text: str) -> Result[[Entry], str]:
+    var cfg: [Entry] = []
+    let lines = split(text, "\n")
+    for n in 0..len(lines):
+        let line = lines[n]
+        if line == "" or starts_hash(line):
+            continue
+        let kv = split(line, "=")
+        if len(kv) < 2:
+            return Err("line " + str(n + 1) + ": missing '='")
+        let rest = [kv[i] for i in 1..len(kv)]
+        push(cfg, Entry { key: kv[0], value: join(rest, "=") })
+    Ok(cfg)
+
+fn lookup(cfg: [Entry], key: str) -> Option[str]:
+    for e in cfg:
+        if e.key == key:
+            return Some(e.value)
+    None
+
+fn get_int(cfg: [Entry], key: str, default: int) -> int:
+    match lookup(cfg, key):
+        Some(v): unwrap_or(parse_int(v), default)
+        None: default
+
+fn main(env: Env):
+    let path = env.args.list()[0]
+    match parse(env.fs.read(path)):
+        Err(e): print("error:", e)
+        Ok(cfg):
+            let name = unwrap_or(lookup(cfg, "name"), "")
+            let shown = match name:
+                "": "(unset)"
+                _: name
+            print("name:", shown)
+            print("port:", get_int(cfg, "port", 8080))
+            print("workers:", get_int(cfg, "workers", 1))
+            print("keys:", len(cfg))

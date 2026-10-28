@@ -1,0 +1,27 @@
+# Convert temperature readings like "21.5C" or "70F" from stdin; summarise in Celsius.
+uses stdin
+
+fn parse(s: str) -> Option[float]:
+    let cs = split(s, "")
+    if len(cs) < 2:
+        return None
+    let unit = cs[len(cs) - 1]
+    let v = parse_float(join([cs[i] for i in 0..len(cs) - 1], ""))?
+    match unit:
+        "C": Some(v)
+        "F": Some((v - 32.0) * 5.0 / 9.0)
+        _: None
+
+var vals: [float] = []
+var line = env.stdin.read_line()
+while line != "":
+    match parse(line):
+        Some(c):
+            push(vals, c)
+            print(line, "=", c, "C")
+        None: print("bad reading:", line)
+    line = env.stdin.read_line()
+if len(vals) > 0:
+    print("min", min(vals), "max", max(vals), "mean", sum(vals) / float(len(vals)))
+else:
+    print("no readings")

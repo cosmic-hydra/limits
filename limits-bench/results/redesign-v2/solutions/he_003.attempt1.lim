@@ -1,0 +1,9 @@
+uses stdin
+let line = env.stdin.read_line()
+var bal = 0
+var below = false
+if line != "":
+    for w in split(line, " "):
+        bal += unwrap(parse_int(w))
+        if bal < 0: below = true
+print(below)

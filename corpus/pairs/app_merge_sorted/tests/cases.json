@@ -1,0 +1,3 @@
+[{"name": "t01", "args": ["a.txt", "b.txt", "c.txt"], "files": {"a.txt": "1\n4\n9\n", "b.txt": "2\n4\n10\n", "c.txt": "-3\n9\n9\n"}},
+ {"name": "t02", "args": ["only.txt"], "files": {"only.txt": "5\n6\n"}},
+ {"name": "t03", "args": ["e.txt", "f.txt"], "files": {"e.txt": "", "f.txt": "7\n"}}]

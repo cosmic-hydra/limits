@@ -1,0 +1,3 @@
+uses stdin
+let a = int(env.stdin.read_line())
+    print(a)

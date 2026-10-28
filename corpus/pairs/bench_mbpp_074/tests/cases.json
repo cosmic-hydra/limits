@@ -1,0 +1,26 @@
+[
+ {
+  "name": "t01",
+  "stdin": "3\nred\ngreen\ngreen\n3\na\nb\nb\n"
+ },
+ {
+  "name": "t02",
+  "stdin": "3\nred\ngreen\ngreenn\n3\na\nb\nb\n"
+ },
+ {
+  "name": "t03",
+  "stdin": "3\nred\ngreen\ngreenn\n2\na\nb\n"
+ },
+ {
+  "name": "t04",
+  "stdin": "3\na\nb\na\n3\nx\ny\nx\n"
+ },
+ {
+  "name": "t05",
+  "stdin": "2\na\na\n2\nx\ny\n"
+ },
+ {
+  "name": "t06",
+  "stdin": "2\na\nb\n2\nx\nx\n"
+ }
+]

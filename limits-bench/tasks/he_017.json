@@ -1,0 +1,39 @@
+{
+ "id": "he_017",
+ "source": "HumanEval/17",
+ "description": "Input to this program is a string representing musical notes in a special ASCII format.\nYour task is to parse this string and return list of integers corresponding to how many beats does each\nnot last.\n\nHere is a legend:\n'o' - whole note, lasts four beats\n'o|' - half note, lasts two beats\n'.|' - quater note, lasts one beat\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `music_string`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nOutput (stdout): the result, a list of integers, written as one line with the integers separated by single spaces (an empty line for an empty list).\nPrint an empty line for an empty list.\n\nExample 1\nstdin:\n```\n\n```\nstdout:\n```\n\n```\n\nExample 2\nstdin:\n```\no o o o\n```\nstdout:\n```\n4 4 4 4\n```",
+ "params": [
+  {
+   "name": "music_string",
+   "type": "str"
+  }
+ ],
+ "output_type": "[int]",
+ "tests": [
+  {
+   "stdin": "\n",
+   "stdout": "\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "o o o o\n",
+   "stdout": "4 4 4 4\n",
+   "origin": "official"
+  },
+  {
+   "stdin": ".| .| .| .|\n",
+   "stdout": "1 1 1 1\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "o| o| .| .| o o o o\n",
+   "stdout": "2 2 1 1 4 4 4 4\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "o| .| o| .| o o| o o|\n",
+   "stdout": "2 1 2 1 4 2 4 2\n",
+   "origin": "official"
+  }
+ ]
+}

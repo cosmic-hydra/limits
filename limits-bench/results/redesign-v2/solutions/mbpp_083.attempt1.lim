@@ -1,0 +1,10 @@
+uses stdin
+let alpha = split("abcdefghijklmnopqrstuvwxyz", "")
+var s = 0
+for c in split(env.stdin.read_line(), ""):
+    s += unwrap_or(find(alpha, c), -1) + 1
+let m = s % 26
+if m == 0:
+    print("z")
+else:
+    print(alpha[m - 1])

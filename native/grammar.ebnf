@@ -1,0 +1,111 @@
+(* Limits v0.5 grammar (the language implemented by native/src/parser.rs).
+
+   Notation: rule = alternatives ; with | (or), ( ) grouping, ? (optional),
+   * (zero or more), + (one or more). "text" matches a token with exactly
+   that text: a keyword, a symbol, or (for the contextual words "uses",
+   "test", "inout", "requires", "ensures") an IDENT with that spelling.
+   UPPERCASE names are token classes defined in the lexical section.
+
+   Layout (as in Python): the lexer turns line structure into tokens.
+   - NEWLINE ends every logical line that has a token. Inside ( ) [ ] { }
+     line breaks and indentation are ignored (no NEWLINE/INDENT/DEDENT).
+   - Indentation is spaces only, exactly 4 more than the enclosing level:
+     a deeper line emits INDENT, a shallower one emits one DEDENT per closed
+     level (it must return to an open level). Blank and comment-only lines
+     are ignored. At end of file the open levels are closed with DEDENT.
+   - Tabs outside strings are an error. There are no semicolons.
+
+   Contextual rules a grammar cannot express (the parser applies them):
+   - "uses" starts a uses_decl only when an IDENT follows; "test" starts a
+     test_decl only when a STRING follows; "inout" is a modifier only when a
+     type follows; "requires"/"ensures" open a contract clause only when the
+     next token is not one of = += -= *= /= %= . [ ; anywhere else all five
+     are ordinary identifiers.
+   - A struct literal brace must be followed by "}" or by IDENT ":".
+   - Comparisons do not chain (a < b < c is an error), as the grammar says.
+   - match_value appears only as the whole right side of let/var, of an
+     assignment, or of return; it ends with its own DEDENT (no NEWLINE). *)
+
+(* ---------- file ---------- *)
+file        = ( NEWLINE | item )* ;
+item        = import_decl | uses_decl | test_decl | fn_decl | struct_decl
+            | enum_decl | stmt ;
+import_decl = "import" dotted NEWLINE ;
+uses_decl   = "uses" dotted ( "," dotted )* NEWLINE ;
+dotted      = IDENT ( "." IDENT )* ;
+test_decl   = "test" STRING block ;
+
+fn_decl     = "pub"? "fn" IDENT "(" params? ")" ( "->" type )? ":" fn_body ;
+params      = param ( "," param )* ","? ;
+param       = IDENT ":" "inout"? type ;
+fn_body     = NEWLINE INDENT contract* stmt* DEDENT
+            | stmt ;
+contract    = ( "requires" | "ensures" ) expr NEWLINE ;
+
+struct_decl = "pub"? "struct" IDENT ":" NEWLINE INDENT field_decl+ DEDENT ;
+field_decl  = IDENT ":" type NEWLINE ;
+enum_decl   = "pub"? "enum" IDENT ":" NEWLINE INDENT variant_decl+ DEDENT ;
+variant_decl = IDENT ( "(" ( vfield ( "," vfield )* ","? )? ")" )? NEWLINE ;
+vfield      = ( IDENT ":" )? type ;
+
+type        = "[" type "]"
+            | IDENT ( "." IDENT )? ( "[" type ( "," type )* "]" )? ;
+
+(* ---------- statements ---------- *)
+block       = ":" ( NEWLINE INDENT stmt+ DEDENT | stmt ) ;
+stmt        = let_stmt | if_stmt | match_stmt | while_stmt | for_stmt
+            | simple_stmt ;
+simple_stmt = ( "break" | "continue" | "pass" | "return" ) NEWLINE
+            | "return" rhs
+            | expr assign_op rhs
+            | expr NEWLINE ;
+let_stmt    = ( "let" | "var" ) IDENT ( ":" type )? "=" rhs ;
+rhs         = expr NEWLINE | match_value ;
+assign_op   = "=" | "+=" | "-=" | "*=" | "/=" | "%=" ;
+if_stmt     = "if" expr block ( ( "elif" | "else" "if" ) expr block )*
+              ( "else" block )? ;
+while_stmt  = "while" expr block ;
+for_stmt    = "for" IDENT "in" expr block ;
+match_stmt  = "match" expr ":" NEWLINE INDENT arm+ DEDENT ;
+match_value = "match" expr ":" NEWLINE INDENT arm+ DEDENT ;
+arm         = pattern block ;
+pattern     = "_" | "-"? INT | STRING | "true" | "false"
+            | IDENT ( "." IDENT )* ( "(" ( IDENT ( "," IDENT )* ","? )? ")" )? ;
+
+(* ---------- expressions, loosest first ---------- *)
+expr        = or_expr ( ".." or_expr )? ;
+or_expr     = and_expr ( "or" and_expr )* ;
+and_expr    = not_expr ( "and" not_expr )* ;
+not_expr    = "not" not_expr | comparison ;
+comparison  = sum ( ( "==" | "!=" | "<" | "<=" | ">" | ">=" ) sum )? ;
+sum         = term ( ( "+" | "-" ) term )* ;
+term        = unary ( ( "*" | "/" | "%" ) unary )* ;
+unary       = "-" unary | primary postfix* ;
+postfix     = "[" expr "]"
+            | "." IDENT "(" args? ")"
+            | "." IDENT
+            | "?" ;
+primary     = INT | FLOAT | STRING | "true" | "false"
+            | "(" expr ")"
+            | "[" ( list_items | comprehension )? "]"
+            | name "(" args? ")"
+            | name "{" ( field_init ( "," field_init )* ","? )? "}"
+            | IDENT ;
+name        = IDENT ( "." IDENT )? ;
+args        = arg ( "," arg )* ","? ;
+arg         = "&" expr | expr ;
+list_items  = expr ( "," expr )* ","? ;
+comprehension = expr ( "for" IDENT "in" expr ) ( "for" IDENT "in" expr | "if" expr )* ;
+field_init  = IDENT ":" expr ;
+
+(* ---------- lexical ---------- *)
+(* IDENT   = [A-Za-z_][A-Za-z0-9_]*, except the keywords below.
+   KEYWORD = let var fn return if elif else while for in true false and or
+             not break continue pass struct enum match import pub
+   INT     = [0-9][0-9_]*  (value at most 9223372036854775807; the literal
+             9223372036854775808 only directly after unary "-")
+   FLOAT   = [0-9][0-9_]* "." [0-9]+   (no exponent form)
+   STRING  = '"' ( any byte except '"', '\' and newline | '\n' | '\t' | '\\' | '\"' )* '"'
+   COMMENT = "#" to end of line (ignored)
+   SYMBOLS = .. == != <= >= -> += -= *= /= %= ( ) { } [ ] , : + - * / % = < > . ? &
+             (longest match first) *)

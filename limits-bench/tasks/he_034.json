@@ -1,0 +1,39 @@
+{
+ "id": "he_034",
+ "source": "HumanEval/34",
+ "description": "Return sorted unique elements in a list\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `l`: a list of integers, written as one line with the integers separated by single spaces (an empty line for an empty list).\n\nOutput (stdout): the result, a list of integers, written as one line with the integers separated by single spaces (an empty line for an empty list).\nPrint an empty line for an empty list.\n\nExample 1\nstdin:\n```\n5 3 5 2 3 3 9 0 123\n```\nstdout:\n```\n0 2 3 5 9 123\n```\n\nExample 2\nstdin:\n```\n5 53 37 33 34 74 94 28 19\n```\nstdout:\n```\n5 19 28 33 34 37 53 74 94\n```",
+ "params": [
+  {
+   "name": "l",
+   "type": "[int]"
+  }
+ ],
+ "output_type": "[int]",
+ "tests": [
+  {
+   "stdin": "5 3 5 2 3 3 9 0 123\n",
+   "stdout": "0 2 3 5 9 123\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "5 53 37 33 34 74 94 28 19\n",
+   "stdout": "5 19 28 33 34 37 53 74 94\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "92 86 70 110 107 1 44 19 87\n",
+   "stdout": "1 19 44 70 86 87 92 107 110\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "72 51 38 104 51 101 94 0 83\n",
+   "stdout": "0 38 51 72 83 94 101 104\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "117 119 74 103 41 94 30 85 1\n",
+   "stdout": "1 30 41 74 85 94 103 117 119\n",
+   "origin": "generated"
+  }
+ ]
+}

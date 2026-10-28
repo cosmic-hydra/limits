@@ -1,0 +1,13 @@
+var total = 0
+for r in 0..20:
+    var s = ""
+    for i in 0..2000:
+        s = s + str(i) + ","
+    total += len(s)
+var parts: [str] = []
+for i in 0..1000000:
+    push(parts, "item" + str(i))
+var n = 0
+for p in parts:
+    n += len(p)
+print(total, n)

@@ -1,0 +1,14 @@
+uses stdin;
+fn read_ints(line: str) -> [int] {
+  let xs: [int] = [];
+  if line == "" { return xs; }
+  for p in split(line, " ") { push(xs, int(p)); }
+  return xs;
+}
+fn fmt(xs: [int]) -> str {
+  let ps: [str] = [];
+  for x in xs { push(ps, str(x)); }
+  return join(ps, " ");
+}
+fn is_prime(p: int) -> bool { if p < 2 { return false; } let d = 2; while d * d <= p { if p % d == 0 { return false; } d = d + 1; } return true; }
+fn main() { let n = int(input_line()); let a = 0; let b = 1; while true { let t = a + b; a = b; b = t; if is_prime(a) { n = n - 1; if n == 0 { print(a); return; } } } }

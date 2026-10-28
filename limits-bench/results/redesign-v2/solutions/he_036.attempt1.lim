@@ -1,0 +1,8 @@
+uses stdin
+let n = unwrap(parse_int(env.stdin.read_line()))
+var c = 0
+for i in 0..max(n, 0):
+    if i % 11 == 0 or i % 13 == 0:
+        for ch in split(str(i), ""):
+            if ch == "7": c += 1
+print(c)

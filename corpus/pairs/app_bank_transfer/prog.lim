@@ -1,0 +1,44 @@
+# Accounts from stdin header "N", then N "name balance" lines, then "from to amount" transfers.
+uses stdin
+
+fn transfer(bal: inout [int], a: int, b: int, amt: int) -> bool:
+    requires amt > 0
+    requires a >= 0 and a < len(bal) and b >= 0 and b < len(bal)
+    if bal[a] < amt:
+        return false
+    bal[a] -= amt
+    bal[b] += amt
+    true
+
+test "transfer keeps the total":
+    var bal = [10, 5]
+    assert(transfer(&bal, 0, 1, 7))
+    assert(not transfer(&bal, 0, 1, 7), "only 3 left")
+    assert(sum(bal) == 15)
+
+fn main(env: Env):
+    let n = int(env.stdin.read_line())
+    var names: [str] = []
+    var bal: [int] = []
+    for i in 0..n:
+        let p = split(env.stdin.read_line(), " ")
+        push(names, p[0])
+        push(bal, int(p[1]))
+    let before = sum(bal)
+    var line = env.stdin.read_line()
+    while line != "":
+        let p = split(line, " ")
+        match find(names, p[0]):
+            None: print("unknown account in:", line)
+            Some(a):
+                match find(names, p[1]):
+                    None: print("unknown account in:", line)
+                    Some(b):
+                        if transfer(&bal, a, b, int(p[2])):
+                            print("ok:", line)
+                        else:
+                            print("insufficient:", line)
+        line = env.stdin.read_line()
+    for i in 0..n:
+        print(names[i], bal[i])
+    print("conserved:", sum(bal) == before)

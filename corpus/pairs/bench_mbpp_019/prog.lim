@@ -1,0 +1,5 @@
+uses stdin
+
+var xs = [int(p) for p in split(env.stdin.read_line(), " ") if p != ""]
+sort(xs)
+print(any([xs[i] == xs[i + 1] for i in 0..len(xs) - 1]))

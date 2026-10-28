@@ -1,0 +1,35 @@
+# Format records as JSON-like lines.
+struct Item:
+    id: int
+    name: str
+    score: int
+    tags: [str]
+
+fn rnd(s: inout [int]) -> int:
+    s[0] = (s[0] * 1103515245 + 12345) % 2147483648
+    s[0] / 65536
+
+fn fmt(it: Item) -> str:
+    var ts = ""
+    for i in 0..len(it.tags):
+        if i > 0:
+            ts += ", "
+        ts = ts + "\"" + it.tags[i] + "\""
+    "{\"id\": " + str(it.id) + ", \"name\": \"" + it.name + "\", \"score\": " + str(it.score) + ", \"tags\": [" + ts + "]}"
+
+let colors = ["red", "green", "blue", "gold"]
+var seed = [5]
+var lines: [str] = []
+for i in 0..60000:
+    var it = Item { id: i, name: "n" + str(rnd(&seed) % 1000), score: 0, tags: [] }
+    it.score = rnd(&seed) % 100
+    let k = rnd(&seed) % 4
+    for j in 0..k:
+        push(it.tags, colors[rnd(&seed) % 4])
+    push(lines, fmt(it))
+var total = len(lines) - 1
+for l in lines:
+    total += len(l)
+print(lines[0])
+print(lines[1])
+print(total)

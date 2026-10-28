@@ -1,0 +1,43 @@
+{
+ "id": "mbpp_004",
+ "source": "MBPP/4",
+ "description": "Write a program to find the n largest integers from a given list of numbers, returned in descending order.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `nums`: a list of integers, written as one line with the integers separated by single spaces (an empty line for an empty list).\n- `n`: an integer, written as one line holding the integer in decimal (e.g. `-12`).\n\nOutput (stdout): the result, a list of integers, written as one line with the integers separated by single spaces (an empty line for an empty list).\nPrint an empty line for an empty list.\n\nExample 1\nstdin:\n```\n25 35 22 85 14 65 75 22 58\n3\n```\nstdout:\n```\n85 75 65\n```\n\nExample 2\nstdin:\n```\n25 35 22 85 14 65 75 22 58\n2\n```\nstdout:\n```\n85 75\n```\n\nExample 3\nstdin:\n```\n25 35 22 85 14 65 75 22 58\n5\n```\nstdout:\n```\n85 75 65 58 35\n```",
+ "params": [
+  {
+   "name": "nums",
+   "type": "[int]"
+  },
+  {
+   "name": "n",
+   "type": "int"
+  }
+ ],
+ "output_type": "[int]",
+ "tests": [
+  {
+   "stdin": "25 35 22 85 14 65 75 22 58\n3\n",
+   "stdout": "85 75 65\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "25 35 22 85 14 65 75 22 58\n2\n",
+   "stdout": "85 75\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "25 35 22 85 14 65 75 22 58\n5\n",
+   "stdout": "85 75 65 58 35\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "62 52 34 77 78 30 81 30 41\n4\n",
+   "stdout": "81 78 77 62\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "51 43 74 37 30 63 59 14 33\n2\n",
+   "stdout": "74 63\n",
+   "origin": "generated"
+  }
+ ]
+}

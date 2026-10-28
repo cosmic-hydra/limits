@@ -1,0 +1,59 @@
+# Tokenize statements: identifiers, numbers, operators.
+fn rnd(s: inout [int]) -> int:
+    s[0] = (s[0] * 1103515245 + 12345) % 2147483648
+    s[0] / 65536
+
+fn is_alpha(c: str) -> bool:
+    c >= "a" and c <= "z"
+
+fn is_digit(c: str) -> bool:
+    c >= "0" and c <= "9"
+
+let ops = ["+", "-", "*", "/"]
+var seed = [19]
+var parts: [str] = []
+for i in 0..20000:
+    push(parts, "v" + str(rnd(&seed) % 50) + " = ")
+    for j in 0..5:
+        if j > 0:
+            var sp = " "
+            if rnd(&seed) % 2 == 0:
+                sp = ""
+            push(parts, sp + ops[rnd(&seed) % 4] + sp)
+        if rnd(&seed) % 2 == 0:
+            push(parts, "x" + str(rnd(&seed) % 100))
+        else:
+            push(parts, str(rnd(&seed) % 1000))
+    push(parts, ";\n")
+let cs = split(join(parts, ""), "")
+var idents = 0
+var nums = 0
+var opc = 0
+var numsum = 0
+var v7 = 0
+var i = 0
+while i < len(cs):
+    let c = cs[i]
+    if c == " " or c == "\n":
+        i += 1
+    elif is_alpha(c):
+        var t = c
+        i += 1
+        while i < len(cs) and (is_alpha(cs[i]) or is_digit(cs[i])):
+            t += cs[i]
+            i += 1
+        idents += 1
+        if t == "v7":
+            v7 += 1
+    elif is_digit(c):
+        var t = c
+        i += 1
+        while i < len(cs) and is_digit(cs[i]):
+            t += cs[i]
+            i += 1
+        nums += 1
+        numsum += int(t)
+    else:
+        opc += 1
+        i += 1
+print(idents, nums, opc, numsum, v7)

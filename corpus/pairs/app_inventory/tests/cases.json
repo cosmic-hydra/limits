@@ -1,0 +1,4 @@
+[{"name": "t01", "stdin": "add apple 5\nadd pear 2\nremove apple 3\nshow apple\nshow kiwi\n"},
+ {"name": "t02", "stdin": "remove fig 1\nadd fig 1\nremove fig 4\nfly away\n"},
+ {"name": "t03", "stdin": ""},
+ {"name": "t04", "stdin": "add a 1\nadd a 2\nadd b 10\nremove b 10\nshow b\nshow a\n"}]

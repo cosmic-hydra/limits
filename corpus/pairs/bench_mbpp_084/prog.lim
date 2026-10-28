@@ -1,0 +1,11 @@
+uses stdin
+
+# Hofstadter-Conway sequence, computed bottom-up.
+fn sequence(n: int) -> int:
+    requires n >= 1
+    var a = [0, 1, 1]
+    for i in 3..n + 1:
+        push(a, a[a[i - 1]] + a[i - a[i - 1]])
+    a[n]
+
+print(sequence(int(env.stdin.read_line())))

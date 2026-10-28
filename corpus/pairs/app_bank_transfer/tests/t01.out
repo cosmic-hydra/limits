@@ -1,0 +1,8 @@
+ok: ann bob 30
+insufficient: bob cy 90
+ok: bob cy 80
+unknown account in: zed ann 1
+ann 70
+bob 0
+cy 80
+conserved: true

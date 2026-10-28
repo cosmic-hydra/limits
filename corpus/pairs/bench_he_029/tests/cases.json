@@ -1,0 +1,22 @@
+[
+ {
+  "name": "t01",
+  "stdin": "0\njohn\n"
+ },
+ {
+  "name": "t02",
+  "stdin": "6\nxxx\nasd\nxxy\njohn doe\nxxxAAA\nxxx\nxxx\n"
+ },
+ {
+  "name": "t03",
+  "stdin": "5\nxdAa\nhxysxon\nd xa h\nynayna\nxh no \nxhn\n"
+ },
+ {
+  "name": "t04",
+  "stdin": "6\nhn jno\nenAnA\nyAdAa\njjj\njsAA \noadxe\nnoxh\n"
+ },
+ {
+  "name": "t05",
+  "stdin": "2\njoxeyo\noox osa\nnoxn\n"
+ }
+]

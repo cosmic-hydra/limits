@@ -1,0 +1,50 @@
+# Parse shapes from stdin ("circle R", "rect W H", "tri A B C") and report areas.
+uses stdin
+
+enum Shape:
+    Circle(r: float)
+    Rect(w: float, h: float)
+    Tri(a: float, b: float, c: float)
+
+fn parse(line: str) -> Option[Shape]:
+    let p = split(line, " ")
+    let n = [parse_float(p[i])? for i in 1..len(p)]
+    match p[0]:
+        "circle": if len(n) == 1: return Some(Circle(n[0]))
+        "rect": if len(n) == 2: return Some(Rect(n[0], n[1]))
+        "tri": if len(n) == 3: return Some(Tri(n[0], n[1], n[2]))
+        _: pass
+    None
+
+fn area(s: Shape) -> float:
+    match s:
+        Circle(r): 3.14159 * r * r
+        Rect(w, h): w * h
+        Tri(a, b, c):
+            let h = (a + b + c) / 2.0
+            sqrt(h * (h - a) * (h - b) * (h - c))
+
+fn kind(s: Shape) -> str:
+    match s:
+        Circle(_): "circle"
+        Rect(_, _): "rect"
+        Tri(_, _, _): "tri"
+
+var total = 0.0
+var largest: Option[Shape] = None
+var line = env.stdin.read_line()
+while line != "":
+    match parse(line):
+        None: print("skip:", line)
+        Some(s):
+            total += area(s)
+            let bigger = match largest:
+                Some(l): area(s) > area(l)
+                None: true
+            if bigger: largest = Some(s)
+            print(kind(s), area(s))
+    line = env.stdin.read_line()
+print("total", total)
+match largest:
+    Some(l): print("largest", kind(l))
+    None: pass

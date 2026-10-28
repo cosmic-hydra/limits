@@ -1,0 +1,9 @@
+[[access Foo in "lala"]]
+[[access Foo in "lele"]] { dg-error "multiple" } 
+
+begin prio // = 8;
+      op (int,int)int // = lala;
+      proc lala = (int a, b) int: a + b;
+      proc void jeje = skip;
+      skip
+end

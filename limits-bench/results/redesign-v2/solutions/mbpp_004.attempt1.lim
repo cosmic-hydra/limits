@@ -1,0 +1,13 @@
+uses stdin
+fn parse_list(line: str) -> [int]:
+    [unwrap(parse_int(w)) for w in split(line, " ") if w != ""]
+fn show(xs: [int]) -> str: join([str(x) for x in xs], " ")
+var l = parse_list(env.stdin.read_line())
+let n = unwrap(parse_int(env.stdin.read_line()))
+sort(l)
+var out: [int] = []
+var i = len(l) - 1
+while i >= 0 and len(out) < n:
+    push(out, l[i])
+    i -= 1
+print(show(out))

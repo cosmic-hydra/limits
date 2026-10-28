@@ -1,0 +1,21 @@
+# Greet the user named by $GREET_NAME (or "stranger"), in the language from $GREET_LANG.
+uses env
+
+fn greeting(lang: str) -> Option[str]:
+    match lang:
+        "en": Some("Hello")
+        "fr": Some("Bonjour")
+        "es": Some("Hola")
+        "de": Some("Hallo")
+        _: None
+
+fn main(env: Env):
+    var name = env.vars.get("GREET_NAME")
+    let lang = env.vars.get("GREET_LANG")
+    if name == "": name = "stranger"
+    let word = match greeting(lang):
+        Some(w): w
+        None:
+            if lang != "": print("unknown language", lang + ", using en")
+            "Hello"
+    print(word + ", " + name + "!")

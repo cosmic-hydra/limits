@@ -1,0 +1,2 @@
+pub fn f(x: int):
+    let y: str = x

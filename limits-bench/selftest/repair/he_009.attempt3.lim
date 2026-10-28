@@ -1,0 +1,3 @@
+uses stdin
+var xs: [int] = []
+print(xs[int(env.stdin.read_line())])

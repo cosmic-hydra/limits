@@ -1,0 +1,13 @@
+uses stdin
+
+fn fib4(n: int) -> int:
+    requires n >= 0
+    var r = [0, 0, 2, 0]
+    if n < 4:
+        return r[n]
+    for i in 4..n + 1:
+        let next = sum(r)
+        r = [r[1], r[2], r[3], next]
+    r[3]
+
+print(fib4(int(env.stdin.read_line())))

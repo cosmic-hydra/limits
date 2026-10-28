@@ -1,0 +1,73 @@
+# Insert stdin integers into a binary search tree (array-backed); print in-order, height, lookups.
+uses stdin
+
+struct Node:
+    key: int
+    left: Option[int]
+    right: Option[int]
+
+fn insert(t: inout [Node], k: int):
+    let fresh = Node { key: k, left: None, right: None }
+    if len(t) == 0:
+        push(t, fresh)
+        return
+    var i = 0
+    while true:
+        if k == t[i].key:
+            return
+        let child = match k < t[i].key:
+            true: t[i].left
+            false: t[i].right
+        match child:
+            Some(c): i = c
+            None:
+                if k < t[i].key:
+                    t[i].left = Some(len(t))
+                else:
+                    t[i].right = Some(len(t))
+                push(t, fresh)
+                return
+
+fn inorder(t: [Node], at: Option[int], out: inout [int]):
+    match at:
+        None: pass
+        Some(i):
+            inorder(t, t[i].left, &out)
+            push(out, t[i].key)
+            inorder(t, t[i].right, &out)
+
+fn height(t: [Node], at: Option[int]) -> int:
+    match at:
+        None: 0
+        Some(i): 1 + max(height(t, t[i].left), height(t, t[i].right))
+
+fn contains(t: [Node], k: int) -> bool:
+    var at: Option[int] = None
+    if len(t) > 0: at = Some(0)
+    while true:
+        let i = match at:
+            Some(i): i
+            None: return false
+        if k == t[i].key: return true
+        if k < t[i].key:
+            at = t[i].left
+        else:
+            at = t[i].right
+    false
+
+var tree: [Node] = []
+for w in split(env.stdin.read_line(), " "):
+    if w != "": insert(&tree, int(w))
+let root: Option[int] = match len(tree):
+    0: None
+    _: Some(0)
+var out: [int] = []
+inorder(tree, root, &out)
+print("sorted:", join([str(x) for x in out], " "))
+print("height:", height(tree, root))
+for w in split(env.stdin.read_line(), " "):
+    if w != "":
+        if contains(tree, int(w)):
+            print(w, "found")
+        else:
+            print(w, "missing")

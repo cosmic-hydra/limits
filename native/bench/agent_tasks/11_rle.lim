@@ -1,0 +1,22 @@
+# Run-length encode a string.
+fn rnd(s: inout [int]) -> int:
+    s[0] = (s[0] * 1103515245 + 12345) % 2147483648
+    s[0] / 65536
+
+let alpha = ["a", "b", "c", "d"]
+var seed = [29]
+var chars: [str] = []
+while len(chars) < 300000:
+    let ch = alpha[rnd(&seed) % 4]
+    for k in 0..1 + rnd(&seed) % 6:
+        push(chars, ch)
+let cs = split(join(chars, ""), "")
+var pieces: [str] = []
+var i = 0
+while i < len(cs):
+    var j = i
+    while j < len(cs) and cs[j] == cs[i]:
+        j += 1
+    push(pieces, str(j - i) + cs[i])
+    i = j
+print(len(join(pieces, "")), len(pieces), join([pieces[k] for k in 0..8], ""))

@@ -1,0 +1,3 @@
+scheme=https host=example.com port=443 path=/a/b?x=1
+scheme=http host=localhost port=8080 path=/
+scheme=ftp host=files.local port=none path=/pub

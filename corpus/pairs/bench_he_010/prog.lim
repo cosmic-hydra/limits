@@ -1,0 +1,24 @@
+uses stdin
+
+fn reversed(cs: [str]) -> [str]:
+    [cs[len(cs) - 1 - i] for i in 0..len(cs)]
+
+fn is_palindrome_from(cs: [str], start: int) -> bool:
+    var i = start
+    var j = len(cs) - 1
+    while i < j:
+        if cs[i] != cs[j]:
+            return false
+        i += 1
+        j -= 1
+    true
+
+fn make_palindrome(s: str) -> str:
+    let cs = split(s, "")
+    var start = 0
+    while not is_palindrome_from(cs, start):
+        start += 1
+    let prefix = [cs[i] for i in 0..start]
+    s + join(reversed(prefix), "")
+
+print(make_palindrome(env.stdin.read_line()))

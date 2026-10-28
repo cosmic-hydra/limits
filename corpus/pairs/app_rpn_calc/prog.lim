@@ -1,0 +1,35 @@
+# Evaluate reverse-Polish integer expressions, one per stdin line.
+uses stdin
+
+fn apply(op: str, a: int, b: int) -> Result[int, str]:
+    match op:
+        "+": Ok(a + b)
+        "-": Ok(a - b)
+        "*": Ok(a * b)
+        _:
+            if b == 0: return Err("divide by zero")
+            Ok(a / b)
+
+fn evaluate(expr: str) -> Result[int, str]:
+    var st: [int] = []
+    for tok in split(expr, " "):
+        if tok == "+" or tok == "-" or tok == "*" or tok == "/":
+            if len(st) < 2:
+                return Err("not enough operands for " + tok)
+            let b = pop(st)
+            let a = pop(st)
+            push(st, apply(tok, a, b)?)
+        else:
+            match parse_int(tok):
+                Some(v): push(st, v)
+                None: return Err("bad token " + tok)
+    if len(st) != 1:
+        return Err(str(len(st)) + " values left")
+    Ok(st[0])
+
+var line = env.stdin.read_line()
+while line != "":
+    match evaluate(line):
+        Ok(v): print(line, "=", v)
+        Err(e): print(line, "=", "error: " + e)
+    line = env.stdin.read_line()

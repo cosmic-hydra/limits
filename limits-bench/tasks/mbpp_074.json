@@ -1,0 +1,48 @@
+{
+ "id": "mbpp_074",
+ "source": "MBPP/74",
+ "description": "Write a program to check whether it follows the sequence given in the patterns array.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `colors`: a list of strings, written as one line with the count n, then n lines, one string per line.\n- `patterns`: a list of strings, written as one line with the count n, then n lines, one string per line.\n\nOutput (stdout): the result, a boolean, written as one line, `true` or `false`.\n\nExample 1\nstdin:\n```\n3\nred\ngreen\ngreen\n3\na\nb\nb\n```\nstdout:\n```\ntrue\n```\n\nExample 2\nstdin:\n```\n3\nred\ngreen\ngreenn\n3\na\nb\nb\n```\nstdout:\n```\nfalse\n```\n\nExample 3\nstdin:\n```\n3\nred\ngreen\ngreenn\n2\na\nb\n```\nstdout:\n```\nfalse\n```",
+ "params": [
+  {
+   "name": "colors",
+   "type": "[str]"
+  },
+  {
+   "name": "patterns",
+   "type": "[str]"
+  }
+ ],
+ "output_type": "bool",
+ "tests": [
+  {
+   "stdin": "3\nred\ngreen\ngreen\n3\na\nb\nb\n",
+   "stdout": "true\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "3\nred\ngreen\ngreenn\n3\na\nb\nb\n",
+   "stdout": "false\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "3\nred\ngreen\ngreenn\n2\na\nb\n",
+   "stdout": "false\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "3\na\nb\na\n3\nx\ny\nx\n",
+   "stdout": "true\n",
+   "origin": "hand"
+  },
+  {
+   "stdin": "2\na\na\n2\nx\ny\n",
+   "stdout": "false\n",
+   "origin": "hand"
+  },
+  {
+   "stdin": "2\na\nb\n2\nx\nx\n",
+   "stdout": "false\n",
+   "origin": "hand"
+  }
+ ]
+}

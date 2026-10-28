@@ -1,0 +1,3 @@
+[{"name": "t01", "stdin": "5km 300m\n2mi 100ft\n"},
+ {"name": "t02", "stdin": "12parsec km 7m\n"},
+ {"name": "t03", "stdin": "0m\n"}]

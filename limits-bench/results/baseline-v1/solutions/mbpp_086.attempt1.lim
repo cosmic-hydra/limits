@@ -1,0 +1,6 @@
+uses stdin;
+fn read_int() -> int { return int(input_line()); }
+fn main() {
+  let n = read_int();
+  print(3 * n * (n - 1) + 1);
+}

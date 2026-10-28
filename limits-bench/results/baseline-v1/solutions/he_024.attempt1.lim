@@ -1,0 +1,10 @@
+uses stdin;
+fn main() {
+  let n = int(input_line());
+  let i = n - 1;
+  while i > 0 {
+    if n % i == 0 { print(i); return; }
+    i = i - 1;
+  }
+  print(0);
+}

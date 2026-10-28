@@ -1,0 +1,37 @@
+# Price payment events from stdin: "card CENTS", "cash CENTS", "refund CENTS", "voucher CODE".
+uses stdin
+
+enum Payment:
+    Card(cents: int)
+    Cash(cents: int)
+    Refund(cents: int)
+    Voucher(code: str)
+
+fn parse(kind: str, arg: str) -> Option[Payment]:
+    match kind:
+        "card": Some(Card(int(arg)))
+        "cash": Some(Cash(int(arg)))
+        "refund": Some(Refund(int(arg)))
+        "voucher": Some(Voucher(arg))
+        _: None
+
+fn net(p: Payment) -> int:
+    match p:
+        Card(c): c - c * 3 / 100
+        Cash(c): c
+        Refund(c): -c
+        Voucher(code):
+            if split(code, "")[0] == "V": return 500
+            0
+
+var balance = 0
+var line = env.stdin.read_line()
+while line != "":
+    let w = split(line, " ")
+    match parse(w[0], w[1]):
+        None: print("unknown:", line)
+        Some(p):
+            balance += net(p)
+            print(w[0], net(p))
+    line = env.stdin.read_line()
+print("balance", balance)

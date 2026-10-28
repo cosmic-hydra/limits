@@ -1,0 +1,39 @@
+{
+ "id": "he_023",
+ "source": "HumanEval/23",
+ "description": "Return length of given string\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `string`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nOutput (stdout): the result, an integer, written as one line holding the integer in decimal (e.g. `-12`).\n\nExample 1\nstdin:\n```\n\n```\nstdout:\n```\n0\n```\n\nExample 2\nstdin:\n```\nx\n```\nstdout:\n```\n1\n```",
+ "params": [
+  {
+   "name": "string",
+   "type": "str"
+  }
+ ],
+ "output_type": "int",
+ "tests": [
+  {
+   "stdin": "\n",
+   "stdout": "0\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "x\n",
+   "stdout": "1\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "asdasnakj\n",
+   "stdout": "9\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "k\n",
+   "stdout": "1\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "njsdasxa\n",
+   "stdout": "8\n",
+   "origin": "generated"
+  }
+ ]
+}

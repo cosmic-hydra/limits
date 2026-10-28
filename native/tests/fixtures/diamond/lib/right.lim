@@ -1,0 +1,3 @@
+import shared
+pub fn bump(c: inout shared.Counter):
+    c.n += 10

@@ -1,0 +1,39 @@
+{
+ "id": "mbpp_072",
+ "source": "MBPP/72",
+ "description": "Write a program to check whether the given number can be represented as the difference of two squares or not.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `n`: an integer, written as one line holding the integer in decimal (e.g. `-12`).\n\nOutput (stdout): the result, a boolean, written as one line, `true` or `false`.\n\nExample 1\nstdin:\n```\n5\n```\nstdout:\n```\ntrue\n```\n\nExample 2\nstdin:\n```\n10\n```\nstdout:\n```\nfalse\n```\n\nExample 3\nstdin:\n```\n15\n```\nstdout:\n```\ntrue\n```",
+ "params": [
+  {
+   "name": "n",
+   "type": "int"
+  }
+ ],
+ "output_type": "bool",
+ "tests": [
+  {
+   "stdin": "5\n",
+   "stdout": "true\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "10\n",
+   "stdout": "false\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "15\n",
+   "stdout": "true\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "14\n",
+   "stdout": "false\n",
+   "origin": "generated"
+  },
+  {
+   "stdin": "13\n",
+   "stdout": "true\n",
+   "origin": "generated"
+  }
+ ]
+}

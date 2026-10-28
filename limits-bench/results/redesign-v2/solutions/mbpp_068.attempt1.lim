@@ -1,0 +1,13 @@
+uses stdin
+fn ints(line: str) -> [int]:
+    var out: [int] = []
+    for w in split(line, " "):
+        if w != "": push(out, unwrap(parse_int(w)))
+    out
+let a = ints(env.stdin.read_line())
+var inc = true
+var dec = true
+for i in 1..len(a):
+    if a[i] < a[i - 1]: inc = false
+    if a[i] > a[i - 1]: dec = false
+print(inc or dec)

@@ -1,0 +1,3 @@
+[{"name": "t01", "stdin": "tick\ntick\ntick\ntick\ntick\ntick\ntick\n"},
+ {"name": "t02", "stdin": "tick\nemergency\ntick\nhonk\nreset\ntick\n"},
+ {"name": "t03", "stdin": "reset\n"}]

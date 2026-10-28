@@ -1,0 +1,48 @@
+{
+ "id": "he_011",
+ "source": "HumanEval/11",
+ "description": "Input are two strings a and b consisting only of 1s and 0s.\nPerform binary XOR on these inputs and return result also as a string.\n\nWrite a complete program. It reads its input from standard input and prints the answer to standard output.\n\nInput (stdin), one value after another:\n- `a`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n- `b`: a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nOutput (stdout): the result, a string, written as one line holding the string exactly (it may be empty or contain spaces; it never contains a newline).\n\nExample 1\nstdin:\n```\n111000\n101010\n```\nstdout:\n```\n010010\n```\n\nExample 2\nstdin:\n```\n1\n1\n```\nstdout:\n```\n0\n```",
+ "params": [
+  {
+   "name": "a",
+   "type": "str"
+  },
+  {
+   "name": "b",
+   "type": "str"
+  }
+ ],
+ "output_type": "str",
+ "tests": [
+  {
+   "stdin": "111000\n101010\n",
+   "stdout": "010010\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "1\n1\n",
+   "stdout": "0\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "0101\n0000\n",
+   "stdout": "0101\n",
+   "origin": "official"
+  },
+  {
+   "stdin": "0\n1\n",
+   "stdout": "1\n",
+   "origin": "hand"
+  },
+  {
+   "stdin": "1111\n1010\n",
+   "stdout": "0101\n",
+   "origin": "hand"
+  },
+  {
+   "stdin": "100\n001\n",
+   "stdout": "101\n",
+   "origin": "hand"
+  }
+ ]
+}

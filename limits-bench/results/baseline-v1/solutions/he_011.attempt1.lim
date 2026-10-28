@@ -1,0 +1,12 @@
+uses stdin;
+fn main() {
+  let a = split(input_line(), "");
+  let b = split(input_line(), "");
+  let out: [str] = [];
+  let n = len(a);
+  if len(b) < n { n = len(b); }
+  for i in 0..n {
+    if a[i] == b[i] { push(out, "0"); } else { push(out, "1"); }
+  }
+  print(join(out, ""));
+}

@@ -1,0 +1,9 @@
+{"name":"app_config","error":"parse error: match used as a call argument (match is only an expression as the whole right side of let/var/=/return)","fix":"bind the match to a let first"}
+{"name":"app_config","error":"check error: user fn named get collides with builtin get","fix":"rename to lookup"}
+{"name":"app_temps","error":"wrong output: mean 0.8703703703703715 vs Python 0.8703703703703702","why":"Python 3.12+ sum() over floats uses compensated (Neumaier) summation; Limits sum() adds left to right","fix":"Python side accumulates with a plain loop"}
+{"name":"app_text_module","error":"check error: cannot apply + to [int] and [int] (list concatenation, as in the Python max(list + [4]))","fix":"running max in a loop"}
+{"name":"app_bst","error":"check error: ? on Option inside a fn returning bool (a half-written contains())","fix":"rewrote contains() as a loop that matches on the Option child index"}
+{"name":"app_dijkstra","error":"check error: cannot infer the type of an empty list inside a comprehension ([[] for i in 0..n]) even with the outer annotation","fix":"bind a typed empty list first: let no_edges: [Edge] = []"}
+{"name":"app_dijkstra","error":"check error: cannot infer the type of None inside a comprehension ([None for i in 0..n])","fix":"bind a typed value first: let unknown: Option[int] = None"}
+{"name":"app_date_diff","error":"parse error: requires placed after let statements (contracts must open the fn body and may only mention parameters)","fix":"assert() on the parsed fields instead"}
+{"name":"app_line_diff","error":"check error: i is already declared in this block (Python reuses the name; Limits forbids redeclaring with var)","fix":"reassign with i = 0"}

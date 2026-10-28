@@ -1,0 +1,12 @@
+uses stdin
+
+fn below_zero(ops: [int]) -> bool:
+    var balance = 0
+    for op in ops:
+        balance += op
+        if balance < 0:
+            return true
+    false
+
+let ops = [int(p) for p in split(env.stdin.read_line(), " ") if p != ""]
+print(below_zero(ops))

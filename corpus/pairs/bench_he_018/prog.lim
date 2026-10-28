@@ -1,0 +1,19 @@
+uses stdin
+
+fn count_overlapping(s: str, sub: str) -> int:
+    let cs = split(s, "")
+    let ss = split(sub, "")
+    var count = 0
+    for i in 0..len(cs) - len(ss) + 1:
+        var ok = true
+        for j in 0..len(ss):
+            if cs[i + j] != ss[j]:
+                ok = false
+                break
+        if ok:
+            count += 1
+    count
+
+let s = env.stdin.read_line()
+let sub = env.stdin.read_line()
+print(count_overlapping(s, sub))

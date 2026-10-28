@@ -1,0 +1,22 @@
+[
+ {
+  "name": "t01",
+  "stdin": "aab_cbbbc\n"
+ },
+ {
+  "name": "t02",
+  "stdin": "aab_Abbbc\n"
+ },
+ {
+  "name": "t03",
+  "stdin": "Aaab_abbbc\n"
+ },
+ {
+  "name": "t04",
+  "stdin": "c_bcaa__cb\n"
+ },
+ {
+  "name": "t05",
+  "stdin": "cAAbababbA\n"
+ }
+]

@@ -1,0 +1,258 @@
+// Copyright (C) 2020-2026 Free Software Foundation, Inc.
+
+// This file is part of GCC.
+
+// GCC is free software; you can redistribute it and/or modify it under
+// the terms of the GNU General Public License as published by the Free
+// Software Foundation; either version 3, or (at your option) any later
+// version.
+
+// GCC is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+// for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with GCC; see the file COPYING3.  If not see
+// <http://www.gnu.org/licenses/>.
+
+#include "rust-ast-validation.h"
+#include "rust-common.h"
+#include "rust-diagnostics.h"
+#include "rust-item.h"
+#include "rust-keyword-values.h"
+
+namespace Rust {
+
+void
+ASTValidation::visit (AST::Lifetime &lifetime)
+{
+  auto name = lifetime.get_lifetime_name ();
+  auto valid = std::set<std::string>{"static", "_"};
+  auto &keywords = Values::Keywords::keywords;
+
+  if (valid.find (name) == valid.end ()
+      && keywords.find (name) != keywords.end ())
+    rust_error_at (lifetime.get_locus (), "lifetimes cannot use keyword names");
+
+  AST::ContextualASTVisitor::visit (lifetime);
+}
+
+void
+ASTValidation::visit (AST::LoopLabel &label)
+{
+  auto name = label.get_lifetime ().get_lifetime_name ();
+  auto lifetime_name = '\'' + name;
+  auto &keywords = Values::Keywords::keywords;
+  if (keywords.find (name) != keywords.end ())
+    rust_error_at (label.get_lifetime ().get_locus (), "invalid label name %qs",
+		   lifetime_name.c_str ());
+
+  // WARNING: Do not call ContextualASTVisitor, we don't want to visit the
+  // lifetime
+  // Maybe we should refactor LoopLabel instead ?
+}
+
+void
+ASTValidation::visit (AST::ConstantItem &const_item)
+{
+  if (!const_item.has_expr () && ctx.peek () != Kind::TRAIT)
+    {
+      rust_error_at (const_item.get_locus (),
+		     "associated constant in %<impl%> without body");
+    }
+  AST::ContextualASTVisitor::visit (const_item);
+}
+
+void
+ASTValidation::visit (AST::Union &item)
+{
+  if (item.get_variants ().empty ())
+    rust_error_at (item.get_locus (), "unions cannot have zero fields");
+
+  AST::ContextualASTVisitor::visit (item);
+}
+
+void
+ASTValidation::visit (AST::Function &function)
+{
+  const auto &qualifiers = function.get_qualifiers ();
+  if (qualifiers.is_default () && ctx.peek () != Kind::INHERENT_IMPL
+      && ctx.peek () != Kind::TRAIT_IMPL)
+    rust_error_at (
+      function.get_locus (),
+      "%<default%> is only allowed on items within %<impl%> blocks");
+  if (qualifiers.is_async () && qualifiers.is_const ())
+    rust_error_at (function.get_locus (),
+		   "functions cannot be both %<const%> and %<async%>");
+
+  if (qualifiers.is_const ()
+      && (ctx.peek () == Kind::TRAIT_IMPL || ctx.peek () == Kind::TRAIT))
+    rust_error_at (function.get_locus (), ErrorCode::E0379,
+		   "functions in traits cannot be declared %<const%>");
+
+  // may change soon
+  if (qualifiers.is_async ()
+      && (ctx.peek () == Kind::TRAIT_IMPL || ctx.peek () == Kind::TRAIT))
+    rust_error_at (function.get_locus (), ErrorCode::E0706,
+		   "functions in traits cannot be declared %<async%>");
+
+  // if not an associated function but has a self parameter
+  if (ctx.peek () != Kind::TRAIT && ctx.peek () != Kind::TRAIT_IMPL
+      && ctx.peek () != Kind::INHERENT_IMPL && function.has_self_param ())
+    rust_error_at (
+      function.get_self_param ().get_locus (),
+      "%<self%> parameter is only allowed in associated functions");
+
+  // functions without bodies can only have very specific
+  // kinds of patterns in their parameters
+  auto is_param_complex_with_loc
+    = [] (AST::Param &param) -> tl::optional<location_t> {
+    tl::optional<location_t> ret;
+
+    if (param.is_self () || param.is_variadic ())
+      return ret;
+
+    auto &fn_param = static_cast<AST::FunctionParam &> (param);
+    if (!fn_param.has_name ())
+      return ret;
+
+    auto &pat = fn_param.get_pattern ();
+    ret = pat.get_locus ();
+    auto kind = pat.get_pattern_kind ();
+    if (kind == AST::Pattern::Kind::Identifier)
+      {
+	auto &ident_pat = static_cast<AST::IdentifierPattern &> (pat);
+	if (!ident_pat.get_is_ref () && !ident_pat.get_is_mut ()
+	    && !ident_pat.has_subpattern ())
+	  ret = tl::nullopt;
+      }
+    else if (kind == AST::Pattern::Kind::Wildcard)
+      ret = tl::nullopt;
+
+    return ret;
+  };
+
+  if (function.is_external ())
+    {
+      if (function.has_body ())
+	rust_error_at (function.get_locus (), "cannot have a body");
+
+      auto &params = function.get_function_params ();
+
+      if (params.size () == 1 && function.is_variadic ())
+	rust_error_at (function.get_locus (),
+		       "C-variadic function must be declared with at least one "
+		       "named argument");
+
+      for (auto it = params.begin (); it != params.end (); it++)
+	{
+	  if (it->get ()->is_variadic () && it + 1 != params.end ())
+	    rust_error_at (
+	      it->get ()->get_locus (),
+	      "%<...%> must be the last argument of a C-variadic function");
+
+	  if (auto pat_loc = is_param_complex_with_loc (**it))
+	    rust_error_at (*pat_loc, ErrorCode::E0130,
+			   "pattern not allowed in foreign function");
+	}
+    }
+  else
+    {
+      if (!function.has_body ())
+	{
+	  if (ctx.peek () == Kind::INHERENT_IMPL
+	      || ctx.peek () == Kind::TRAIT_IMPL)
+	    rust_error_at (function.get_locus (),
+			   "associated function in %<impl%> without body");
+	  else if (ctx.peek () != Kind::TRAIT)
+	    rust_error_at (function.get_locus (),
+			   "free function without a body");
+	}
+      auto &function_params = function.get_function_params ();
+      for (auto it = function_params.begin (); it != function_params.end ();
+	   it++)
+	{
+	  if (it->get ()->is_variadic ())
+	    rust_error_at (
+	      it->get ()->get_locus (),
+	      "only foreign or %<unsafe extern \"C\"%> functions may "
+	      "be C-variadic");
+
+	  if (!function.has_body ())
+	    if (auto pat_loc = is_param_complex_with_loc (**it))
+	      rust_error_at (*pat_loc, ErrorCode::E0642,
+			     "pattern not allowed in function without body");
+	}
+    }
+
+  AST::ContextualASTVisitor::visit (function);
+}
+
+void
+ASTValidation::visit (AST::Trait &trait)
+{
+  if (trait.is_auto ())
+    {
+      if (trait.has_generics ())
+	rust_error_at (trait.get_generic_params ()[0]->get_locus (),
+		       ErrorCode::E0567,
+		       "auto traits cannot have generic parameters");
+      if (trait.has_type_param_bounds ())
+	rust_error_at (trait.get_type_param_bounds ()[0]->get_locus (),
+		       ErrorCode::E0568,
+		       "auto traits cannot have super traits");
+      if (trait.has_trait_items ())
+	{
+	  rust_error_at (trait.get_identifier ().get_locus (), ErrorCode::E0380,
+			 "auto traits cannot have methods or associated items");
+	  for (const auto &item : trait.get_trait_items ())
+	    Error::Hint (item->get_locus (), "remove this item").emit ();
+	}
+    }
+
+  AST::ContextualASTVisitor::visit (trait);
+}
+
+void
+ASTValidation::visit (AST::Module &module)
+{
+  if (module.get_unsafety () == Unsafety::Unsafe)
+    rust_error_at (module.get_locus (), "module cannot be declared unsafe");
+
+  AST::ContextualASTVisitor::visit (module);
+}
+
+void
+ASTValidation::visit (AST::SlicePattern &pattern)
+{
+  // TODO: store/use first rest pattern location?
+  //       for nicer errors
+  bool had_rest = false;
+
+  auto note_rest = [&] (location_t locus) {
+    if (had_rest)
+      rust_error_at (locus, "%<..%> can only be used once per slice pattern");
+    had_rest = true;
+  };
+
+  for (auto &pat : pattern.get_patterns ())
+    {
+      if (pat->get_pattern_kind () == AST::Pattern::Kind::Rest)
+	{
+	  note_rest (pat->get_locus ());
+	}
+      else if (pat->get_pattern_kind () == AST::Pattern::Kind::Identifier)
+	{
+	  auto &ident_pat = static_cast<AST::IdentifierPattern &> (*pat);
+	  if (ident_pat.has_subpattern ())
+	    {
+	      auto &ident_sub_pat = ident_pat.get_subpattern ();
+	      if (ident_sub_pat.get_pattern_kind () == AST::Pattern::Kind::Rest)
+		note_rest (ident_sub_pat.get_locus ());
+	    }
+	}
+    }
+}
+
+} // namespace Rust
