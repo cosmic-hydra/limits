@@ -1,0 +1,13 @@
+uses stdin
+
+fn is_sublist(l: [int], s: [int]) -> bool:
+    if len(s) == 0:
+        return true
+    for i in 0..len(l) - len(s) + 1:
+        if all([l[i + j] == s[j] for j in 0..len(s)]):
+            return true
+    false
+
+let l = [int(p) for p in split(env.stdin.read_line(), " ") if p != ""]
+let s = [int(p) for p in split(env.stdin.read_line(), " ") if p != ""]
+print(is_sublist(l, s))

@@ -1,0 +1,32 @@
+# Bucket the integers on stdin (0..99) into tens and draw a bar chart scaled to width 20.
+uses stdin
+
+fn pad2(n: int) -> str:
+    if n < 10: return " " + str(n)
+    str(n)
+
+fn repeat(s: str, n: int) -> str:
+    join([s for i in 0..n], "")
+
+var xs: [int] = []
+var line = env.stdin.read_line()
+while line != "":
+    for w in split(line, " "):
+        if w != "": push(xs, int(w))
+    line = env.stdin.read_line()
+var buckets = [0 for i in 0..10]
+var bad = 0
+for x in xs:
+    if x >= 0 and x <= 99:
+        buckets[x / 10] += 1
+    else:
+        bad += 1
+let top = max(buckets)
+for i in 0..10:
+    let label = pad2(i * 10) + "-" + pad2(i * 10 + 9) + " |"
+    let c = buckets[i]
+    if c == 0:
+        print(label)
+    else:
+        print(label, repeat("#", c * 20 / top), c)
+print("out of range:", bad)

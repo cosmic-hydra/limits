@@ -1,0 +1,49 @@
+# Group the words on stdin into anagram classes; print classes with 2+ members, largest first.
+uses stdin
+
+struct Group:
+    key: str
+    words: [str]
+
+fn to_lower(c: str) -> str:
+    let lower = split("abcdefghijklmnopqrstuvwxyz", "")
+    let upper = split("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "")
+    match find(upper, c):
+        Some(i): lower[i]
+        None: c
+
+fn key_of(w: str) -> str:
+    var cs = [to_lower(c) for c in split(w, "")]
+    sort(cs)
+    join(cs, "")
+
+# true when a should be listed before b: bigger group first, then by key
+fn before(a: Group, b: Group) -> bool:
+    if len(a.words) != len(b.words): return len(a.words) > len(b.words)
+    a.key < b.key
+
+fn main(env: Env):
+    var groups: [Group] = []
+    var line = env.stdin.read_line()
+    while line != "":
+        for w in split(line, " "):
+            if w == "": continue
+            let k = key_of(w)
+            match find([g.key for g in groups], k):
+                Some(i):
+                    if is_none(find(groups[i].words, w)): push(groups[i].words, w)
+                None: push(groups, Group { key: k, words: [w] })
+        line = env.stdin.read_line()
+    var big = [g for g in groups if len(g.words) > 1]
+    for i in 1..len(big):
+        var j = i
+        while j > 0 and before(big[j], big[j - 1]):
+            let t = big[j]
+            big[j] = big[j - 1]
+            big[j - 1] = t
+            j -= 1
+    for g in big:
+        var ws = g.words
+        sort(ws)
+        print(g.key + ":", join(ws, " "))
+    print(len(big), "groups,", len(groups), "keys")

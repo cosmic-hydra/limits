@@ -1,0 +1,5 @@
+uses stdin
+
+let s = env.stdin.read_line()
+let dirty = split(env.stdin.read_line(), "")
+print(join([c for c in split(s, "") if is_none(find(dirty, c))], ""))

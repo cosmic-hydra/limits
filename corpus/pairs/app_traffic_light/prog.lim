@@ -1,0 +1,55 @@
+# Drive a traffic-light state machine with events from stdin (tick / emergency / reset).
+uses stdin
+
+enum Light:
+    Red
+    Green
+    Yellow
+
+fn duration(l: Light) -> int:
+    match l:
+        Red: 3
+        Green: 2
+        Yellow: 1
+
+fn next(l: Light) -> Light:
+    match l:
+        Red: Green
+        Green: Yellow
+        Yellow: Red
+
+fn name(l: Light) -> str:
+    match l:
+        Red: "red"
+        Green: "green"
+        Yellow: "yellow"
+
+var state = Red
+var left = 3
+var flashing = false
+var t = 0
+var ev = env.stdin.read_line()
+while ev != "":
+    var shown = true
+    match ev:
+        "emergency": flashing = true
+        "reset":
+            state = Red
+            left = duration(Red)
+            flashing = false
+        "tick":
+            if not flashing:
+                left -= 1
+                if left == 0:
+                    state = next(state)
+                    left = duration(state)
+        _:
+            print(t, "ignored", ev)
+            shown = false
+    if shown:
+        if flashing:
+            print(t, "flashing")
+        else:
+            print(t, name(state) + "(" + str(left) + ")")
+    t += 1
+    ev = env.stdin.read_line()

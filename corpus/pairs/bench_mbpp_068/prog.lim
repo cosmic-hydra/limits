@@ -1,0 +1,7 @@
+uses stdin
+
+let xs = [int(p) for p in split(env.stdin.read_line(), " ") if p != ""]
+let steps = 0..len(xs) - 1
+let up = all([xs[i] <= xs[i + 1] for i in steps])
+let down = all([xs[i] >= xs[i + 1] for i in steps])
+print(up or down)

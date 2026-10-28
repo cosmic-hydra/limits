@@ -1,0 +1,11 @@
+uses stdin
+
+fn rotations(s: str) -> int:
+    let cs = split(s, "")
+    let n = len(cs)
+    for k in 1..n + 1:
+        if all([cs[(i + k) % n] == cs[i] for i in 0..n]):
+            return k
+    n
+
+print(rotations(env.stdin.read_line()))

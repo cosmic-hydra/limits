@@ -1,0 +1,4 @@
+uses stdin
+
+let xs = [int(p) for p in split(env.stdin.read_line(), " ") if p != ""]
+print(join([str(x) for x in xs if x > 0], " "))

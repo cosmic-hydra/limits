@@ -1,0 +1,4 @@
+[{"name": "t01", "stdin": "push 6\npush 7\nmul\nprint\npush -5\nswap\nsub\nprint\n"},
+ {"name": "t02", "stdin": "push 7\npush -2\ndiv\nprint\npush 0\ndiv\nprint\n"},
+ {"name": "t03", "stdin": "push 1\nadd\n"},
+ {"name": "t04", "stdin": "push 2\ndup\nmul\ndup\nprint\njump 3\n"}]

@@ -1,10 +1,12 @@
 //! Multi-file programs under tests/fixtures/ and examples/modules/.
 
+mod common;
+
 use std::process::Command;
 
 fn run(dir: &str, cmd: &str) -> (i32, String, String) {
     let root = env!("CARGO_MANIFEST_DIR");
-    let o = Command::new(env!("CARGO_BIN_EXE_limits"))
+    let o = common::limits()
         .arg(cmd)
         .arg(format!("{}/{}/main.lim", root, dir))
         .args(if cmd == "run" {
@@ -120,7 +122,7 @@ fn module_cannot_have_top_level_statements() {
     std::fs::create_dir_all(&dir).unwrap();
     std::fs::write(dir.join("main.lim"), "import m\nm.f()\n").unwrap();
     std::fs::write(dir.join("m.lim"), "pub fn f(): pass\nprint(1)\n").unwrap();
-    let o = Command::new(env!("CARGO_BIN_EXE_limits"))
+    let o = common::limits()
         .arg("check")
         .arg(dir.join("main.lim"))
         .output()

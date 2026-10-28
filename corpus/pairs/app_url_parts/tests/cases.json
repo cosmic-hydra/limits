@@ -1,0 +1,3 @@
+[{"name": "t01", "stdin": "https://example.com/a/b?x=1\nhttp://localhost:8080\nftp://files.local/pub\n"},
+ {"name": "t02", "stdin": "example.com/no/scheme\nhttp://:80/x\nhttp://h:abc/\n"},
+ {"name": "t03", "stdin": "https://api.test:443/v1/items\nhttp://a/b://c\n"}]

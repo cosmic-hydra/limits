@@ -1,0 +1,3 @@
+[{"name": "t01", "stdin": "alice,alice@example.com,30\nbo,bo@x,7\ncarol,carol@mail.org,abc\n"},
+ {"name": "t02", "stdin": "x,y\nverylongusername1,a@b.c,200\n"},
+ {"name": "t03", "stdin": "dan,dan@d.io,13\neve,e@@e.io,131\n"}]

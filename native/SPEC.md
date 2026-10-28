@@ -69,16 +69,35 @@ limits build file.lim [-o out] [--unchecked] [--max-steps N] [--max-depth N]
                     [--allow fs.read=DIR | fs.write=DIR | env=NAME]...
 limits run   file.lim [same flags] [-- args]  # build to a temp dir, run, forward exit code
 limits check file.lim [--json]          # lex + parse + type check only
+limits check --stdin [--partial] [--expect] [--json] [--time]   # see Checking unfinished programs
 limits test  file.lim [same flags]      # run the inline tests (see Tests)
+limits fix   file.lim [--json]          # apply machine-applicable fixes in place (see Fixes)
 ```
 
 - `--json` prints every diagnostic (lex, parse, check and, because the flag
   is compiled into the program, runtime) to stderr as one JSON object per
-  line: `{"kind","code","file","line","col","msg","hint"}`. `kind` is
-  `lex|parse|check|runtime`, `file` is the path of the file the error is in
-  (the root as given on the command line), `hint` is `""` when there is none.
-  Output is always valid UTF-8 (invalid bytes from program strings become
-  `\ufffd`); a source file that is not UTF-8 is lex error E0005. See *Diagnostic codes*.
+  line. Compile-time diagnostics have the fields
+  `{"kind","code","file","line","col","end_line","end_col","msg","hint","source_line","expected","found","alternatives","fixes"}`:
+  `kind` is `lex|parse|check`, `file` is the path of the file the error is in
+  (the root as given on the command line, `<stdin>` with `--stdin`), `hint`
+  is `""` when there is none. `end_line`/`end_col` end the span (exclusive;
+  columns count code points from 1; the span is the token at `line:col`).
+  `source_line` is that source line. `expected`/`found` are the expected and
+  actual type, argument count or token kind for a mismatch (`"int"`/`"str"`,
+  `"1 argument(s)"`/`"2 argument(s)"`, `"')'"`/`"end of line"`), else
+  `null`. `alternatives` lists valid names that could stand there (closest
+  first, at most 10: variables in scope, functions, fields, variants,
+  capabilities, missing match arms), else `[]`. `fixes` is a list of
+  `{"msg","edits":[{"line","col","end_line","end_col","text"}],"applicability"}`
+  (see *Fixes*). Runtime errors have
+  `{"kind":"runtime","code","file","line","col","msg","hint","data"}` where
+  `data` holds observed values when there are any: `{"index","len"}` (out of
+  bounds), `{"limit"}` (step limit), `{"depth","limit"}` (call depth),
+  `{"used","limit"}` (memory, bytes), `{"a","b"}` (integer overflow
+  operands), `{"dividend"}` (division by zero), `{"len"}` (pop from empty
+  list), `{"path"}` (file errors and denied paths); else `{}`. Output is
+  always valid UTF-8 (invalid bytes from program strings become `\ufffd`); a
+  source file that is not UTF-8 is lex error E0005. See *Diagnostic codes*.
 
 - C compiler. `limits build` compiles with `cc -O2` (`$CC` overrides `cc`).
   `limits run`, `limits test` and `--debug` use TinyCC when it is available:
@@ -549,6 +568,27 @@ Runtime enforcement (the `--allow` grants are compiled into the binary):
 - `fs.read`, `fs.write` and `stdin.read_line` charge one step per 64 bytes.
   Bytes read are heap and count against `--max-mem`; bytes written also count
   against `--max-mem` (never refunded), which bounds the disk a program can fill.
+- OS backstop: `limits run` and `limits test` execute the program under
+  `limits-sandbox` (`../sandbox`; found next to `limits`, then
+  `$LIMITS_SANDBOX`, then `PATH`, then `sandbox/target/release` above the
+  `limits` executable). The kernel (Landlock, seccomp, rlimits) then enforces
+  the same grants: `--read` for each fs.read directory (also for `uses
+  fs.write`), `--write` for each fs.write directory (the current directory
+  when there is no `--allow`), nothing for a program without `uses fs.*`; no
+  network or new processes ever; `--mem-mb` and `--fsize-mb` = `--max-mem` +
+  512 MB headroom; `--cpu-sec` = `--timeout SEC` (default 60) and
+  `--wall-sec` one second more, as a backstop: limits itself kills a run
+  that exceeds `--timeout` (also with `--no-sandbox`) and reports `program
+  timed out (wall limit N s)`, exit 137 (a JSON runtime diagnostic with
+  `--json`). Each test of `limits test` gets min(10 s, `--timeout`). The
+  launcher sets `PR_SET_PDEATHSIG`, so killing it also kills the program. Environment: only the sandbox's harmless defaults (`PATH`, `LANG`,
+  `LC_*`, `TERM`, `TZ`) plus, for `uses env`, each `--pass-env NAME` and
+  `--allow env=NAME` (a name only, with the caller's value: `NAME=VALUE`
+  and empty names are usage errors). Program arguments are passed only with `uses args`,
+  stdin only with `uses stdin` (otherwise it is `/dev/null`). If the sandbox
+  is missing, `run`/`test` stop with an error; `--no-sandbox` runs without
+  it (with a warning). `limits build` output is not sandboxed: run it with
+  `limits-sandbox` yourself.
 - Not defended against: another process swapping a directory for a symlink
   between the check and the `open` (the program itself cannot create
   symlinks); paths longer than `PATH_MAX`. Strings containing a NUL byte are
@@ -712,6 +752,107 @@ writes nothing for that call. The literal `-9223372036854775808` is allowed.
 Type names may not be `int`, `float`, `bool`, `str`, `Option`, `Result`, `Env`, `Fs`, `Vars`, `Clock`, `Args` or `Stdin`, and a struct may not
 contain itself except through a list.
 
+## Fixes
+
+Diagnostics carry deterministic fixes where the repair is unambiguous
+(`applicability: "machine"`) or plausible (`"maybe"`):
+
+| Diagnostic | Fix | Applicability |
+|---|---|---|
+| unknown name with a did-you-mean hint (variable, function, type, field, variant, method) | rename to the suggestion | machine |
+| assignment to an undeclared variable (E0202) whose suggestion is not a `var` | rename to the suggestion (it would also need `let` -> `var`, i.e. change a different variable) | maybe |
+| non-exhaustive match (E0317) | insert the missing arms (`Rect(w, h): pass`) before the first arm | machine for a match statement, maybe for a match value |
+| capability method without `uses` (E0219) | append `, cap` to the file's `uses` line, or insert `uses cap` as line 1 | machine |
+| argument to an `inout` parameter without `&` (E0225) | insert `&` before the place | machine |
+| `&` for a parameter that is not `inout` (E0225) | delete the `&` | maybe |
+| assignment to or change of a `let` binding (E0222) | `let` -> `var` at its declaration | machine |
+
+`limits fix file.lim` applies every machine-applicable fix of the root
+file in place (fixes whose edits overlap an earlier one wait), re-checks and
+repeats until no machine fix remains (at most 20 rounds). It prints one
+`fixed file:line:col: msg` line per applied fix to stdout, then the remaining
+diagnostics (stderr; JSON with `--json`) and `N fix(es) applied, M error(s)
+remain`. Exit code 0 when no error remains, else 1. Errors in imported
+modules are reported but not fixed.
+
+## Checking unfinished programs
+
+`limits check --stdin` reads the root file's text from stdin (imports
+resolve from the current directory) and writes everything to **stdout**.
+It exits 1 if a diagnostic was printed, else 0.
+
+`--partial` treats the input as an unfinished program prefix, as produced
+during generation. It does not report errors caused only by the input ending
+early: an unfinished last line (no final newline, or open brackets or an
+open string at the end), blocks with no body yet (`if x:`, `fn f() -> int:`),
+a missing return, missing match arms or a missing arm value in a block still
+open at the end, a missing `main`, and names of functions, types and
+capitalised variants that may still be declared later (items may come in any
+order). Every other error in the complete part is reported as usual (one
+syntax error at most, then all check errors). Implementation: the prefix is
+completed with closing quotes and brackets and a neutral body (`pass`, `_:
+pass`) for an open block header; if the last logical line still does not
+parse it is dropped (and so on, at most 4 lines).
+
+`--expect` (implies `--partial`, needs `--json`) prints, after the
+diagnostics, one object describing what may come next at the end of the
+input (the *cursor*):
+
+```
+{"kind":"expect","line":3,"col":16,"prefix":"","context":"expression",
+ "tokens":["ident","int","float","str","true","false","not","match","(","[","-","newline"],
+ "expected":"int",
+ "names":[{"name":"a","type":"int","kind":"var"},
+          {"name":"f","type":"fn(int, str) -> int","kind":"fn"},
+          {"name":"len","type":"fn([T] | str) -> int","kind":"builtin"}, ...]}
+```
+
+- `line`/`col`: the cursor; when the input ends in a partly typed name, the
+  start of that name, which is `prefix` (and `names` start with it).
+- `tokens`: the syntactically valid next token classes: `ident`, `int`,
+  `float`, `str`, each keyword and each symbol by its spelling, and
+  `newline` (never inside brackets). Each class is tested by parsing the
+  current top-level item with a sample token appended: it is valid when the
+  parser accepts it (fails only after it, or not at all).
+- `indents`: at the start of a line, the indentations (spaces) at which a
+  statement may start.
+- `context`: `statement` (line start), `expression`, `member` (after `.`),
+  `field` (a field name in a struct literal, `P { ` or `P { a: 1, `; `names`
+  are the fields not given yet), `string`, `comment`, or `syntax` (no name can come here, e.g. after a
+  complete expression or where a new name is declared).
+- `expected`: the type the context requires (argument and annotation types,
+  return type, `bool` for conditions, the left operand's type for an
+  operator, field types), or `null` when it is free (e.g. `let x = `).
+- `names`: what fits: variables in scope, functions and builtins whose result
+  has the expected type, variants of an expected enum/Option/Result (`true`,
+  `false` for `bool`); after `.`: the fields of a struct (filtered by
+  `expected`), the methods of a capability, the fields of `Env`, or the
+  variants of an enum (`Color.`). With no expected type, all of them (and
+  struct names), at most 200. Nothing fits after an operator that does not
+  apply to its left operand's type (`xs + ` for a list; `expected` is then
+  `null`). Types are shown in source syntax.
+
+The expected type and names come from the real checker: the cursor is
+replaced by a placeholder name, the program is completed as for
+`--partial`, and the checker records the context and scope where it meets
+the placeholder.
+
+Latency (measured with `bench/partial_prefixes.py`, release build, on this
+machine: every prefix of every program in `examples/`, 3810 prefixes, plus
+every 3rd prefix of `bench/*.lim` and `bench/agent_tasks/*.lim`, 5735
+prefixes): no prefix of these valid programs reported an error. In-process
+time for `--partial --expect` (check + expect, from `--time`): examples p50
+0.44 ms, p95 1.29 ms, max 5.1 ms; bench files p50 0.65 ms, p95 2.3 ms,
+max 11 ms (an earlier run of the same measurement gave 0.38/1.09/4.7 and
+0.58/2.0/8.4 ms). Wall time per call including process start: p50 3.5 ms,
+p95 5.2 ms (examples). Cost grows with file size (the whole program is
+checked twice): an 18,000-line prefix takes about 150 ms. One huge item
+costs the same: a single `fn main()` of 12,000 lines ending in `let z = v1 + `
+measured check 26 ms + expect 27 ms (18,000 lines: 61 + 103 ms). The token
+probes parse a skeleton of the current item (open block headers, the
+current line, an `if`/`elif` chain before `elif`/`else`) once it has 64
+lines or more, so their cost does not grow with the item.
+
 ## Diagnostic codes
 
 Codes are stable. A message is assigned the first matching row (by kind and
@@ -759,6 +900,7 @@ message text) of the table in `src/diag.rs`, which is also compiled into
 | E0225 | check | `inout` / `&` misuse: inout argument without `&`, `&` for a parameter that is not inout or outside a call argument, one variable passed to two inout parameters |
 | E0226 | check | capability stored in a struct field, enum variant, list or Option/Result |
 | E0227 | check | no such method (methods exist only on capabilities) |
+| E0228 | check | call of a variable (`x(2)` where `x` is a local, not a function) |
 | E0300 | check | other type error |
 | E0301 | check | type mismatch (`X must be T, got U`) |
 | E0302 | check | operator not applicable to these types |
@@ -873,5 +1015,12 @@ variables are reported for a hand fix.
   `Ok(..)` with no expected type (e.g. the first element of a list literal)
   needs an annotation.
 - Methods exist only on capabilities; there are no user-defined methods.
+- `--partial` hides errors on the unfinished last line (even real ones) and
+  reports forward references to functions/types only once the input is
+  complete. `--expect` reports no tokens while a syntax error is pending in
+  the current top-level item, and no names or expected type while any
+  syntax error is pending; it gives no expected type for most builtin arguments
+  (generic builtins), and lists names by type compatibility only (no ranking).
+  Fixes cover the error kinds listed in *Fixes*; parse errors have none.
 - No closures or function values, no maps, no float exponent literals.
   There is no string indexing; `split(s, "")` gives the code points as a list.

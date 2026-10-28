@@ -1,0 +1,3 @@
+row 1: expected 3 fields, got 2
+row 2: username length 17; age out of range 200
+0 valid

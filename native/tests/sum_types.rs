@@ -1,6 +1,7 @@
 //! Enums, Option/Result, match and `?`: end-to-end and error tests.
 
-use std::process::Command;
+mod common;
+
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 static N: AtomicUsize = AtomicUsize::new(0);
@@ -14,7 +15,7 @@ fn limits(cmd: &str, src: &str, flags: &[&str]) -> (String, String, i32) {
     ));
     std::fs::create_dir_all(&dir).unwrap();
     std::fs::write(dir.join("t.lim"), src).unwrap();
-    let o = Command::new(env!("CARGO_BIN_EXE_limits"))
+    let o = common::limits()
         .arg(cmd)
         .arg(dir.join("t.lim"))
         // Every program run by the tests must free all its memory.

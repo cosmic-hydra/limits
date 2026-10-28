@@ -2,9 +2,33 @@
 //! at the first, and annotates `Expr::ty` for codegen.
 
 use crate::ast::*;
+use crate::diag::{ranked, Edit, Fix};
 use crate::module::Module;
 use crate::Error;
+use std::cell::RefCell;
 use std::collections::{HashMap, HashSet};
+
+/// Name of the placeholder identifier `limits check --expect` puts at the
+/// cursor; the checker records what is expected there instead of failing.
+pub const HOLE: &str = "__limits_hole__";
+
+/// What the checker saw at the hole: the expected type (if the context gives
+/// one), the receiver type after `.`, and every name in scope.
+#[derive(Debug, Clone, Default)]
+pub struct Hole {
+    pub expected: Option<Ty>,
+    pub recv: Option<Ty>,
+    /// `X.` where X is an enum name (variant completion).
+    pub enum_recv: Option<String>,
+    pub vars: Vec<(String, Ty)>,
+    pub funcs: Vec<(String, Vec<Ty>, Ty)>,
+    pub enums: Vec<(String, Variants)>,
+    pub structs: Vec<(String, Vec<(String, Ty)>)>,
+    pub seen: bool,
+    /// No value fits: the hole is the right operand of an operator that
+    /// does not apply to the left operand's type (`xs + ` for a list).
+    pub none_fits: bool,
+}
 
 pub const BUILTINS: &[&str] = &[
     "print",
@@ -69,7 +93,7 @@ pub fn cap_method(cap: Cap, name: &str) -> Option<(&'static [&'static str], Vec<
 }
 
 /// Method names of a capability type, for messages.
-fn cap_methods(cap: Cap) -> &'static [&'static str] {
+pub fn cap_methods(cap: Cap) -> &'static [&'static str] {
     match cap {
         Cap::Env => &[],
         Cap::Fs => &["read", "write", "sub"],
@@ -221,6 +245,16 @@ pub struct Checker {
     ret: Ty,
     loops: usize,
     errs: Vec<Error>,
+    /// Alternatives and fixes for the next reported error (taken by err_h).
+    alts: RefCell<Vec<String>>,
+    fix: Vec<Fix>,
+    /// Position of the `let` declaring (name, scope depth), for let -> var.
+    let_decl: HashMap<(String, usize), (u32, u32)>,
+    /// Per module: where to append to the `uses` line (end of its last
+    /// name), if it has one.
+    uses_end: Vec<Option<(u32, u32)>>,
+    /// Recording for `--expect`, when the program contains a hole.
+    pub hole: Option<Hole>,
 }
 
 fn qualify(module: &str, item: &str) -> String {
@@ -235,6 +269,17 @@ fn qualify(module: &str, item: &str) -> String {
 /// every call, struct literal and type that refers to them) are qualified.
 /// `need_main` is false in `limits test` mode, where no entry point is used.
 pub fn check(mods: &mut [Module], need_main: bool) -> Result<(Program, Types), Vec<Error>> {
+    check_with(mods, need_main, None).0
+}
+
+pub type Checked = Result<(Program, Types), Vec<Error>>;
+
+/// `check`, optionally recording what the checker sees at a hole.
+pub fn check_with(
+    mods: &mut [Module],
+    need_main: bool,
+    hole: Option<Hole>,
+) -> (Checked, Option<Hole>) {
     let mut c = Checker {
         structs: HashMap::new(),
         enums: HashMap::new(),
@@ -256,6 +301,20 @@ pub fn check(mods: &mut [Module], need_main: bool) -> Result<(Program, Types), V
         ret: Ty::Unit,
         loops: 0,
         errs: Vec::new(),
+        alts: RefCell::new(Vec::new()),
+        fix: Vec::new(),
+        let_decl: HashMap::new(),
+        uses_end: mods
+            .iter()
+            .map(|m| {
+                m.prog
+                    .uses
+                    .iter()
+                    .max_by_key(|u| (u.1, u.2))
+                    .map(|(n, l, c)| (*l, c + n.chars().count() as u32))
+            })
+            .collect(),
+        hole,
     };
     // Script mode: the root file's top-level statements are the body of an
     // implicit `fn main()`; modules may not have any.
@@ -309,6 +368,7 @@ pub fn check(mods: &mut [Module], need_main: bool) -> Result<(Program, Types), V
         for (u, l, col) in &m.prog.uses {
             if !CAPS.contains(&u.as_str()) {
                 let h = format!("capabilities are: {}", CAPS.join(", "));
+                *c.alts.borrow_mut() = ranked(u, CAPS.iter().copied());
                 c.err_h(*l, *col, format!("unknown capability '{}'", u), h);
             } else if i > 0 && !c.caps[0].contains(u) {
                 let m = format!(
@@ -536,10 +596,11 @@ pub fn check(mods: &mut [Module], need_main: bool) -> Result<(Program, Types), V
             }
         }
     }
+    let hole = c.hole.take();
     if !c.errs.is_empty() {
         c.errs
             .sort_by(|a, b| (&a.file, a.line, a.col).cmp(&(&b.file, b.line, b.col)));
-        return Err(c.errs);
+        return (Err(c.errs), hole);
     }
     let mut out = Program {
         files: mods.iter().map(|m| m.file.clone()).collect(),
@@ -561,13 +622,16 @@ pub fn check(mods: &mut [Module], need_main: bool) -> Result<(Program, Types), V
             out.enums.push(en);
         }
     }
-    Ok((
-        out,
-        Types {
-            structs: c.structs,
-            enums: c.enums,
-        },
-    ))
+    (
+        Ok((
+            out,
+            Types {
+                structs: c.structs,
+                enums: c.enums,
+            },
+        )),
+        hole,
+    )
 }
 
 /// Does every path through the block end in `return`?
@@ -590,7 +654,7 @@ fn covers_all(t: &Ty, seen: &[bool], seen_lit: &[String]) -> bool {
     !seen.is_empty() && seen.iter().all(|s| *s)
 }
 
-fn compat(a: &Ty, b: &Ty) -> bool {
+pub fn compat(a: &Ty, b: &Ty) -> bool {
     match (a, b) {
         (Ty::Err, _) | (_, Ty::Err) => true,
         (Ty::List(x), Ty::List(y)) | (Ty::Option(x), Ty::Option(y)) => compat(x, y),
@@ -600,6 +664,108 @@ fn compat(a: &Ty, b: &Ty) -> bool {
 }
 
 impl Checker {
+    /// Queue the let -> var fix for `n` (declared with `let` in a live scope).
+    fn let_fix(&mut self, n: &str) {
+        let Some(d) = (1..=self.scopes.len())
+            .rev()
+            .find(|d| self.scopes[d - 1].contains_key(n))
+        else {
+            return;
+        };
+        if let Some(&(l, c)) = self.let_decl.get(&(n.to_string(), d)) {
+            self.fix.push(Fix {
+                msg: format!("declare '{}' with 'var'", n),
+                edits: vec![Edit::replace(l, c, 3, "var".into())],
+                machine: true,
+            });
+        }
+    }
+
+    /// Queue a fix adding skeleton arms (`pats`, each with body `pass`) before
+    /// the first arm. Machine-applicable for match statements only: a match
+    /// value needs real arm values.
+    fn arms_fix(&mut self, arms: &[Arm], pats: &[String], stmt: bool) {
+        let Some(a) = arms.first() else { return };
+        let ind = " ".repeat(a.col.saturating_sub(1) as usize);
+        let text: String = pats
+            .iter()
+            .map(|p| format!("{}{}: pass\n", ind, p))
+            .collect();
+        self.fix.push(Fix {
+            msg: format!("add the missing arm(s): {}", pats.join(", ")),
+            edits: vec![Edit::insert(a.line, 1, text)],
+            machine: stmt,
+        });
+    }
+
+    /// Record the scope and expected type at the `--expect` hole.
+    fn record_hole(&mut self, hint: Option<&Ty>, recv: Option<Ty>, en: Option<String>) {
+        // Scope by scope (outermost first, names sorted), each name once:
+        // in the innermost scope that declares it. Linear in the names.
+        let mut deepest: HashMap<&str, usize> = HashMap::new();
+        for (d, sc) in self.scopes.iter().enumerate() {
+            for n in sc.keys() {
+                deepest.insert(n, d);
+            }
+        }
+        let mut vars: Vec<(String, Ty)> = Vec::new();
+        for (d, sc) in self.scopes.iter().enumerate() {
+            let mut names: Vec<(&String, &(Ty, Bind))> = sc
+                .iter()
+                .filter(|(n, _)| deepest.get(n.as_str()) == Some(&d))
+                .collect();
+            names.sort_by(|a, b| a.0.cmp(b.0));
+            vars.extend(names.into_iter().map(|(n, (t, _))| (n.clone(), t.clone())));
+        }
+        let pre = qualify(&self.names[self.cur], "");
+        let short = |q: &str| -> Option<String> {
+            if let Some(k) = q.strip_prefix(pre.as_str()).filter(|k| !k.contains('.')) {
+                return Some(k.to_string());
+            }
+            // An imported module's public item: `alias.item`.
+            let (m, item) = q.rsplit_once('.')?;
+            let (alias, _) = self.aliases[self.cur]
+                .iter()
+                .find(|(_, &i)| self.names[i] == m)?;
+            Some(format!("{}.{}", alias, item))
+        };
+        let mut funcs: Vec<(String, Vec<Ty>, Ty)> = self
+            .funcs
+            .iter()
+            .filter(|(q, _)| !q.starts_with(|c: char| c.is_ascii_digit()) && q.as_str() != "main")
+            .filter(|(q, _)| q.starts_with(pre.as_str()) || self.pub_fns.contains(*q))
+            .filter_map(|(q, (ps, r))| Some((short(q)?, ps.clone(), r.clone())))
+            .collect();
+        funcs.sort_by(|a, b| a.0.cmp(&b.0));
+        let mut enums: Vec<(String, Variants)> = self
+            .enums
+            .iter()
+            .filter_map(|(q, v)| Some((short(q)?, v.clone())))
+            .collect();
+        enums.sort_by(|a, b| a.0.cmp(&b.0));
+        let mut structs: Vec<(String, Vec<(String, Ty)>)> = self
+            .structs
+            .iter()
+            .filter_map(|(q, v)| Some((short(q)?, v.clone())))
+            .collect();
+        structs.sort_by(|a, b| a.0.cmp(&b.0));
+        let enum_recv = en.and_then(|a| {
+            let q = qualify(&self.names[self.cur], &a);
+            self.enums.contains_key(&q).then_some(a)
+        });
+        self.hole = Some(Hole {
+            expected: hint.cloned().filter(|t| *t != Ty::Err),
+            recv: recv.filter(|t| *t != Ty::Err),
+            enum_recv,
+            vars,
+            funcs,
+            enums,
+            structs,
+            seen: true,
+            none_fits: false,
+        });
+    }
+
     fn err(&mut self, l: u32, c: u32, m: String) {
         self.err_h(l, c, m, String::new());
     }
@@ -615,6 +781,8 @@ impl Checker {
         let mut e = Error::new("check", l, c, m);
         e.file = self.files[self.cur].clone();
         e.hint = hint;
+        e.more.alts = self.alts.take();
+        e.more.fixes = std::mem::take(&mut self.fix);
         self.errs.push(e);
     }
 
@@ -631,7 +799,9 @@ impl Checker {
             .filter_map(|k| k.strip_prefix(pre.as_str()))
             .filter(|k| !k.contains('.'));
         let extra = if fns && m == self.cur { BUILTINS } else { &[] };
-        crate::diag::suggest(n, local.chain(extra.iter().copied()))
+        let all: Vec<&str> = local.chain(extra.iter().copied()).collect();
+        *self.alts.borrow_mut() = ranked(n, all.iter().copied());
+        crate::diag::suggest(n, all.into_iter())
     }
 
     /// Resolve a function (`fns`) or struct name as written in the current
@@ -647,6 +817,12 @@ impl Checker {
             };
             if known {
                 return Some(q);
+            }
+            if let Some(t) = self.lookup(n).filter(|_| fns).cloned() {
+                let m = format!("'{}' is a variable of type {}, not a function", n, t);
+                let h = "only functions can be called; use the variable without '(...)', or rename it if a function was meant".into();
+                self.err_h(l, c, m, h);
+                return None;
             }
             let m = if fns {
                 format!("undefined function '{}'", n)
@@ -801,7 +977,9 @@ impl Checker {
             .scopes
             .iter()
             .flat_map(|s| s.keys().map(String::as_str));
-        crate::diag::suggest(n, names)
+        let all: Vec<&str> = names.filter(|x| *x != HOLE).collect();
+        *self.alts.borrow_mut() = ranked(n, all.iter().copied());
+        crate::diag::suggest(n, all.into_iter())
     }
 
     fn lookup(&self, n: &str) -> Option<&Ty> {
@@ -819,14 +997,7 @@ impl Checker {
         if ta == Ty::Err || tb == Ty::Err {
             return if arith { Ty::Err } else { Ty::Bool };
         }
-        let ok = match op {
-            "and" | "or" => ta == Ty::Bool && tb == Ty::Bool,
-            "+" => ta == tb && matches!(ta, Ty::Int | Ty::Float | Ty::Str),
-            "-" | "*" | "/" | "%" => ta == tb && matches!(ta, Ty::Int | Ty::Float),
-            "==" | "!=" => ta == tb && matches!(ta, Ty::Int | Ty::Float | Ty::Str | Ty::Bool),
-            _ => ta == tb && matches!(ta, Ty::Int | Ty::Float | Ty::Str),
-        };
-        if !ok {
+        if !binop_ok(op, &ta, &tb) {
             let sum = |t: &Ty| matches!(t, Ty::Option(_) | Ty::Result(..) | Ty::Enum(_));
             if sum(&ta) || sum(&tb) {
                 let m = format!("cannot apply '{}' to {} and {}", what, ta, tb);
@@ -917,11 +1088,8 @@ impl Checker {
     fn want(&mut self, e: &mut Expr, t: &Ty, what: &str) {
         let got = self.expr(e, Some(t));
         if !compat(&got, t) {
-            self.err(
-                e.line,
-                e.col,
-                format!("{} must be {}, got {}", what, t, got),
-            );
+            let (l, c) = expr_start(e);
+            self.err(l, c, format!("{} must be {}, got {}", what, t, got));
         }
     }
 
@@ -930,6 +1098,10 @@ impl Checker {
         match s {
             Stmt::Pass => {}
             Stmt::Let(name, ann, e, l, c, mutable) => {
+                if !*mutable {
+                    let d = self.scopes.len();
+                    self.let_decl.insert((name.clone(), d), (*l, *c));
+                }
                 let t = match ann {
                     Some(a) => {
                         let t = self.resolve(a);
@@ -966,6 +1138,31 @@ impl Checker {
                                 h if h.is_empty() => format!("declare it first: var {} = ...", n),
                                 h => h,
                             };
+                            // Renaming to a name declared with `let` would only
+                            // lead to a second fix (let -> var) that silently
+                            // makes this assign a different variable: offer the
+                            // rename for review, never as a machine fix.
+                            let good = h
+                                .split("did you mean '")
+                                .nth(1)
+                                .and_then(|r| r.split('\'').next())
+                                .map(str::to_string);
+                            if let Some(g) = good {
+                                let mutable =
+                                    matches!(self.binding(&g), Some((_, Bind::Var | Bind::Inout)));
+                                if !mutable {
+                                    self.fix.push(Fix {
+                                        msg: format!("rename '{}' to '{}'", n, g),
+                                        edits: vec![Edit::replace(
+                                            target.line,
+                                            target.col,
+                                            n.chars().count() as u32,
+                                            g,
+                                        )],
+                                        machine: false,
+                                    });
+                                }
+                            }
                             let m = format!("assignment to undeclared variable '{}'", n);
                             self.err_h(target.line, target.col, m, h);
                             self.expr(v, None);
@@ -986,7 +1183,11 @@ impl Checker {
                                     format!("copy it first: var {0}2 = {0}", n),
                                 ),
                                 _ => (
-                                    format!("cannot assign to '{}': it is declared with 'let'", n),
+                                    {
+                                        let n = n.clone();
+                                        self.let_fix(&n);
+                                        format!("cannot assign to '{}': it is declared with 'let'", n)
+                                    },
                                     format!(
                                         "declare it with 'var {} = ...' to allow reassignment",
                                         n
@@ -1071,6 +1272,21 @@ impl Checker {
     }
 
     fn expr(&mut self, e: &mut Expr, hint: Option<&Ty>) -> Ty {
+        if self.hole.as_ref().is_some_and(|h| !h.seen) {
+            let rec = match &mut e.kind {
+                ExprKind::Var(n) if n == HOLE => Some((None, None)),
+                ExprKind::Field(x, f) if f == HOLE => match &x.kind {
+                    ExprKind::Var(a) if self.lookup(a).is_none() => Some((None, Some(a.clone()))),
+                    _ => Some((Some(self.expr(x, None)), None)),
+                },
+                _ => None,
+            };
+            if let Some((recv, en)) = rec {
+                self.record_hole(hint, recv, en);
+                e.ty = Ty::Err;
+                return Ty::Err;
+            }
+        }
         if let ExprKind::Call(n, args) = &mut e.kind {
             // `x.m(...)` where `x` is a local: a method call on its value.
             if let Some((v, m)) = n.split_once('.') {
@@ -1153,6 +1369,7 @@ impl Checker {
                 "Env has fields, not methods: env.fs, env.vars, env.clock, env.args, env.stdin"
                     .to_string()
             } else {
+                *self.alts.borrow_mut() = ranked(m, cap_methods(cap).iter().copied());
                 match crate::diag::suggest(m, cap_methods(cap).iter().copied()) {
                     h if h.is_empty() => format!(
                         "{} methods are: {}",
@@ -1172,6 +1389,16 @@ impl Checker {
         if !need.iter().any(|n| self.caps[self.cur].contains(*n)) {
             let msg = format!("'{}' needs capability '{}'", name, need.join("' or '"));
             let h = format!("add 'uses {}' at the top of this file", need[0]);
+            let edit = match self.uses_end[self.cur] {
+                Some((ul, uc)) => Edit::insert(ul, uc, format!(", {}", need[0])),
+                None => Edit::insert(1, 1, format!("uses {}\n", need[0])),
+            };
+            self.fix.push(Fix {
+                msg: format!("add 'uses {}'", need[0]),
+                edits: vec![edit],
+                machine: true,
+            });
+            *self.alts.borrow_mut() = need.iter().map(|x| x.to_string()).collect();
             self.err_h(l, c, msg, h);
         }
         if args.len() != ps.len() {
@@ -1224,6 +1451,7 @@ impl Checker {
                 return VarRef::Yes(eq, i);
             }
             let h = crate::diag::suggest(v, vs.iter().map(|x| x.0.as_str()));
+            *self.alts.borrow_mut() = ranked(v, vs.iter().map(|x| x.0.as_str()));
             self.err_h(l, c, format!("enum '{}' has no variant '{}'", a, v), h);
             return VarRef::Bad;
         }
@@ -1387,6 +1615,7 @@ impl Checker {
                             None => {
                                 let names: Vec<&str> = vs.iter().map(|v| v.0.as_str()).collect();
                                 let m = format!("{} has no variant '{}'", t, short);
+                                *self.alts.borrow_mut() = ranked(&short, names.iter().copied());
                                 let h = match crate::diag::suggest(&short, names.iter().copied()) {
                                     h if h.is_empty() => {
                                         format!("its variants are: {}", names.join(", "))
@@ -1517,6 +1746,9 @@ impl Checker {
                         names.join(", ")
                     );
                     let h = format!("add {} (or a final '_: ...' arm)", pats.join(", "));
+                    let skel: Vec<String> = missing.iter().map(|v| pat_hint(&v.0, &v.1)).collect();
+                    *self.alts.borrow_mut() = skel.clone();
+                    self.arms_fix(arms, &skel, value.is_none());
                     self.err_h(l, c, m, h);
                 }
             } else if t == Ty::Bool {
@@ -1524,6 +1756,8 @@ impl Checker {
                     if !seen_lit.iter().any(|k| k == b) {
                         let m = format!("match on bool is not exhaustive: missing {}", b);
                         let h = format!("add '{}: ...' (or a final '_: ...' arm)", b);
+                        *self.alts.borrow_mut() = vec![b.to_string()];
+                        self.arms_fix(arms, &[b.to_string()], value.is_none());
                         self.err_h(l, c, m, h);
                     }
                 }
@@ -1533,6 +1767,7 @@ impl Checker {
                     "literal patterns cannot cover every {}; add '_: ...' as the last arm",
                     t
                 );
+                self.arms_fix(arms, &["_".to_string()], value.is_none());
                 self.err_h(l, c, m, h);
             }
         }
@@ -1692,7 +1927,10 @@ impl Checker {
                         Some((_, t)) => self.want(v, t, &format!("field '{}'", f)),
                         None => {
                             let m = format!("struct '{}' has no field '{}'", name, f);
-                            self.err(v.line, v.col, m);
+                            let names = decl.iter().map(|(n, _)| n.as_str());
+                            *self.alts.borrow_mut() = ranked(f, names.clone());
+                            let h = crate::diag::suggest(f, names);
+                            self.err_h(v.line, v.col, m, h);
                             self.expr(v, None);
                         }
                     }
@@ -1729,6 +1967,11 @@ impl Checker {
                 let ta = self.expr(a, None);
                 let tb = self.expr(b, Some(&ta));
                 let op = *op;
+                if matches!(&b.kind, ExprKind::Var(n) if n == HOLE) && !binop_ok(op, &ta, &ta) {
+                    if let Some(h) = self.hole.as_mut() {
+                        h.none_fits = true;
+                    }
+                }
                 self.binop(op, op, ta, tb, l, c)
             }
             ExprKind::Range(a, b) => {
@@ -1767,6 +2010,7 @@ impl Checker {
                     Ty::List(t) => *t,
                     Ty::Err => Ty::Err,
                     t => {
+                        let (l, c) = expr_start(x);
                         self.err(l, c, format!("cannot index {}", t));
                         Ty::Err
                     }
@@ -1780,6 +2024,7 @@ impl Checker {
                         None => {
                             let m = format!("struct '{}' has no field '{}'", s, f);
                             let names = self.structs[s].iter().map(|(n, _)| n.as_str());
+                            *self.alts.borrow_mut() = ranked(f, names.clone());
                             let h = crate::diag::suggest(f, names);
                             self.err_h(l, c, m, h);
                             Ty::Err
@@ -1791,6 +2036,7 @@ impl Checker {
                         None => {
                             let m = format!("Env has no field '{}'", f);
                             let fs = ["fs", "vars", "clock", "args", "stdin"];
+                            *self.alts.borrow_mut() = ranked(f, fs.iter().copied());
                             let h = match crate::diag::suggest(f, fs.iter().copied()) {
                                 h if h.is_empty() => {
                                     "fields are: fs, vars, clock, args, stdin".into()
@@ -1816,6 +2062,7 @@ impl Checker {
                     }
                     t => {
                         let m = format!("{} has no fields", t);
+                        let (l, c) = expr_start(x);
                         self.err(l, c, m);
                         Ty::Err
                     }
@@ -1855,7 +2102,7 @@ impl Checker {
 
     fn call(&mut self, name: &str, args: &mut [Expr], l: u32, c: u32) -> Ty {
         let nargs = args.len();
-        let pos: Vec<(u32, u32)> = args.iter().map(|a| (a.line, a.col)).collect();
+        let pos: Vec<(u32, u32)> = args.iter().map(expr_start).collect();
         let arity = |n: std::ops::RangeInclusive<usize>, me: &mut Self| {
             if !n.contains(&nargs) {
                 let want = if n.start() == n.end() {
@@ -2216,6 +2463,11 @@ impl Checker {
                         "remove the '&' (arguments are passed read-only), or declare the parameter '{}: inout {}'",
                         pname, t
                     );
+                    self.fix.push(Fix {
+                        msg: "remove the '&'".into(),
+                        edits: vec![Edit::replace(al, ac, 1, String::new())],
+                        machine: false,
+                    });
                     self.err_h(al, ac, m, h);
                 }
                 (Some(t), _) => {
@@ -2230,6 +2482,12 @@ impl Checker {
                             src
                         );
                         let h = if place_text(a).is_some() {
+                            let (rl, rc) = place_start(a);
+                            self.fix.push(Fix {
+                                msg: format!("pass '&{}'", src),
+                                edits: vec![Edit::insert(rl, rc, "&".into())],
+                                machine: true,
+                            });
                             format!("write '&{}' to let '{}' change it", src, name)
                         } else {
                             "store the value in a variable first ('var x = ...') and pass '&x'"
@@ -2257,7 +2515,8 @@ impl Checker {
         let ExprKind::Var(n) = &x.kind else {
             let m = "can only change a variable, or a field or element of one".into();
             let h = "store the value in a variable first: var xs = ...".into();
-            self.err_h(e.line, e.col, m, h);
+            let (l, c) = expr_start(e);
+            self.err_h(l, c, m, h);
             return;
         };
         let Some((t, b)) = self.binding(n).cloned() else {
@@ -2278,11 +2537,51 @@ impl Checker {
                     .into(),
             ),
             Bind::Let => (
-                format!("cannot change '{}': it is declared with 'let'", n),
+                {
+                    let n = n.clone();
+                    self.let_fix(&n);
+                    format!("cannot change '{}': it is declared with 'let'", n)
+                },
                 format!("declare it with 'var {} = ...' to allow changes", n),
             ),
         };
-        self.err_h(e.line, e.col, m, h);
+        let (l, c) = place_start(e);
+        self.err_h(l, c, m, h);
+    }
+}
+
+/// Do the operand types suit the operator? (`Err` operands always do.)
+fn binop_ok(op: &str, ta: &Ty, tb: &Ty) -> bool {
+    if *ta == Ty::Err || *tb == Ty::Err {
+        return true;
+    }
+    match op {
+        "and" | "or" => *ta == Ty::Bool && *tb == Ty::Bool,
+        "+" => ta == tb && matches!(ta, Ty::Int | Ty::Float | Ty::Str),
+        "-" | "*" | "/" | "%" => ta == tb && matches!(ta, Ty::Int | Ty::Float),
+        "==" | "!=" => ta == tb && matches!(ta, Ty::Int | Ty::Float | Ty::Str | Ty::Bool),
+        _ => ta == tb && matches!(ta, Ty::Int | Ty::Float | Ty::Str),
+    }
+}
+
+/// Position of the first token of an expression. Binary, index and field
+/// nodes are located at their operator (runtime errors name it); diagnostics
+/// about the whole value point at its start instead.
+fn expr_start(e: &Expr) -> (u32, u32) {
+    match &e.kind {
+        ExprKind::Binary(_, b, _)
+        | ExprKind::Field(b, _)
+        | ExprKind::Index(b, _)
+        | ExprKind::Try(b) => expr_start(b),
+        _ => (e.line, e.col),
+    }
+}
+
+/// Position of the root variable of a place expression (its first token).
+fn place_start(e: &Expr) -> (u32, u32) {
+    match &e.kind {
+        ExprKind::Field(b, _) | ExprKind::Index(b, _) => place_start(b),
+        _ => (e.line, e.col),
     }
 }
 

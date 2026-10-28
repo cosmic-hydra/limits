@@ -1,19 +1,16 @@
-uses stdin;
+uses stdin
 
-fn gcd(a: int, b: int) -> int {
-    while b != 0 {
-        let t = a % b;
-        a = b;
-        b = t;
-    }
-    if a < 0 {
-        return -a;
-    }
-    return a;
-}
+fn gcd(a: int, b: int) -> int:
+    var a = a
+    var b = b
+    while b != 0:
+        let t = a % b
+        a = b
+        b = t
+    if a < 0:
+        return -a
+    a
 
-fn main() {
-    let a = int(input_line());
-    let b = int(input_line());
-    print(gcd(a, b));
-}
+let a = int(env.stdin.read_line())
+let b = int(env.stdin.read_line())
+print(gcd(a, b))

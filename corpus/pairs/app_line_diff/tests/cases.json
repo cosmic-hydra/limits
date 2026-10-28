@@ -1,0 +1,3 @@
+[{"name": "t01", "args": ["old.txt", "new.txt"], "files": {"old.txt": "a\nb\nc\nd\n", "new.txt": "a\nc\nd\ne\n"}},
+ {"name": "t02", "args": ["x", "y"], "files": {"x": "", "y": "only new\n"}},
+ {"name": "t03", "args": ["p", "q"], "files": {"p": "same\nsame\n", "q": "same\nsame\n"}}]

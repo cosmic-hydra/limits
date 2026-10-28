@@ -1,0 +1,15 @@
+uses stdin
+
+let lower = split("abcdefghijklmnopqrstuvwxyz", "")
+let upper = split("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "")
+
+fn flip(c: str, lower: [str], upper: [str]) -> str:
+    match find(lower, c):
+        Some(i): return upper[i]
+        None: pass
+    match find(upper, c):
+        Some(i): lower[i]
+        None: c
+
+let s = env.stdin.read_line()
+print(join([flip(c, lower, upper) for c in split(s, "")], ""))

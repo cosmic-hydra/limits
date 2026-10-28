@@ -1,0 +1,121 @@
+{"name": "agent_01_csv_aggregate", "source": "native/bench/agent_tasks/01_csv_aggregate.py", "features": ["struct", "inout"], "tokens_py": 255, "tokens_lim": 363, "cases": 1, "status": "pass"}
+{"name": "agent_02_word_freq", "source": "native/bench/agent_tasks/02_word_freq.py", "features": ["inout"], "tokens_py": 184, "tokens_lim": 297, "cases": 1, "status": "pass"}
+{"name": "agent_03_dedupe_sort", "source": "native/bench/agent_tasks/03_dedupe_sort.py", "features": ["comprehension", "inout"], "tokens_py": 100, "tokens_lim": 158, "cases": 1, "status": "pass"}
+{"name": "agent_04_matmul", "source": "native/bench/agent_tasks/04_matmul.py", "features": ["comprehension", "inout"], "tokens_py": 146, "tokens_lim": 206, "cases": 1, "status": "pass"}
+{"name": "agent_05_json_format", "source": "native/bench/agent_tasks/05_json_format.py", "features": ["struct", "comprehension", "inout"], "tokens_py": 200, "tokens_lim": 306, "cases": 1, "status": "pass"}
+{"name": "agent_06_binary_search", "source": "native/bench/agent_tasks/06_binary_search.py", "features": ["inout", "while"], "tokens_py": 167, "tokens_lim": 267, "cases": 1, "status": "pass"}
+{"name": "agent_07_bfs_grid", "source": "native/bench/agent_tasks/07_bfs_grid.py", "features": ["comprehension", "inout", "while"], "tokens_py": 265, "tokens_lim": 320, "cases": 1, "status": "pass"}
+{"name": "agent_08_lru_cache", "source": "native/bench/agent_tasks/08_lru_cache.py", "features": ["match", "option", "inout"], "tokens_py": 158, "tokens_lim": 226, "cases": 1, "status": "pass"}
+{"name": "agent_09_tokenizer", "source": "native/bench/agent_tasks/09_tokenizer.py", "features": ["inout", "while"], "tokens_py": 292, "tokens_lim": 512, "cases": 1, "status": "pass"}
+{"name": "agent_10_top_k", "source": "native/bench/agent_tasks/10_top_k.py", "features": ["inout"], "tokens_py": 86, "tokens_lim": 128, "cases": 1, "status": "pass"}
+{"name": "agent_11_rle", "source": "native/bench/agent_tasks/11_rle.py", "features": ["inout", "while"], "tokens_py": 144, "tokens_lim": 235, "cases": 1, "status": "pass"}
+{"name": "agent_12_prime_sieve", "source": "native/bench/agent_tasks/12_prime_sieve.py", "features": ["comprehension", "while"], "tokens_py": 94, "tokens_lim": 118, "cases": 1, "status": "pass"}
+{"name": "agent_13_levenshtein", "source": "native/bench/agent_tasks/13_levenshtein.py", "features": ["inout"], "tokens_py": 211, "tokens_lim": 321, "cases": 1, "status": "pass"}
+{"name": "agent_14_interval_merge", "source": "native/bench/agent_tasks/14_interval_merge.py", "features": ["inout"], "tokens_py": 161, "tokens_lim": 264, "cases": 1, "status": "pass"}
+{"name": "agent_15_histogram", "source": "native/bench/agent_tasks/15_histogram.py", "features": ["comprehension", "inout"], "tokens_py": 144, "tokens_lim": 196, "cases": 1, "status": "pass"}
+{"name": "agent_16_collatz_max", "source": "native/bench/agent_tasks/16_collatz_max.py", "features": ["while"], "tokens_py": 98, "tokens_lim": 111, "cases": 1, "status": "pass"}
+{"name": "agent_17_fizzbuzz", "source": "native/bench/agent_tasks/17_fizzbuzz.py", "features": [], "tokens_py": 98, "tokens_lim": 130, "cases": 1, "status": "pass"}
+{"name": "agent_18_bank_ledger", "source": "native/bench/agent_tasks/18_bank_ledger.py", "features": ["struct", "comprehension", "inout"], "tokens_py": 219, "tokens_lim": 249, "cases": 1, "status": "pass"}
+{"name": "agent_19_moving_average", "source": "native/bench/agent_tasks/19_moving_average.py", "features": ["comprehension", "inout"], "tokens_py": 135, "tokens_lim": 184, "cases": 1, "status": "pass"}
+{"name": "agent_20_expr_eval", "source": "native/bench/agent_tasks/20_expr_eval.py", "features": ["inout", "while"], "tokens_py": 386, "tokens_lim": 562, "cases": 1, "status": "pass"}
+{"name": "app_anagrams", "source": "authored", "features": ["struct", "match", "option", "comprehension", "fn_main", "cap_stdin", "while"], "tokens_py": 181, "tokens_lim": 430, "cases": 3, "status": "pass"}
+{"name": "app_bank_transfer", "source": "authored", "features": ["match", "option", "inout", "contract", "inline_test", "fn_main", "cap_stdin", "while"], "tokens_py": 262, "tokens_lim": 401, "cases": 3, "status": "pass"}
+{"name": "app_brackets", "source": "authored", "features": ["struct", "match", "option", "inline_test", "cap_stdin", "while"], "tokens_py": 165, "tokens_lim": 306, "cases": 3, "status": "pass"}
+{"name": "app_bst", "source": "authored", "features": ["struct", "match", "option", "comprehension", "inout", "cap_stdin", "while"], "tokens_py": 292, "tokens_lim": 560, "cases": 3, "status": "pass"}
+{"name": "app_caesar", "source": "authored", "features": ["match", "option", "comprehension", "inline_test", "fn_main", "cap_stdin", "cap_args", "while"], "tokens_py": 144, "tokens_lim": 276, "cases": 4, "status": "pass"}
+{"name": "app_config", "source": "authored", "features": ["struct", "match", "option", "result", "fn_main", "cap_args", "cap_fs_read"], "tokens_py": 265, "tokens_lim": 395, "cases": 3, "status": "pass"}
+{"name": "app_csv_join", "source": "authored", "features": ["struct", "match", "option", "comprehension", "fn_main", "cap_args", "cap_fs_read"], "tokens_py": 226, "tokens_lim": 437, "cases": 3, "status": "pass"}
+{"name": "app_data_dir", "source": "authored", "features": ["comprehension", "fn_main", "cap_fs_read", "cap_fs_sub"], "tokens_py": 112, "tokens_lim": 135, "cases": 3, "status": "pass"}
+{"name": "app_date_diff", "source": "authored", "features": ["comprehension", "contract", "inline_test", "cap_stdin", "while"], "tokens_py": 294, "tokens_lim": 453, "cases": 3, "status": "pass"}
+{"name": "app_dijkstra", "source": "authored", "features": ["struct", "match", "option", "comprehension", "fn_main", "cap_stdin", "while"], "tokens_py": 336, "tokens_lim": 491, "cases": 3, "status": "pass"}
+{"name": "app_env_greeting", "source": "authored", "features": ["match", "option", "fn_main", "cap_env_vars"], "tokens_py": 129, "tokens_lim": 170, "cases": 3, "status": "pass"}
+{"name": "app_grades", "source": "authored", "features": ["struct", "comprehension", "fn_main", "cap_stdin", "while"], "tokens_py": 236, "tokens_lim": 469, "cases": 3, "status": "pass"}
+{"name": "app_histogram", "source": "authored", "features": ["comprehension", "cap_stdin", "while"], "tokens_py": 214, "tokens_lim": 276, "cases": 3, "status": "pass"}
+{"name": "app_inventory", "source": "authored", "features": ["struct", "enum", "match", "option", "result", "comprehension", "inout", "cap_stdin", "while"], "tokens_py": 336, "tokens_lim": 504, "cases": 4, "status": "pass"}
+{"name": "app_kv_parse", "source": "authored", "features": ["struct", "match", "option", "result", "try_op", "comprehension", "cap_stdin", "while"], "tokens_py": 223, "tokens_lim": 294, "cases": 3, "status": "pass"}
+{"name": "app_life", "source": "authored", "features": ["comprehension", "cap_stdin", "while"], "tokens_py": 248, "tokens_lim": 340, "cases": 3, "status": "pass"}
+{"name": "app_line_diff", "source": "authored", "features": ["comprehension", "fn_main", "cap_args", "cap_fs_read", "while"], "tokens_py": 332, "tokens_lim": 439, "cases": 3, "status": "pass"}
+{"name": "app_log_levels", "source": "authored", "features": ["enum", "match", "option", "fn_main", "cap_args", "cap_fs_read"], "tokens_py": 219, "tokens_lim": 325, "cases": 3, "status": "pass"}
+{"name": "app_matrix_rotate", "source": "authored", "features": ["comprehension", "inout", "cap_stdin"], "tokens_py": 192, "tokens_lim": 270, "cases": 4, "status": "pass"}
+{"name": "app_merge_sorted", "source": "authored", "features": ["comprehension", "fn_main", "cap_args", "cap_fs_read", "while"], "tokens_py": 212, "tokens_lim": 303, "cases": 3, "status": "pass"}
+{"name": "app_payments", "source": "authored", "features": ["enum", "match", "option", "cap_stdin", "while"], "tokens_py": 179, "tokens_lim": 265, "cases": 3, "status": "pass"}
+{"name": "app_prime_factors", "source": "authored", "features": ["struct", "comprehension", "contract", "inline_test", "cap_stdin", "while"], "tokens_py": 228, "tokens_lim": 356, "cases": 3, "status": "pass"}
+{"name": "app_queue_sim", "source": "authored", "features": ["struct", "fn_main", "cap_stdin", "while"], "tokens_py": 167, "tokens_lim": 270, "cases": 3, "status": "pass"}
+{"name": "app_rle_decode", "source": "authored", "features": ["match", "result", "inline_test", "cap_stdin", "while"], "tokens_py": 166, "tokens_lim": 223, "cases": 3, "status": "pass"}
+{"name": "app_roman", "source": "authored", "features": ["match", "option", "result", "try_op", "comprehension", "inline_test", "cap_stdin", "while"], "tokens_py": 419, "tokens_lim": 548, "cases": 3, "status": "pass"}
+{"name": "app_rpn_calc", "source": "authored", "features": ["match", "option", "result", "try_op", "cap_stdin", "while"], "tokens_py": 234, "tokens_lim": 293, "cases": 3, "status": "pass"}
+{"name": "app_sales_report", "source": "authored", "features": ["struct", "comprehension", "fn_main", "cap_fs_read", "cap_fs_write"], "tokens_py": 243, "tokens_lim": 396, "cases": 3, "status": "pass"}
+{"name": "app_shapes", "source": "authored", "features": ["enum", "match", "option", "try_op", "cap_stdin", "while", "float"], "tokens_py": 289, "tokens_lim": 431, "cases": 3, "status": "pass"}
+{"name": "app_shuffle", "source": "authored", "features": ["inout", "contract", "while"], "tokens_py": 282, "tokens_lim": 343, "cases": 1, "status": "pass"}
+{"name": "app_stack_vm", "source": "authored", "features": ["enum", "match", "result", "inout", "cap_stdin", "while"], "tokens_py": 432, "tokens_lim": 588, "cases": 4, "status": "pass"}
+{"name": "app_stats_module", "source": "authored", "features": ["comprehension", "contract", "module", "cap_stdin", "while"], "tokens_py": 279, "tokens_lim": 451, "cases": 4, "status": "pass"}
+{"name": "app_temps", "source": "authored", "features": ["match", "option", "try_op", "cap_stdin", "while", "float"], "tokens_py": 238, "tokens_lim": 242, "cases": 3, "status": "pass"}
+{"name": "app_text_module", "source": "authored", "features": ["struct", "module", "cap_stdin", "while"], "tokens_py": 303, "tokens_lim": 424, "cases": 3, "status": "pass"}
+{"name": "app_todo", "source": "authored", "features": ["struct", "match", "fn_main", "cap_args", "cap_fs_read", "cap_fs_write"], "tokens_py": 262, "tokens_lim": 408, "cases": 4, "status": "pass"}
+{"name": "app_topo_sort", "source": "authored", "features": ["struct", "comprehension", "fn_main", "cap_stdin", "while"], "tokens_py": 197, "tokens_lim": 312, "cases": 3, "status": "pass"}
+{"name": "app_traffic_light", "source": "authored", "features": ["enum", "match", "cap_stdin", "while"], "tokens_py": 211, "tokens_lim": 297, "cases": 3, "status": "pass"}
+{"name": "app_uniq", "source": "authored", "features": ["struct", "match", "option", "fn_main", "cap_stdin", "cap_args", "while"], "tokens_py": 185, "tokens_lim": 338, "cases": 3, "status": "pass"}
+{"name": "app_units", "source": "authored", "features": ["enum", "match", "result", "try_op", "cap_stdin", "while"], "tokens_py": 252, "tokens_lim": 363, "cases": 3, "status": "pass"}
+{"name": "app_url_parts", "source": "authored", "features": ["struct", "match", "option", "try_op", "comprehension", "cap_stdin", "while"], "tokens_py": 249, "tokens_lim": 424, "cases": 3, "status": "pass"}
+{"name": "app_validate_users", "source": "authored", "features": ["match", "option", "result", "cap_stdin", "while"], "tokens_py": 249, "tokens_lim": 350, "cases": 3, "status": "pass"}
+{"name": "app_wc", "source": "authored", "features": ["struct", "comprehension", "fn_main", "cap_args", "cap_fs_read"], "tokens_py": 138, "tokens_lim": 230, "cases": 3, "status": "pass"}
+{"name": "bench_he_001", "source": "limits-bench/tasks/he_001.py", "features": ["cap_stdin"], "tokens_py": 572, "tokens_lim": 130, "cases": 7, "status": "pass"}
+{"name": "bench_he_003", "source": "limits-bench/tasks/he_003.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 519, "tokens_lim": 77, "cases": 6, "status": "pass"}
+{"name": "bench_he_005", "source": "limits-bench/tasks/he_005.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 512, "tokens_lim": 114, "cases": 5, "status": "pass"}
+{"name": "bench_he_006", "source": "limits-bench/tasks/he_006.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 562, "tokens_lim": 110, "cases": 6, "status": "pass"}
+{"name": "bench_he_007", "source": "limits-bench/tasks/he_007.py", "features": ["cap_stdin"], "tokens_py": 478, "tokens_lim": 113, "cases": 5, "status": "pass"}
+{"name": "bench_he_009", "source": "limits-bench/tasks/he_009.py", "features": ["cap_stdin"], "tokens_py": 523, "tokens_lim": 84, "cases": 5, "status": "pass"}
+{"name": "bench_he_010", "source": "limits-bench/tasks/he_010.py", "features": ["cap_stdin", "while"], "tokens_py": 559, "tokens_lim": 181, "cases": 5, "status": "pass"}
+{"name": "bench_he_011", "source": "limits-bench/tasks/he_011.py", "features": ["cap_stdin"], "tokens_py": 494, "tokens_lim": 114, "cases": 6, "status": "pass"}
+{"name": "bench_he_013", "source": "limits-bench/tasks/he_013.py", "features": ["cap_stdin", "while"], "tokens_py": 462, "tokens_lim": 93, "cases": 5, "status": "pass"}
+{"name": "bench_he_014", "source": "limits-bench/tasks/he_014.py", "features": ["cap_stdin"], "tokens_py": 451, "tokens_lim": 35, "cases": 5, "status": "pass"}
+{"name": "bench_he_015", "source": "limits-bench/tasks/he_015.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 453, "tokens_lim": 31, "cases": 5, "status": "pass"}
+{"name": "bench_he_017", "source": "limits-bench/tasks/he_017.py", "features": ["match", "comprehension", "cap_stdin"], "tokens_py": 577, "tokens_lim": 79, "cases": 5, "status": "pass"}
+{"name": "bench_he_018", "source": "limits-bench/tasks/he_018.py", "features": ["cap_stdin"], "tokens_py": 505, "tokens_lim": 131, "cases": 5, "status": "pass"}
+{"name": "bench_he_019", "source": "limits-bench/tasks/he_019.py", "features": ["cap_stdin"], "tokens_py": 575, "tokens_lim": 87, "cases": 5, "status": "pass"}
+{"name": "bench_he_023", "source": "limits-bench/tasks/he_023.py", "features": ["cap_stdin"], "tokens_py": 413, "tokens_lim": 10, "cases": 5, "status": "pass"}
+{"name": "bench_he_024", "source": "limits-bench/tasks/he_024.py", "features": ["cap_stdin", "while"], "tokens_py": 441, "tokens_lim": 64, "cases": 5, "status": "pass"}
+{"name": "bench_he_026", "source": "limits-bench/tasks/he_026.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 479, "tokens_lim": 85, "cases": 5, "status": "pass"}
+{"name": "bench_he_027", "source": "limits-bench/tasks/he_027.py", "features": ["match", "option", "comprehension", "cap_stdin"], "tokens_py": 421, "tokens_lim": 107, "cases": 5, "status": "pass"}
+{"name": "bench_he_028", "source": "limits-bench/tasks/he_028.py", "features": ["cap_stdin"], "tokens_py": 432, "tokens_lim": 43, "cases": 5, "status": "pass"}
+{"name": "bench_he_029", "source": "limits-bench/tasks/he_029.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 473, "tokens_lim": 138, "cases": 5, "status": "pass"}
+{"name": "bench_he_030", "source": "limits-bench/tasks/he_030.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 495, "tokens_lim": 44, "cases": 5, "status": "pass"}
+{"name": "bench_he_034", "source": "limits-bench/tasks/he_034.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 448, "tokens_lim": 81, "cases": 5, "status": "pass"}
+{"name": "bench_he_035", "source": "limits-bench/tasks/he_035.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 478, "tokens_lim": 30, "cases": 5, "status": "pass"}
+{"name": "bench_he_036", "source": "limits-bench/tasks/he_036.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 517, "tokens_lim": 79, "cases": 8, "status": "pass"}
+{"name": "bench_he_039", "source": "limits-bench/tasks/he_039.py", "features": ["contract", "cap_stdin", "while"], "tokens_py": 577, "tokens_lim": 159, "cases": 10, "status": "pass"}
+{"name": "bench_he_040", "source": "limits-bench/tasks/he_040.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 589, "tokens_lim": 109, "cases": 9, "status": "pass"}
+{"name": "bench_he_041", "source": "limits-bench/tasks/he_041.py", "features": ["cap_stdin"], "tokens_py": 523, "tokens_lim": 17, "cases": 5, "status": "pass"}
+{"name": "bench_he_042", "source": "limits-bench/tasks/he_042.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 491, "tokens_lim": 42, "cases": 5, "status": "pass"}
+{"name": "bench_he_043", "source": "limits-bench/tasks/he_043.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 571, "tokens_lim": 89, "cases": 9, "status": "pass"}
+{"name": "bench_he_046", "source": "limits-bench/tasks/he_046.py", "features": ["contract", "cap_stdin"], "tokens_py": 611, "tokens_lim": 100, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_003", "source": "limits-bench/tasks/mbpp_003.py", "features": ["cap_stdin", "while"], "tokens_py": 421, "tokens_lim": 72, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_004", "source": "limits-bench/tasks/mbpp_004.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 410, "tokens_lim": 77, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_006", "source": "limits-bench/tasks/mbpp_006.py", "features": ["cap_stdin"], "tokens_py": 435, "tokens_lim": 173, "cases": 6, "status": "pass"}
+{"name": "bench_mbpp_008", "source": "limits-bench/tasks/mbpp_008.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 398, "tokens_lim": 41, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_009", "source": "limits-bench/tasks/mbpp_009.py", "features": ["cap_stdin"], "tokens_py": 435, "tokens_lim": 79, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_011", "source": "limits-bench/tasks/mbpp_011.py", "features": ["match", "option", "cap_stdin", "while"], "tokens_py": 474, "tokens_lim": 188, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_012", "source": "limits-bench/tasks/mbpp_012.py", "features": ["struct", "cap_stdin", "while"], "tokens_py": 394, "tokens_lim": 190, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_016", "source": "limits-bench/tasks/mbpp_016.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 421, "tokens_lim": 112, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_017", "source": "limits-bench/tasks/mbpp_017.py", "features": ["cap_stdin"], "tokens_py": 389, "tokens_lim": 13, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_018", "source": "limits-bench/tasks/mbpp_018.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 575, "tokens_lim": 44, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_019", "source": "limits-bench/tasks/mbpp_019.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 400, "tokens_lim": 55, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_020", "source": "limits-bench/tasks/mbpp_020.py", "features": ["cap_stdin", "while"], "tokens_py": 462, "tokens_lim": 117, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_056", "source": "limits-bench/tasks/mbpp_056.py", "features": ["cap_stdin", "while"], "tokens_py": 441, "tokens_lim": 76, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_057", "source": "limits-bench/tasks/mbpp_057.py", "features": ["comprehension", "cap_stdin", "while"], "tokens_py": 432, "tokens_lim": 71, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_058", "source": "limits-bench/tasks/mbpp_058.py", "features": ["cap_stdin"], "tokens_py": 396, "tokens_lim": 35, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_059", "source": "limits-bench/tasks/mbpp_059.py", "features": ["cap_stdin"], "tokens_py": 393, "tokens_lim": 25, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_061", "source": "limits-bench/tasks/mbpp_061.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 468, "tokens_lim": 109, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_062", "source": "limits-bench/tasks/mbpp_062.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 386, "tokens_lim": 30, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_066", "source": "limits-bench/tasks/mbpp_066.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 413, "tokens_lim": 40, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_068", "source": "limits-bench/tasks/mbpp_068.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 437, "tokens_lim": 84, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_069", "source": "limits-bench/tasks/mbpp_069.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 494, "tokens_lim": 135, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_071", "source": "limits-bench/tasks/mbpp_071.py", "features": ["comprehension", "inout", "cap_stdin", "while", "float"], "tokens_py": 494, "tokens_lim": 159, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_072", "source": "limits-bench/tasks/mbpp_072.py", "features": ["cap_stdin"], "tokens_py": 401, "tokens_lim": 21, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_074", "source": "limits-bench/tasks/mbpp_074.py", "features": ["comprehension", "cap_stdin"], "tokens_py": 542, "tokens_lim": 158, "cases": 6, "status": "pass"}
+{"name": "bench_mbpp_077", "source": "limits-bench/tasks/mbpp_077.py", "features": ["cap_stdin"], "tokens_py": 391, "tokens_lim": 17, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_079", "source": "limits-bench/tasks/mbpp_079.py", "features": ["cap_stdin"], "tokens_py": 414, "tokens_lim": 30, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_083", "source": "limits-bench/tasks/mbpp_083.py", "features": ["cap_stdin"], "tokens_py": 460, "tokens_lim": 81, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_084", "source": "limits-bench/tasks/mbpp_084.py", "features": ["contract", "cap_stdin"], "tokens_py": 413, "tokens_lim": 89, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_086", "source": "limits-bench/tasks/mbpp_086.py", "features": ["cap_stdin"], "tokens_py": 399, "tokens_lim": 28, "cases": 5, "status": "pass"}
+{"name": "bench_mbpp_089", "source": "limits-bench/tasks/mbpp_089.py", "features": ["cap_stdin"], "tokens_py": 386, "tokens_lim": 14, "cases": 5, "status": "pass"}

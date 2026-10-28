@@ -3,7 +3,8 @@
 //! hold, long chains free without recursion, `--max-mem` counts live bytes,
 //! and `inout` / `&` are checked.
 
-use std::process::Command;
+mod common;
+
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 static N: AtomicUsize = AtomicUsize::new(0);
@@ -17,7 +18,7 @@ fn limits(cmd: &str, src: &str, flags: &[&str]) -> (String, String, i32) {
     ));
     std::fs::create_dir_all(&dir).unwrap();
     std::fs::write(dir.join("t.lim"), src).unwrap();
-    let mut c = Command::new(env!("CARGO_BIN_EXE_limits"));
+    let mut c = common::limits();
     c.arg(cmd).arg(dir.join("t.lim")).args(flags);
     if cmd != "check" {
         c.arg("--leak-check");
@@ -93,7 +94,7 @@ fn every_program_in_the_tree_frees_all_memory() {
                 s.spawn(move || {
                     let mut bad = Vec::new();
                     for (f, cmd) in chunk {
-                        let o = Command::new(env!("CARGO_BIN_EXE_limits"))
+                        let o = common::limits()
                             .arg(cmd)
                             .arg(f)
                             .args(["--leak-check", "--max-steps", "100000000000"])
@@ -119,7 +120,7 @@ fn leak_check_flag_is_compiled_in() {
     assert_eq!(code, 0);
     assert!(out.contains("leak check: %lld heap blocks"));
     let (out, _, _) = {
-        let o = Command::new(env!("CARGO_BIN_EXE_limits"))
+        let o = common::limits()
             .args(["build", "/dev/null", "--emit-c"])
             .output()
             .unwrap();
@@ -263,9 +264,9 @@ fn inout_and_mutation_errors_have_hints() {
     );
     check_fails(
         "struct P:\n    x: int\nfn f(p: P):\n    p.x = 1\nfor q in [P { x: 1 }]:\n    q.x = 2\nprint(&1)\n",
-        "check error at 4:6: cannot change parameter 'p': parameters are read-only\n  \
+        "check error at 4:5: cannot change parameter 'p': parameters are read-only\n  \
          hint: to change the caller's value declare 'p: inout P' and call with '&p'; to change a local copy start the body with 'var p = p'\n\
-         check error at 6:6: cannot change loop variable 'q': it is a copy of the element\n  \
+         check error at 6:5: cannot change loop variable 'q': it is a copy of the element\n  \
          hint: change the element itself instead, e.g. 'xs[i] = ...' in 'for i in 0..len(xs)'\n\
          check error at 7:7: '&' can only pass a variable to an 'inout' parameter of a fn\n  \
          hint: remove the '&'",

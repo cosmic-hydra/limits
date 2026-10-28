@@ -1,0 +1,3 @@
+[{"name": "t01", "args": ["-c"], "stdin": "a\na\nb\nA\na\n"},
+ {"name": "t02", "args": ["-i", "-d", "-c"], "stdin": "Hello\nhello\nHELLO\nworld\nx\nx\n"},
+ {"name": "t03", "args": [], "stdin": "z\nz\nz\n"}]

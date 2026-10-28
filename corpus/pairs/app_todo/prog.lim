@@ -1,0 +1,46 @@
+# Tiny todo manager: state in todo.txt, command from args (add TEXT / done N / list).
+uses fs.read, fs.write, args
+
+struct Todo:
+    done: bool
+    text: str
+
+fn load(text: str) -> [Todo]:
+    var items: [Todo] = []
+    for line in split(text, "\n"):
+        if line == "": continue
+        let words = split(line, " ")
+        let rest = join([words[i] for i in 1..len(words)], " ")
+        push(items, Todo { done: words[0] == "x", text: rest })
+    items
+
+fn save(items: [Todo]) -> str:
+    var out = ""
+    for t in items:
+        let mark = match t.done:
+            true: "x "
+            false: "- "
+        out += mark + t.text + "\n"
+    out
+
+fn main(env: Env):
+    let args = env.args.list()
+    var items = load(env.fs.read("todo.txt"))
+    let cmd = unwrap_or(get(args, 0), "list")
+    if cmd == "add":
+        push(items, Todo { done: false, text: join([args[i] for i in 1..len(args)], " ") })
+        print("added", len(items))
+    elif cmd == "done":
+        let n = int(args[1])
+        if n >= 1 and n <= len(items):
+            items[n - 1].done = true
+            print("done", n)
+        else:
+            print("no item", n)
+    for i in 0..len(items):
+        let box = match items[i].done:
+            true: "[x]"
+            false: "[ ]"
+        print(str(i + 1), box, items[i].text)
+    env.fs.write("todo.txt", save(items))
+    print(len(split(env.fs.read("todo.txt"), "\n")) - 1, "saved")

@@ -1,0 +1,22 @@
+[
+ {
+  "name": "t01",
+  "stdin": "\n"
+ },
+ {
+  "name": "t02",
+  "stdin": "three\n"
+ },
+ {
+  "name": "t03",
+  "stdin": "three five nine\n"
+ },
+ {
+  "name": "t04",
+  "stdin": "five zero four seven nine eight\n"
+ },
+ {
+  "name": "t05",
+  "stdin": "six five four three two one zero\n"
+ }
+]

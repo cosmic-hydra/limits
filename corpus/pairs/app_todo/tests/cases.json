@@ -1,0 +1,4 @@
+[{"name": "t01", "args": ["add", "buy", "milk"], "files": {"todo.txt": "x write report\n- call bob\n"}},
+ {"name": "t02", "args": ["done", "2"], "files": {"todo.txt": "x write report\n- call bob\n- fix bug\n"}},
+ {"name": "t03", "args": ["done", "9"], "files": {"todo.txt": "- one\n"}},
+ {"name": "t04", "args": [], "files": {"todo.txt": ""}}]

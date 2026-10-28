@@ -1,0 +1,47 @@
+# Count log lines per level in the file named by the first argument.
+uses fs.read, args
+
+enum Level:
+    Debug
+    Info
+    Warn
+    Error
+
+fn level_of(word: str) -> Option[Level]:
+    match word:
+        "DEBUG": Some(Debug)
+        "INFO": Some(Info)
+        "WARN": Some(Warn)
+        "ERROR": Some(Error)
+        _: None
+
+fn slot(l: Level) -> int:
+    match l:
+        Debug: 0
+        Info: 1
+        Warn: 2
+        Error: 3
+
+fn main(env: Env):
+    let names = ["DEBUG", "INFO", "WARN", "ERROR"]
+    var counts = [0, 0, 0, 0]
+    var unknown = 0
+    var errors: [str] = []
+    for line in split(env.fs.read(env.args.list()[0]), "\n"):
+        if line == "":
+            continue
+        let parts = split(line, " ")
+        if len(parts) < 2:
+            unknown += 1
+            continue
+        match level_of(parts[1]):
+            None: unknown += 1
+            Some(l):
+                counts[slot(l)] += 1
+                if slot(l) == 3:
+                    push(errors, join([parts[i] for i in 2..len(parts)], " "))
+    for i in 0..4:
+        print(names[i], counts[i])
+    print("unparsed", unknown)
+    for e in errors:
+        print("!", e)

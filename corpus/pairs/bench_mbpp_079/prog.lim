@@ -1,0 +1,4 @@
+uses stdin
+
+let words = split(env.stdin.read_line(), " ")
+print(len(split(words[0], "")) % 2 != 0)

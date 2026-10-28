@@ -1,0 +1,8 @@
+uses stdin
+
+let cs = split(env.stdin.read_line(), "")
+var prefix = ""
+print(len(cs))
+for c in cs:
+    prefix += c
+    print(prefix)

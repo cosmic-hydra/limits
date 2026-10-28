@@ -1,0 +1,81 @@
+# A tiny stack machine: one instruction per stdin line (push N, add, sub, mul, div, dup, swap, print).
+uses stdin
+
+enum Op:
+    Push(n: int)
+    Add
+    Sub
+    Mul
+    Div
+    Dup
+    Swap
+    Print
+
+fn parse(line: str) -> Result[Op, str]:
+    let w = split(line, " ")
+    match w[0]:
+        "push": Ok(Push(int(w[1])))
+        "add": Ok(Add)
+        "sub": Ok(Sub)
+        "mul": Ok(Mul)
+        "div": Ok(Div)
+        "dup": Ok(Dup)
+        "swap": Ok(Swap)
+        "print": Ok(Print)
+        _: Err("unknown op " + w[0])
+
+fn needs(op: Op) -> int:
+    match op:
+        Push(_): 0
+        Dup: 1
+        Print: 1
+        _: 2
+
+fn step(op: Op, stack: inout [int], out: inout [str]) -> Result[int, str]:
+    if len(stack) < needs(op):
+        return Err("stack underflow")
+    let top = len(stack) - 1
+    match op:
+        Push(n): push(stack, n)
+        Dup: push(stack, stack[top])
+        Swap:
+            let t = stack[top]
+            stack[top] = stack[top - 1]
+            stack[top - 1] = t
+        Print: push(out, str(stack[top]))
+        _:
+            let b = pop(stack)
+            let a = pop(stack)
+            let v = match op:
+                Add: a + b
+                Sub: a - b
+                Mul: a * b
+                _:
+                    if b == 0: return Err("division by zero")
+                    a / b
+            push(stack, v)
+    Ok(len(stack))
+
+fn run(prog: [str], out: inout [str]) -> Result[int, str]:
+    var stack: [int] = []
+    for pc in 0..len(prog):
+        let r = match parse(prog[pc]):
+            Ok(op): step(op, &stack, &out)
+            Err(e): Err(e)
+        match r:
+            Err(e): return Err("pc " + str(pc) + ": " + e)
+            Ok(_): pass
+    Ok(len(stack))
+
+var prog: [str] = []
+var line = env.stdin.read_line()
+while line != "":
+    push(prog, line)
+    line = env.stdin.read_line()
+var out: [str] = []
+let r = run(prog, &out)
+for o in out:
+    print(o)
+match r:
+    Ok(_): print("ok")
+    Err(e): print("error:", e)

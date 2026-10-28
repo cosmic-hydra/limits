@@ -1,0 +1,60 @@
+# Apply inventory commands from stdin: add NAME QTY, remove NAME QTY, show NAME.
+uses stdin
+
+struct Item:
+    name: str
+    qty: int
+
+enum Cmd:
+    Add(name: str, qty: int)
+    Remove(name: str, qty: int)
+    Show(name: str)
+
+fn parse(line: str) -> Result[Cmd, str]:
+    let p = split(line, " ")
+    if p[0] == "add" and len(p) == 3:
+        return Ok(Add(p[1], int(p[2])))
+    if p[0] == "remove" and len(p) == 3:
+        return Ok(Remove(p[1], int(p[2])))
+    if p[0] == "show" and len(p) == 2:
+        return Ok(Show(p[1]))
+    Err("bad command: " + line)
+
+fn index_of(stock: [Item], name: str) -> Option[int]:
+    for i in 0..len(stock):
+        if stock[i].name == name:
+            return Some(i)
+    None
+
+fn apply(stock: inout [Item], cmd: Cmd) -> Result[str, str]:
+    match cmd:
+        Add(name, qty):
+            match index_of(stock, name):
+                Some(i): stock[i].qty += qty
+                None: push(stock, Item { name: name, qty: qty })
+            Ok("ok")
+        Remove(name, qty):
+            let i = match index_of(stock, name):
+                Some(i): i
+                None: return Err("no " + name)
+            if stock[i].qty < qty:
+                return Err("only " + str(stock[i].qty) + " " + name)
+            stock[i].qty -= qty
+            Ok("ok")
+        Show(name):
+            let qty = match index_of(stock, name):
+                Some(i): stock[i].qty
+                None: 0
+            Ok(name + " " + str(qty))
+
+var stock: [Item] = []
+var line = env.stdin.read_line()
+while line != "":
+    let r = match parse(line):
+        Ok(cmd): apply(&stock, cmd)
+        Err(e): Err(e)
+    match r:
+        Ok(msg): print(msg)
+        Err(e): print("error: " + e)
+    line = env.stdin.read_line()
+print("total", sum([it.qty for it in stock]))

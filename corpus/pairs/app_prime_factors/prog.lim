@@ -1,0 +1,43 @@
+# Factorise each integer on stdin; print "n = p^k * ..." and the divisor count.
+uses stdin
+
+struct Power:
+    p: int
+    k: int
+
+fn factor(n: int) -> [Power]:
+    requires n >= 2
+    ensures len(result) > 0
+    var n = n
+    var fs: [Power] = []
+    var d = 2
+    while d * d <= n:
+        var k = 0
+        while n % d == 0:
+            n /= d
+            k += 1
+        if k > 0: push(fs, Power { p: d, k: k })
+        d += 1
+    if n > 1: push(fs, Power { p: n, k: 1 })
+    fs
+
+fn show(f: Power) -> str:
+    if f.k == 1: return str(f.p)
+    str(f.p) + "^" + str(f.k)
+
+test "factor 360":
+    let fs = factor(360)
+    assert(join([show(f) for f in fs], " * ") == "2^3 * 3^2 * 5")
+
+var line = env.stdin.read_line()
+while line != "":
+    let n = int(line)
+    if n < 2:
+        print(n, "has no prime factors")
+    else:
+        let fs = factor(n)
+        var divisors = 1
+        for f in fs:
+            divisors *= f.k + 1
+        print(n, "=", join([show(f) for f in fs], " * "), "|", divisors, "divisors")
+    line = env.stdin.read_line()

@@ -1,0 +1,28 @@
+uses stdin
+
+fn is_prime(p: int) -> bool:
+    if p < 2:
+        return false
+    var k = 2
+    while k * k <= p:
+        if p % k == 0:
+            return false
+        k += 1
+    true
+
+fn prime_fib(n: int) -> int:
+    requires n >= 1
+    var left = n
+    var a = 0
+    var b = 1
+    while true:
+        let c = a + b
+        a = b
+        b = c
+        if is_prime(b):
+            left -= 1
+            if left == 0:
+                return b
+    0
+
+print(prime_fib(int(env.stdin.read_line())))

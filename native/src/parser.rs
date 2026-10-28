@@ -175,6 +175,10 @@ impl Parser {
             Tok::Dedent => "end of block".to_string(),
         };
         let mut e = Error::new("parse", l, c, format!("{}, found '{}'", msg, found));
+        if let Some(x) = msg.strip_prefix("expected ") {
+            e.more.expected = x.to_string();
+        }
+        e.more.found = found;
         e.hint = match self.peek() {
             Tok::Sym(";") => "Limits has no semicolons: put one statement per line".into(),
             Tok::Sym("{") if msg.contains("':'") => {
@@ -500,12 +504,19 @@ impl Parser {
 
     /// Does a struct literal body start `i` tokens ahead? It is `{}` or
     /// `{ field: ...`; any other `{` (e.g. a C-style block) is not one.
+    /// `{ field` cut off by the end of the input counts too, so a truncated
+    /// literal is reported (and probed by `--expect`) as one.
     fn lit(&self, i: usize) -> bool {
         let tok = |i: usize| self.toks.get(self.pos + i).map(|t| &t.tok);
+        let at_end = |i: usize| {
+            self.toks[(self.pos + i).min(self.toks.len())..]
+                .iter()
+                .all(|t| matches!(t.tok, Tok::Newline | Tok::Dedent | Tok::Eof))
+        };
         matches!(tok(i), Some(Tok::Sym("{")))
             && (matches!(tok(i + 1), Some(Tok::Sym("}")))
                 || (matches!(tok(i + 1), Some(Tok::Ident(_)))
-                    && matches!(tok(i + 2), Some(Tok::Sym(":")))))
+                    && (matches!(tok(i + 2), Some(Tok::Sym(":"))) || at_end(i + 2))))
     }
 
     fn eat_tok(&mut self, t: &Tok) -> bool {
@@ -715,6 +726,9 @@ impl Parser {
             self.enter()?;
             self.next();
             let rhs = self.binary(level + 1)?;
+            // Located at the operator: runtime errors (division by zero,
+            // overflow) name it. Diagnostics about the whole expression use
+            // `ast::Expr::start`.
             lhs = ex(ExprKind::Binary(op, Box::new(lhs), Box::new(rhs)), l, c);
             if level == 3 && matches!(self.peek(), Tok::Sym(s) if LEVELS[3].contains(s)) {
                 return Err(self.err("comparison operators cannot be chained"));

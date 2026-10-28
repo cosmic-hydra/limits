@@ -1,0 +1,13 @@
+uses stdin
+
+fn triples_sum_to_zero(xs: [int]) -> bool:
+    let n = len(xs)
+    for i in 0..n:
+        for j in i + 1..n:
+            for k in j + 1..n:
+                if xs[i] + xs[j] + xs[k] == 0:
+                    return true
+    false
+
+let xs = [int(p) for p in split(env.stdin.read_line(), " ") if p != ""]
+print(triples_sum_to_zero(xs))

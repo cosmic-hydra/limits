@@ -1,0 +1,41 @@
+# Validate "username,email,age" rows from stdin; list every problem per row.
+uses stdin
+
+fn email_ok(email: str) -> bool:
+    let at = split(email, "@")
+    len(at) == 2 and len(split(at[1], ".")) > 1
+
+fn check_age(age: str) -> Result[int, str]:
+    let a = match parse_int(age):
+        Some(a): a
+        None: return Err("age not a number")
+    if a < 13 or a > 130:
+        return Err("age out of range " + str(a))
+    Ok(a)
+
+fn problems(row: str) -> [str]:
+    let p = split(row, ",")
+    if len(p) != 3:
+        return ["expected 3 fields, got " + str(len(p))]
+    var out: [str] = []
+    if len(p[0]) < 3 or len(p[0]) > 12:
+        push(out, "username length " + str(len(p[0])))
+    if not email_ok(p[1]):
+        push(out, "bad email " + p[1])
+    match check_age(p[2]):
+        Err(e): push(out, e)
+        Ok(_): pass
+    out
+
+var ok = 0
+var i = 1
+var row = env.stdin.read_line()
+while row != "":
+    let ps = problems(row)
+    if len(ps) == 0:
+        ok += 1
+    else:
+        print("row " + str(i) + ": " + join(ps, "; "))
+    i += 1
+    row = env.stdin.read_line()
+print(ok, "valid")

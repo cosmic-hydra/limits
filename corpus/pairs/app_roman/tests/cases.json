@@ -1,0 +1,3 @@
+[{"name": "t01", "stdin": "1994\nMCMXCIV\n4\nIX\n"},
+ {"name": "t02", "stdin": "0\n4000\nIIII\nABC\n"},
+ {"name": "t03", "stdin": "3999\nMMMCMXCIX\nXLII\n-7\n"}]

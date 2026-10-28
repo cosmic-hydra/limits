@@ -25,20 +25,32 @@ struct Loader {
     stack: Vec<PathBuf>,
     base: PathBuf,
     errs: Vec<Error>,
+    /// Source text of the root file when it does not come from disk.
+    root_src: Option<String>,
 }
 
 /// Load the root file and everything it imports. Module 0 is the root.
 pub fn load(root: &Path) -> Result<Vec<Module>, Vec<Error>> {
-    let canon = std::fs::canonicalize(root).unwrap_or_else(|e| {
-        eprintln!("limits: cannot read '{}': {}", root.display(), e);
-        std::process::exit(2)
-    });
+    load_with(root, None)
+}
+
+/// Like `load`, but with the root file's text given (`src`, e.g. read from
+/// stdin; `root` then only locates imports and need not exist).
+pub fn load_with(root: &Path, src: Option<String>) -> Result<Vec<Module>, Vec<Error>> {
+    let canon = match &src {
+        Some(_) => std::path::absolute(root).unwrap_or_else(|_| root.to_path_buf()),
+        None => std::fs::canonicalize(root).unwrap_or_else(|e| {
+            eprintln!("limits: cannot read '{}': {}", root.display(), e);
+            std::process::exit(2)
+        }),
+    };
     let mut l = Loader {
         mods: Vec::new(),
         cache: HashMap::new(),
         stack: Vec::new(),
         base: canon.parent().map(Path::to_path_buf).unwrap_or_default(),
         errs: Vec::new(),
+        root_src: src,
     };
     l.file(canon, String::new());
     if l.errs.is_empty() {
@@ -67,17 +79,19 @@ impl Loader {
         } else {
             self.show(&path)
         };
-        let src = match std::fs::read(&path).map(String::from_utf8) {
+        let given = if name.is_empty() {
+            self.root_src.take()
+        } else {
+            None
+        };
+        let read = match given {
+            Some(s) => Ok(Ok(s)),
+            None => std::fs::read(&path).map(String::from_utf8),
+        };
+        let src = match read {
             Ok(Ok(s)) => s,
             Ok(Err(e)) => {
-                // A located lex error, so `--json` covers it too.
-                let ok = &e.as_bytes()[..e.utf8_error().valid_up_to()];
-                let ok = std::str::from_utf8(ok).unwrap_or_default();
-                let last = ok.rsplit('\n').next().unwrap_or("");
-                let line = ok.matches('\n').count() as u32 + 1;
-                let col = last.chars().count() as u32 + 1;
-                let msg = "invalid UTF-8 in source file".to_string();
-                self.err(Error::new("lex", line, col, msg), &file);
+                self.err(utf8_error(&e).0, &file);
                 return None;
             }
             Err(e) => {
@@ -153,4 +167,16 @@ impl Loader {
         self.stack.pop();
         Some(idx)
     }
+}
+
+/// A located lex error for a source that is not UTF-8 (so `--json` covers
+/// it too), and the valid prefix it points into.
+pub fn utf8_error(e: &std::string::FromUtf8Error) -> (Error, &str) {
+    let ok = &e.as_bytes()[..e.utf8_error().valid_up_to()];
+    let ok = std::str::from_utf8(ok).unwrap_or_default();
+    let last = ok.rsplit('\n').next().unwrap_or("");
+    let line = ok.matches('\n').count() as u32 + 1;
+    let col = last.chars().count() as u32 + 1;
+    let msg = "invalid UTF-8 in source file".to_string();
+    (Error::new("lex", line, col, msg), ok)
 }

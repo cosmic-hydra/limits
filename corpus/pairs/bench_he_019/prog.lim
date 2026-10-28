@@ -1,0 +1,9 @@
+uses stdin
+
+let names = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+var values: [int] = []
+for w in split(env.stdin.read_line(), " "):
+    if w != "":
+        push(values, unwrap(find(names, w)))
+sort(values)
+print(join([names[v] for v in values], " "))

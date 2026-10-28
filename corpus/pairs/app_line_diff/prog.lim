@@ -1,0 +1,44 @@
+# Line diff of two files (argv): LCS-based, prints "  " / "- " / "+ " lines and a summary.
+uses fs.read, args
+
+fn lines_of(text: str) -> [str]:
+    var ls = split(text, "\n")
+    if len(ls) > 0 and ls[len(ls) - 1] == "":
+        pop(ls)
+    ls
+
+fn main(env: Env):
+    let paths = env.args.list()
+    let a = lines_of(env.fs.read(paths[0]))
+    let b = lines_of(env.fs.read(paths[1]))
+    let n = len(a)
+    let m = len(b)
+    var lcs = [[0 for j in 0..m + 1] for i in 0..n + 1]
+    var i = n - 1
+    while i >= 0:
+        var j = m - 1
+        while j >= 0:
+            if a[i] == b[j]:
+                lcs[i][j] = lcs[i + 1][j + 1] + 1
+            else:
+                lcs[i][j] = max(lcs[i + 1][j], lcs[i][j + 1])
+            j -= 1
+        i -= 1
+    i = 0
+    var j = 0
+    var added = 0
+    var removed = 0
+    while i < n or j < m:
+        if i < n and j < m and a[i] == b[j]:
+            print("  " + a[i])
+            i += 1
+            j += 1
+        elif j < m and (i == n or lcs[i][j + 1] >= lcs[i + 1][j]):
+            print("+ " + b[j])
+            j += 1
+            added += 1
+        else:
+            print("- " + a[i])
+            i += 1
+            removed += 1
+    print(str(added) + " added, " + str(removed) + " removed")

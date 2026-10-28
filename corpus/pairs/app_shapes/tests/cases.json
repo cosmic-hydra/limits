@@ -1,0 +1,3 @@
+[{"name": "t01", "stdin": "circle 1.5\nrect 2 3.5\ntri 3 4 5\nhex 2\n"},
+ {"name": "t02", "stdin": "rect 1\ncircle 0.5\n"},
+ {"name": "t03", "stdin": "tri 2 2 2\nrect 10 10\n"}]

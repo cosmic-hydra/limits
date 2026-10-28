@@ -1,0 +1,50 @@
+# Shortest paths from node 0. stdin: "N M", then M lines "u v w" (undirected).
+uses stdin
+
+struct Edge:
+    to: int
+    w: int
+
+fn main(env: Env):
+    let head = split(env.stdin.read_line(), " ")
+    let n = int(head[0])
+    let m = int(head[1])
+    let no_edges: [Edge] = []
+    var adj = [no_edges for i in 0..n]
+    for i in 0..m:
+        let p = [int(x) for x in split(env.stdin.read_line(), " ")]
+        push(adj[p[0]], Edge { to: p[1], w: p[2] })
+        push(adj[p[1]], Edge { to: p[0], w: p[2] })
+    let unknown: Option[int] = None
+    var dist = [unknown for i in 0..n]
+    var prev = [-1 for i in 0..n]
+    var done = [false for i in 0..n]
+    dist[0] = Some(0)
+    for round in 0..n:
+        var best = -1
+        var best_d = 0
+        for i in 0..n:
+            match dist[i]:
+                Some(d):
+                    if not done[i] and (best < 0 or d < best_d):
+                        best = i
+                        best_d = d
+                None: pass
+        if best < 0: break
+        done[best] = true
+        for e in adj[best]:
+            let shorter = match dist[e.to]:
+                Some(d): best_d + e.w < d
+                None: true
+            if shorter:
+                dist[e.to] = Some(best_d + e.w)
+                prev[e.to] = best
+    for i in 0..n:
+        match dist[i]:
+            None: print(i, "unreachable")
+            Some(d):
+                var path = [i]
+                while prev[path[len(path) - 1]] >= 0:
+                    push(path, prev[path[len(path) - 1]])
+                let k = len(path)
+                print(i, d, "via", join([str(path[k - 1 - j]) for j in 0..k], "-"))

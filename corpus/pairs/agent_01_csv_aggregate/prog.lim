@@ -1,0 +1,30 @@
+# Parse CSV-ish text into structs and aggregate per department.
+struct Rec:
+    name: str
+    dept: str
+    amount: int
+
+fn rnd(s: inout [int]) -> int:
+    s[0] = (s[0] * 1103515245 + 12345) % 2147483648
+    s[0] / 65536
+
+let depts = ["eng", "ops", "sales", "hr", "legal", "it", "fin", "mkt"]
+var seed = [42]
+var lines: [str] = []
+for i in 0..200000:
+    let d = depts[rnd(&seed) % 8]
+    push(lines, "u" + str(i) + "," + d + "," + str(rnd(&seed) % 1000))
+let text = join(lines, "\n")
+var recs: [Rec] = []
+for line in split(text, "\n"):
+    let f = split(line, ",")
+    push(recs, Rec { name: f[0], dept: f[1], amount: int(f[2]) })
+var totals = [0, 0, 0, 0, 0, 0, 0, 0]
+var counts = [0, 0, 0, 0, 0, 0, 0, 0]
+for r in recs:
+    for j in 0..8:
+        if depts[j] == r.dept:
+            totals[j] += r.amount
+            counts[j] += 1
+for j in 0..8:
+    print(depts[j], counts[j], totals[j], totals[j] / counts[j])

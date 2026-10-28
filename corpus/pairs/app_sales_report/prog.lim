@@ -1,0 +1,37 @@
+# Read sales.csv (region,item,units,cents), write report.txt with per-region totals, then echo it.
+uses fs.read, fs.write
+
+struct Sale:
+    region: str
+    units: int
+    cents: int
+
+fn money(c: int) -> str:
+    let frac = c % 100
+    if frac < 10: return str(c / 100) + ".0" + str(frac)
+    str(c / 100) + "." + str(frac)
+
+fn main(env: Env):
+    let lines = split(env.fs.read("sales.csv"), "\n")
+    var sales: [Sale] = []
+    for i in 1..len(lines):
+        if lines[i] == "": continue
+        let f = split(lines[i], ",")
+        push(sales, Sale { region: f[0], units: int(f[2]), cents: int(f[3]) })
+    var regions: [str] = []
+    for s in sales:
+        if is_none(find(regions, s.region)): push(regions, s.region)
+    sort(regions)
+    var out: [str] = []
+    var grand = 0
+    for reg in regions:
+        let mine = [s for s in sales if s.region == reg]
+        let cents = sum([s.units * s.cents for s in mine])
+        grand += cents
+        push(out, reg + ": " + str(sum([s.units for s in mine])) + " units, " + money(cents))
+    push(out, "TOTAL: " + money(grand))
+    env.fs.write("report.txt", join(out, "\n") + "\n")
+    let back = split(env.fs.read("report.txt"), "\n")
+    for i in 0..len(back) - 1:
+        print(back[i])
+    print("wrote", len(out), "lines")

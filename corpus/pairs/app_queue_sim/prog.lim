@@ -1,0 +1,28 @@
+# Simulate a single-server queue: customers "arrival service" from stdin, report waits.
+uses stdin
+
+struct Customer:
+    arrival: int
+    service: int
+
+fn read_customers(stdin: Stdin) -> [Customer]:
+    var out: [Customer] = []
+    var line = stdin.read_line()
+    while line != "":
+        let p = split(line, " ")
+        push(out, Customer { arrival: int(p[0]), service: int(p[1]) })
+        line = stdin.read_line()
+    out
+
+fn main(env: Env):
+    let custs = read_customers(env.stdin)
+    var free_at = 0
+    var waits: [int] = []
+    for i in 0..len(custs):
+        let c = custs[i]
+        let start = max(c.arrival, free_at)
+        push(waits, start - c.arrival)
+        free_at = start + c.service
+        print("c" + str(i), "arrives", c.arrival, "starts", start, "leaves", free_at, "waited", start - c.arrival)
+    if len(waits) > 0:
+        print("max wait", max(waits), "total wait", sum(waits), "busy until", free_at)

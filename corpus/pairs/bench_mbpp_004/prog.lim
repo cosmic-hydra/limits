@@ -1,0 +1,7 @@
+uses stdin
+
+var xs = [int(p) for p in split(env.stdin.read_line(), " ") if p != ""]
+let n = int(env.stdin.read_line())
+sort(xs)
+let top = [xs[len(xs) - 1 - i] for i in 0..min(n, len(xs))]
+print(join([str(x) for x in top], " "))

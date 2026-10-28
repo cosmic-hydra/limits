@@ -1,0 +1,3 @@
+[{"name": "t01", "args": ["app.conf"], "files": {"app.conf": "# demo\nname=api\nport=9000\n\nworkers=4\n"}},
+ {"name": "t02", "args": ["c.conf"], "files": {"c.conf": "port=abc\nurl=http://x/?a=b\n"}},
+ {"name": "t03", "args": ["bad.conf"], "files": {"bad.conf": "name=x\noops\n"}}]

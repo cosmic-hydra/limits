@@ -1,0 +1,3 @@
+[{"name": "t01", "stdin": "app: lib utils\nlib: utils\ntest: app\n"},
+ {"name": "t02", "stdin": "a: b\nb: c\nc: a\nd:\n"},
+ {"name": "t03", "stdin": "z:\ny:\nx: z y\n"}]

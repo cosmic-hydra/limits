@@ -1,0 +1,4 @@
+[{"name": "t01", "args": ["3"], "stdin": "Hello, World!\nxyz ABC\n"},
+ {"name": "t02", "args": ["-3"], "stdin": "Khoor, Zruog!\n"},
+ {"name": "t03", "args": [], "stdin": "Why did the chicken cross the road?\n"},
+ {"name": "t04", "args": ["53"], "stdin": "abc 123\n"}]

@@ -1,5 +1,3 @@
-uses stdin;
-fn main() {
-    let xs: [int] = [];
-    print(xs[int(input_line())]);
-}
+uses stdin
+let xs: [int] = []
+print(xs[int(env.stdin.read_line())])

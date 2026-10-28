@@ -1,0 +1,31 @@
+# Render "name qty price_cents" lines from stdin as an aligned table with a total.
+uses stdin
+import text.fmt
+
+struct Row:
+    name: str
+    qty: int
+    cents: int
+
+fn money2(c: int) -> str:
+    let cents = c % 100
+    if cents < 10: return str(c / 100) + ".0" + str(cents)
+    str(c / 100) + "." + str(cents)
+
+var rows: [Row] = []
+var line = env.stdin.read_line()
+while line != "":
+    let p = split(line, " ")
+    push(rows, Row { name: p[0], qty: int(p[1]), cents: int(p[2]) })
+    line = env.stdin.read_line()
+var w = 4
+for r in rows:
+    w = max(w, len(r.name))
+print(fmt.pad_right("item", w), fmt.pad_left("qty", 4), fmt.pad_left("total", 9))
+print(fmt.rule(w + 15))
+var grand = 0
+for r in rows:
+    grand += r.qty * r.cents
+    print(fmt.pad_right(r.name, w), fmt.pad_left(str(r.qty), 4), fmt.pad_left(money2(r.qty * r.cents), 9))
+print(fmt.rule(w + 15))
+print(fmt.pad_right("sum", w), fmt.pad_left("", 4), fmt.pad_left(money2(grand), 9))

@@ -229,6 +229,28 @@ fn cpu_limit_kills() {
 }
 
 #[test]
+fn program_dies_with_killed_launcher() {
+    // Killing the launcher (as `limits test` does on its own timeout) must
+    // not orphan the program: it holds the stderr pipe and has no wall limit.
+    use std::io::Read;
+    let mut c = Command::new(env!("CARGO_BIN_EXE_limits-sandbox"))
+        .args(["--wall-sec", "120", "--cpu-sec", "120", "--"])
+        .arg(probe())
+        .arg("sleep")
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
+        .unwrap();
+    std::thread::sleep(std::time::Duration::from_millis(300));
+    let t = std::time::Instant::now();
+    c.kill().unwrap();
+    c.wait().unwrap();
+    let mut rest = Vec::new();
+    c.stderr.take().unwrap().read_to_end(&mut rest).unwrap();
+    assert!(t.elapsed().as_secs() < 10, "program outlived its launcher");
+}
+
+#[test]
 fn wall_timeout_kills() {
     let t = std::time::Instant::now();
     let (code, _, err) = run(&["--wall-sec", "1"], &["sleep"]);

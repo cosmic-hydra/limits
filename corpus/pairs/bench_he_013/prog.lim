@@ -1,0 +1,16 @@
+uses stdin
+
+fn gcd(a: int, b: int) -> int:
+    var a = a
+    var b = b
+    while b != 0:
+        let t = a % b
+        a = b
+        b = t
+    if a < 0:
+        return -a
+    a
+
+let a = int(env.stdin.read_line())
+let b = int(env.stdin.read_line())
+print(gcd(a, b))

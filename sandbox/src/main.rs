@@ -62,12 +62,15 @@ extern "C" {
     fn waitpid(pid: i32, status: *mut i32, opts: i32) -> i32;
     fn kill(pid: i32, sig: i32) -> i32;
     fn getpid() -> i32;
+    fn getppid() -> i32;
     fn setrlimit(res: i32, lim: *const RLimit) -> i32;
     fn prctl(op: i32, ...) -> i32;
     fn open(p: *const i8, flags: i32, ...) -> i32;
     fn close(fd: i32) -> i32;
     fn write(fd: i32, buf: *const u8, n: usize) -> isize;
     fn _exit(code: i32) -> !;
+    fn signal(sig: i32, handler: usize) -> usize;
+    fn raise(sig: i32) -> i32;
     fn __errno_location() -> *mut i32;
 }
 
@@ -79,6 +82,7 @@ const O_PATH: i32 = 0o10000000;
 const O_CLOEXEC: i32 = 0o2000000;
 const PR_SET_NO_NEW_PRIVS: i32 = 38;
 const PR_GET_SECCOMP: i32 = 21;
+const PR_SET_PDEATHSIG: i32 = 1;
 const WNOHANG: i32 = 1;
 const SIGKILL: i32 = 9;
 
@@ -99,11 +103,14 @@ struct Opts {
     nproc: u64,
     wall_sec: u64,
     allow_degraded: bool,
+    /// `--quiet`: no line for a normal exit; a death by signal is passed on
+    /// by dying of the same signal (so callers see it as the program's).
+    quiet: bool,
     env: Vec<String>,
     prog: Vec<String>,
 }
 
-const USAGE: &str = "usage: limits-sandbox [--read DIR]... [--write DIR]... [--net none] [--cpu-sec N] [--mem-mb N] [--fsize-mb N] [--nproc N] [--wall-sec N] [--env NAME[=VALUE]]... [--allow-degraded] -- PROGRAM ARGS...";
+const USAGE: &str = "usage: limits-sandbox [--read DIR]... [--write DIR]... [--net none] [--cpu-sec N] [--mem-mb N] [--fsize-mb N] [--nproc N] [--wall-sec N] [--env NAME[=VALUE]]... [--allow-degraded] [--quiet] -- PROGRAM ARGS...";
 
 fn die(msg: &str) -> ! {
     eprintln!("limits-sandbox: {msg}");
@@ -127,6 +134,10 @@ fn parse(args: Vec<String>) -> Opts {
         }
         if a == "--allow-degraded" {
             o.allow_degraded = true;
+            continue;
+        }
+        if a == "--quiet" {
+            o.quiet = true;
             continue;
         }
         let v = it
@@ -446,10 +457,23 @@ struct Plan<'a> {
     exe: &'a CString,
     argv: &'a [*const i8],
     envp: &'a [*const i8],
+    /// The launcher's pid, to detect that it died before PDEATHSIG was set.
+    parent: i32,
 }
 
 /// Runs between fork and exec: only syscalls, no allocation, no locks.
 fn child(p: &Plan) -> ! {
+    // The program must never outlive the launcher (which enforces the wall
+    // limit): if the launcher is killed, the kernel SIGKILLs the program.
+    // SAFETY: plain prctl/getppid. The getppid check closes the race where
+    // the launcher died before the prctl took effect.
+    if unsafe { prctl(PR_SET_PDEATHSIG, SIGKILL as usize, 0usize, 0usize, 0usize) } != 0 {
+        child_fail(b"PR_SET_PDEATHSIG\n");
+    }
+    if unsafe { getppid() } != p.parent {
+        // SAFETY: async-signal-safe _exit after fork.
+        unsafe { _exit(128 + SIGKILL) }
+    }
     for (res, val) in p.limits {
         // RLIMIT_CPU: soft limit sends SIGXCPU; hard limit (+1s) SIGKILLs a
         // program that catches SIGXCPU.
@@ -504,6 +528,20 @@ fn signal_reason(sig: i32) -> &'static str {
     }
 }
 
+/// Die of signal `s` (default action, no core file), as the child did.
+fn die_of(s: i32) -> ! {
+    let no_core = RLimit { cur: 0, max: 0 };
+    // SAFETY: plain libc calls on our own process; SIG_DFL is 0.
+    unsafe {
+        setrlimit(4, &no_core); // RLIMIT_CORE
+        signal(s, 0);
+        raise(s);
+    }
+    // Signals whose default action is to be ignored (none of the child's
+    // fatal ones, but be safe) fall back to the usual exit code.
+    std::process::exit(128 + s)
+}
+
 fn main() {
     let o = parse(std::env::args().skip(1).collect());
     let exe = resolve(&o.prog[0]);
@@ -549,6 +587,8 @@ fn main() {
     let mut envp: Vec<*const i8> = env.iter().map(|e| e.as_ptr()).collect();
     envp.push(std::ptr::null());
 
+    // SAFETY: getpid has no preconditions.
+    let parent = unsafe { getpid() };
     let start = Instant::now();
     // SAFETY: the launcher is single-threaded; the child only runs `child`.
     let pid = unsafe { fork() };
@@ -572,6 +612,7 @@ fn main() {
             exe: &exe_c,
             argv: &argv,
             envp: &envp,
+            parent,
         });
     }
     if let Some(fd) = ruleset {
@@ -604,10 +645,15 @@ fn main() {
         128 + SIGKILL
     } else if status & 0x7f == 0 {
         let c = (status >> 8) & 0xff;
-        eprintln!("limits-sandbox: exit {c}");
+        if !o.quiet {
+            eprintln!("limits-sandbox: exit {c}");
+        }
         c
     } else {
         let s = status & 0x7f;
+        if o.quiet {
+            die_of(s);
+        }
         eprintln!(
             "limits-sandbox: killed by signal {s} ({})",
             signal_reason(s)

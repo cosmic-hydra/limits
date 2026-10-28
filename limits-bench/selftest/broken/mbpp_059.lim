@@ -1,4 +1,3 @@
-uses stdin;
-fn main() {
-    while true { }
-}
+uses stdin
+while true:
+    pass

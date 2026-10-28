@@ -1,0 +1,3 @@
+[{"name": "t01", "stdin": "21.5C\n70F\n-40F\nhot\n"},
+ {"name": "t02", "stdin": "C\n12K\n"},
+ {"name": "t03", "stdin": "100C\n212F\n0C\n"}]

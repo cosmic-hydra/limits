@@ -1,0 +1,9 @@
+uses stdin
+
+var xs = [int(p) for p in split(env.stdin.read_line(), " ") if p != ""]
+sort(xs)
+var out: [int] = []
+for x in xs:
+    if len(out) == 0 or out[len(out) - 1] != x:
+        push(out, x)
+print(join([str(x) for x in out], " "))

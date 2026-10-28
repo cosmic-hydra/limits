@@ -1,0 +1,5 @@
+uses stdin
+
+let x = int(env.stdin.read_line())
+let y = int(env.stdin.read_line())
+print((x < 0) != (y < 0))

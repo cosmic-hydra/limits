@@ -1,0 +1,15 @@
+uses stdin
+
+# Count substrings whose digit sum equals their length.
+fn count_substrings(s: str) -> int:
+    let ds = [int(c) for c in split(s, "")]
+    var count = 0
+    for i in 0..len(ds):
+        var total = 0
+        for j in i..len(ds):
+            total += ds[j]
+            if total == j - i + 1:
+                count += 1
+    count
+
+print(count_substrings(env.stdin.read_line()))

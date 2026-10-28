@@ -1,0 +1,14 @@
+uses stdin
+
+let line = env.stdin.read_line()
+var out: [str] = []
+if line != "":
+    var best = 0
+    var first = true
+    for p in split(line, " "):
+        let v = int(p)
+        if first or v > best:
+            best = v
+            first = false
+        push(out, str(best))
+print(join(out, " "))

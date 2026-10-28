@@ -1,0 +1,46 @@
+# Split URLs from stdin into scheme, host, port (default by scheme) and path.
+uses stdin
+
+struct Url:
+    scheme: str
+    host: str
+    port: Option[int]
+    path: str
+
+fn default_port(scheme: str) -> Option[int]:
+    match scheme:
+        "http": Some(80)
+        "https": Some(443)
+        _: None
+
+fn parse(url: str) -> Option[Url]:
+    let sp = split(url, "://")
+    if len(sp) < 2:
+        return None
+    let scheme = sp[0]
+    let rest = split(join([sp[i] for i in 1..len(sp)], "://"), "")
+    let slash = unwrap_or(find(rest, "/"), len(rest))
+    let hostport = join([rest[i] for i in 0..slash], "")
+    var path = join([rest[i] for i in slash..len(rest)], "")
+    if path == "": path = "/"
+    let hp = split(hostport, ":")
+    var port = default_port(scheme)
+    if len(hp) > 1:
+        let p = join([hp[i] for i in 1..len(hp)], ":")
+        if not all([is_some(find(split("0123456789", ""), c)) for c in split(p, "")]) or p == "":
+            return None
+        port = Some(parse_int(p)?)
+    if hp[0] == "":
+        return None
+    Some(Url { scheme: scheme, host: hp[0], port: port, path: path })
+
+var line = env.stdin.read_line()
+while line != "":
+    match parse(line):
+        None: print("invalid:", line)
+        Some(u):
+            let port = match u.port:
+                Some(p): str(p)
+                None: "none"
+            print("scheme=" + u.scheme, "host=" + u.host, "port=" + port, "path=" + u.path)
+    line = env.stdin.read_line()

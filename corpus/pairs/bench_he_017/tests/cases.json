@@ -1,0 +1,22 @@
+[
+ {
+  "name": "t01",
+  "stdin": "\n"
+ },
+ {
+  "name": "t02",
+  "stdin": "o o o o\n"
+ },
+ {
+  "name": "t03",
+  "stdin": ".| .| .| .|\n"
+ },
+ {
+  "name": "t04",
+  "stdin": "o| o| .| .| o o o o\n"
+ },
+ {
+  "name": "t05",
+  "stdin": "o| .| o| .| o o| o o|\n"
+ }
+]

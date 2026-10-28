@@ -1,0 +1,12 @@
+# Top 10 largest values, descending.
+fn rnd(s: inout [int]) -> int:
+    s[0] = (s[0] * 1103515245 + 12345) % 2147483648
+    s[0] / 65536
+
+var seed = [23]
+var xs: [int] = []
+for i in 0..300000:
+    let hi = rnd(&seed)
+    push(xs, hi * 32768 + rnd(&seed))
+sort(xs)
+print([xs[len(xs) - 1 - i] for i in 0..10])

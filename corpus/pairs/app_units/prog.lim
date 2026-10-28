@@ -1,0 +1,46 @@
+# Sum distances like "5km", "300m", "2mi" from stdin and print the total in metres.
+uses stdin
+
+enum Unit:
+    Metre
+    Kilometre
+    Mile
+    Foot
+
+fn unit_of(s: str) -> Result[Unit, str]:
+    match s:
+        "m": Ok(Metre)
+        "km": Ok(Kilometre)
+        "mi": Ok(Mile)
+        "ft": Ok(Foot)
+        _: Err("unknown unit '" + s + "'")
+
+fn metres(n: int, u: Unit) -> int:
+    match u:
+        Metre: n
+        Kilometre: n * 1000
+        Mile: n * 1609
+        Foot: n * 3048 / 10000
+
+fn parse(tok: str) -> Result[int, str]:
+    let cs = split(tok, "")
+    var i = 0
+    while i < len(cs) and is_some(parse_int(cs[i])):
+        i += 1
+    if i == 0:
+        return Err("no number in " + tok)
+    let n = int(join([cs[j] for j in 0..i], ""))
+    let u = unit_of(join([cs[j] for j in i..len(cs)], ""))?
+    Ok(metres(n, u))
+
+var total = 0
+var line = env.stdin.read_line()
+while line != "":
+    for tok in split(line, " "):
+        match parse(tok):
+            Ok(m):
+                total += m
+                print(tok, "=", m, "m")
+            Err(e): print("skip:", e)
+    line = env.stdin.read_line()
+print("total", total, "m")

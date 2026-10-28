@@ -71,6 +71,13 @@ LM_RT void lm_json_str(const char *s) {
   fputc('"', stderr);
 }
 #endif
+/* Observed values for the "data" object of a --json runtime error. Set right
+   before lm_panic, which is in the same translation unit (hence static). */
+static struct { int n; const char *k[4]; int64_t v[4]; const char *pk, *pv; } lm_jd LM_U;
+LM_RT void lm_jd_int(const char *k, int64_t v) {
+  if (lm_jd.n < 4) { lm_jd.k[lm_jd.n] = k; lm_jd.v[lm_jd.n++] = v; }
+}
+LM_RT void lm_jd_str(const char *k, const char *v) { lm_jd.pk = k; lm_jd.pv = v; }
 LM_COLD static void lm_panic(int l, int c, const char *m) {
   fflush(stdout);
   int f = l >> LM_FILE_SHIFT;
@@ -82,7 +89,10 @@ LM_COLD static void lm_panic(int l, int c, const char *m) {
   lm_json_str(lm_file_name(f));
   fprintf(stderr, ",\"line\":%d,\"col\":%d,\"msg\":", l & ((1 << LM_FILE_SHIFT) - 1), c);
   lm_json_str(m);
-  fputs(",\"hint\":\"\"}\n", stderr);
+  fputs(",\"hint\":\"\",\"data\":{", stderr);
+  for (int i = 0; i < lm_jd.n; i++) fprintf(stderr, "%s\"%s\":%lld", i ? "," : "", lm_jd.k[i], (long long)lm_jd.v[i]);
+  if (lm_jd.pk) { fprintf(stderr, "%s\"%s\":", lm_jd.n ? "," : "", lm_jd.pk); lm_json_str(lm_jd.pv); }
+  fputs("}}\n", stderr);
   exit(1);
 #endif
   if (f) fprintf(stderr, "runtime error in %s at %d:%d: %s\n", lm_file_name(f), l & ((1 << LM_FILE_SHIFT) - 1), c, m);
@@ -112,18 +122,27 @@ LM_COLD static void lm_assert_fail(int l, int c, lm_str m) {
 /* Steps are counted in a function-local copy (lm_ls) of the global budget so
    the hot loop counter lives in a register; it is written back before every
    call and on return, and reloaded after each call. Accounting stays exact. */
-#define LM_STEP(l, c) if (__builtin_expect(--lm_ls < 0, 0)) lm_panic(l, c, "step limit exceeded")
-#define LM_ENTER(l, c) int64_t lm_ls = lm_steps; LM_STEP(l, c); if (__builtin_expect(++lm_depth > LM_MAX_DEPTH || !LM_STACK_OK(), 0)) lm_panic(l, c, "call depth limit exceeded")
+LM_COLD static void lm_steps_out(int l, int c) {
+  lm_jd_int("limit", LM_MAX_STEPS);
+  lm_panic(l, c, "step limit exceeded");
+}
+LM_COLD static void lm_depth_out(int l, int c) {
+  lm_jd_int("depth", lm_depth);
+  lm_jd_int("limit", LM_MAX_DEPTH);
+  lm_panic(l, c, "call depth limit exceeded");
+}
+#define LM_STEP(l, c) if (__builtin_expect(--lm_ls < 0, 0)) lm_steps_out(l, c)
+#define LM_ENTER(l, c) int64_t lm_ls = lm_steps; LM_STEP(l, c); if (__builtin_expect(++lm_depth > LM_MAX_DEPTH || !LM_STACK_OK(), 0)) lm_depth_out(l, c)
 #define LM_LEAVE (lm_steps = lm_ls, lm_depth--)
 #define LM_CALL(T, call) ({ lm_steps = lm_ls; T lm_r_ = call; lm_ls = lm_steps; lm_r_; })
 #define LM_CALLV(call) ({ lm_steps = lm_ls; call; lm_ls = lm_steps; })
 /* Builtins doing O(n) work charge one step per 64 bytes (caller wraps them in LM_CALL). */
 LM_RT inline void lm_charge(int64_t n, int l, int c) {
-  if (__builtin_expect((lm_steps -= n >> 6) < 0, 0)) lm_panic(l, c, "step limit exceeded");
+  if (__builtin_expect((lm_steps -= n >> 6) < 0, 0)) lm_steps_out(l, c);
 }
 #define LM_ARITH(name, op, bi) \
   LM_RT inline int64_t name(int64_t a, int64_t b, int l, int c) { \
-    int64_t r; if (__builtin_expect(bi(a, b, &r), 0)) lm_panic(l, c, "integer overflow in '" op "'"); return r; }
+    int64_t r; if (__builtin_expect(bi(a, b, &r), 0)) { lm_jd_int("a", a); lm_jd_int("b", b); lm_panic(l, c, "integer overflow in '" op "'"); } return r; }
 #else
 #define LM_STEP(l, c) ((void)0)
 #define LM_ENTER(l, c) ((void)0)
@@ -141,7 +160,7 @@ LM_ARITH(lm_mul, "*", __builtin_mul_overflow)
 
 LM_RT inline int64_t lm_neg(int64_t a, int l, int c) { return lm_sub(0, a, l, c); }
 LM_RT inline int64_t lm_div(int64_t a, int64_t b, int l, int c) {
-  if (__builtin_expect(b == 0, 0)) lm_panic(l, c, "division by zero");
+  if (__builtin_expect(b == 0, 0)) { lm_jd_int("dividend", a); lm_panic(l, c, "division by zero"); }
 #ifdef LM_CHECKED
   if (__builtin_expect(b == -1 && a == INT64_MIN, 0)) lm_panic(l, c, "integer overflow in '/'");
 #endif
@@ -149,7 +168,7 @@ LM_RT inline int64_t lm_div(int64_t a, int64_t b, int l, int c) {
   return a / b;
 }
 LM_RT inline int64_t lm_mod(int64_t a, int64_t b, int l, int c) {
-  if (__builtin_expect(b == 0, 0)) lm_panic(l, c, "division by zero");
+  if (__builtin_expect(b == 0, 0)) { lm_jd_int("dividend", a); lm_panic(l, c, "division by zero"); }
   if (b == -1) return 0;
   return a % b;
 }
@@ -161,7 +180,9 @@ LM_RT inline int64_t lm_mod(int64_t a, int64_t b, int l, int c) {
 #define LM_SMALL 1024
 LM_G void *lm_fl[LM_SMALL / 16 + 1];
 LM_RT inline __attribute__((always_inline)) void lm_mem_charge(size_t n, int l, int c) {
-  if (__builtin_expect(n > (size_t)INT64_MAX || (lm_mem += (int64_t)n) > LM_MAX_MEM, 0)) lm_panic(l, c, "memory limit exceeded");
+  if (__builtin_expect(n > (size_t)INT64_MAX || (lm_mem += (int64_t)n) > LM_MAX_MEM, 0)) {
+    lm_jd_int("used", lm_mem); lm_jd_int("limit", LM_MAX_MEM); lm_panic(l, c, "memory limit exceeded");
+  }
 }
 LM_RT inline size_t lm_rs(size_t n) { return n > (size_t)INT64_MAX ? n : (n + 15) & ~(size_t)15; }
 /* n already rounded and charged: a new chunk for a small block, or malloc. */
@@ -536,6 +557,7 @@ LM_RT double lm_float_of_str(lm_str s, int l, int c) {
    everything else one pointer. LM_LIST(sfx, T) defines the typed accessors. */
 LM_COLD static void lm_oob(int64_t i, int64_t n, int ln, int c) {
   char m[96]; snprintf(m, sizeof m, "index %lld out of bounds for list of length %lld", (long long)i, (long long)n);
+  lm_jd_int("index", i); lm_jd_int("len", n);
   lm_panic(ln, c, m);
 }
 __attribute__((noinline)) LM_RT void lm_grow(lm_list *l, size_t esz, int ln, int c) {
@@ -576,7 +598,7 @@ __attribute__((noinline)) LM_RT lm_list *lm_list_copy(lm_list *x, size_t esz, bo
     if (__builtin_expect(l->len == l->cap, 0)) lm_grow(l, sizeof(T), ln, c); \
     ((T *)l->d)[l->len++] = v; } \
   LM_RT inline T lm_pop_##S(lm_list *l, int ln, int c) { \
-    if (__builtin_expect(l->len == 0, 0)) lm_panic(ln, c, "pop from empty list"); \
+    if (__builtin_expect(l->len == 0, 0)) { lm_jd_int("len", 0); lm_panic(ln, c, "pop from empty list"); } \
     return ((T *)l->d)[--l->len]; } \
   LM_RT inline lm_list *lm_lit_##S(int64_t n, const T *items, int ln, int c) { \
     return lm_list_new(n, items, sizeof(T), ln, c); }
@@ -681,6 +703,7 @@ LM_COLD static void lm_io_fail(const char *op, lm_str path, int l, int c) {
   const char *why = errno ? strerror(errno) : "not a regular file";
   char *m = malloc((size_t)path->len + 160);
   snprintf(m, (size_t)path->len + 160, "cannot %s file '%s': %s", op, path->d, why);
+  lm_jd_str("path", path->d);
   lm_panic(l, c, m);
 }
 /* Is canonical path `p` the directory `dir` or inside it? */
@@ -689,6 +712,10 @@ LM_RT bool lm_under(const char *p, const char *dir) {
   return strncmp(p, dir, n) == 0 && (p[n] == 0 || p[n] == '/' || dir[n - 1] == '/');
 }
 LM_RT bool lm_path_ok(const char *p, const char *const *allow) {
+#ifdef LM_UNSAFE_NO_RUNTIME_FS
+  (void)p; (void)allow;
+  return true; /* tests only: leave fs checks to the OS sandbox */
+#endif
   char cwd[PATH_MAX];
   const char *here[2] = {cwd, 0};
   if (!*allow) {
@@ -717,6 +744,7 @@ LM_COLD static void lm_fs_denied(lm_str s, int64_t fs, int l, int c) {
   size_t n = (size_t)s->len + strlen(lm_fs_roots[fs - 1]) + 96;
   char *m = malloc(n);
   snprintf(m, n, "access denied: '%s' is outside the Fs root '%s'", s->d, lm_fs_roots[fs - 1]);
+  lm_jd_str("path", s->d);
   lm_panic(l, c, m);
 }
 /* Canonical path of `s` (for Fs `fs`) into `out`. A missing final component
@@ -743,6 +771,7 @@ LM_RT void lm_resolve(int64_t fs, lm_str s, char *out, const char *const *allow,
   if (!lm_path_ok(out, allow)) {
     char *m = malloc((size_t)s->len + 160);
     snprintf(m, (size_t)s->len + 160, "access denied: '%s' is outside the allowed fs.%s paths (see --allow)", s->d, op);
+    lm_jd_str("path", s->d);
     lm_panic(l, c, m);
   }
 }
@@ -791,6 +820,7 @@ LM_RT int64_t lm_fs_sub(int64_t fs, lm_str path, int l, int c) {
     const char *why = strerror(errno);
     char *m = malloc((size_t)path->len + 160);
     snprintf(m, (size_t)path->len + 160, "cannot use directory '%s': %s", path->d, why);
+    lm_jd_str("path", path->d);
     lm_panic(l, c, m);
   }
   if (fs && !lm_under(p, lm_fs_roots[fs - 1])) lm_fs_denied(path, fs, l, c);

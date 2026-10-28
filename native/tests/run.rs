@@ -1,5 +1,7 @@
 //! End-to-end tests: compile real .lim programs with limits and run them.
 
+mod common;
+
 use std::process::Command;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
@@ -20,7 +22,7 @@ fn limits(cmd: &str, src: &str, flags: &[&str]) -> Out {
     std::fs::create_dir_all(&dir).unwrap();
     let file = dir.join("t.lim");
     std::fs::write(&file, src).unwrap();
-    let o = Command::new(env!("CARGO_BIN_EXE_limits"))
+    let o = common::limits()
         .arg(cmd)
         .arg(&file)
         // Every program run by the tests must free all its memory.
@@ -176,7 +178,7 @@ fn let_is_immutable_var_is_mutable() {
     // A `let` value cannot change at all, not even its contents.
     fails(
         limits("check", "let xs = [1]\nxs[0] = 5\npush(xs, 2)\n", &[]),
-        "check error at 2:3: cannot change 'xs': it is declared with 'let'\n  \
+        "check error at 2:1: cannot change 'xs': it is declared with 'let'\n  \
          hint: declare it with 'var xs = ...' to allow changes\n\
          check error at 3:6: cannot change 'xs': it is declared with 'let'\n  \
          hint: declare it with 'var xs = ...' to allow changes",
@@ -666,7 +668,7 @@ fn build_emits_binary_and_emit_c() {
     let file = dir.join("p.lim");
     std::fs::write(&file, "print(\"built\")\n").unwrap();
     let bin = dir.join("p.bin");
-    let st = Command::new(env!("CARGO_BIN_EXE_limits"))
+    let st = common::limits()
         .arg("build")
         .arg(&file)
         .arg("-o")
@@ -676,7 +678,7 @@ fn build_emits_binary_and_emit_c() {
     assert!(st.success());
     let o = Command::new(&bin).output().unwrap();
     assert_eq!(String::from_utf8_lossy(&o.stdout), "built\n");
-    let c = Command::new(env!("CARGO_BIN_EXE_limits"))
+    let c = common::limits()
         .arg("build")
         .arg(&file)
         .arg("--emit-c")
@@ -695,7 +697,7 @@ fn examples_run() {
         ("structs", "Point {x: 1.5, y: 0.0}"),
         ("primes", "count below 1000000: 78498"),
     ] {
-        let o = Command::new(env!("CARGO_BIN_EXE_limits"))
+        let o = common::limits()
             .arg("run")
             .arg(format!("{}/examples/{}.lim", root, name))
             .output()
@@ -955,14 +957,14 @@ fn json_diagnostics() {
         "{}",
         l
     );
-    assert!(l.ends_with(r#"t.lim","line":2,"col":7,"msg":"undefined variable 'totl'","hint":"did you mean 'total'?"}"#), "{}", l);
+    assert!(l.ends_with(r#"t.lim","line":2,"col":7,"end_line":2,"end_col":11,"msg":"undefined variable 'totl'","hint":"did you mean 'total'?","source_line":"print(totl)","expected":null,"found":null,"alternatives":["total","env"],"fixes":[{"msg":"rename 'totl' to 'total'","edits":[{"line":2,"col":7,"end_line":2,"end_col":11,"text":"total"}],"applicability":"machine"}]}"#), "{}", l);
     let o = limits("run", "assert(false, \"a \\\"q\\\"\")\n", &["--json"]);
     assert_eq!(o.code, 1);
     assert!(o.stderr.contains(r#""code":"E0506","#), "{}", o.stderr);
     assert!(
-        o.stderr
-            .trim_end()
-            .ends_with(r#""line":1,"col":1,"msg":"assertion failed: a \"q\"","hint":""}"#),
+        o.stderr.trim_end().ends_with(
+            r#""line":1,"col":1,"msg":"assertion failed: a \"q\"","hint":"","data":{}}"#
+        ),
         "{}",
         o.stderr
     );
@@ -1068,7 +1070,7 @@ fn in_dir(
     for (p, d) in files {
         std::fs::write(dir.join(p), d).unwrap();
     }
-    let mut ch = Command::new(env!("CARGO_BIN_EXE_limits"))
+    let mut ch = common::limits()
         .arg("run")
         .arg("t.lim")
         .arg("--leak-check")
@@ -1192,7 +1194,7 @@ check error at 6:9: a capability (Fs) cannot be stored in a list
   hint: pass capabilities as fn parameters instead (e.g. 'fn load(fs: Fs)')
 check error at 7:9: a capability (Vars) cannot be stored in an Option
   hint: pass capabilities as fn parameters instead (e.g. 'fn load(fs: Fs)')
-check error at 8:10: 'print' expects a printable value, got Fs
+check error at 8:7: 'print' expects a printable value, got Fs
 check error at 9:7: undefined function 'read_file'
   hint: I/O goes through capability values: use env.fs.read(path) (in a fn: take 'fs: Fs' and call fs.read(path))
 check error at 10:1: Fs has no method 'reed'
@@ -1248,7 +1250,7 @@ fn fs_access_is_sandboxed() {
     // A symlink inside the sandbox pointing out of it is an escape.
     let (_, dir) = in_dir(src, &["--", "x"], &[], "");
     std::os::unix::fs::symlink("/etc/hostname", dir.join("link")).unwrap();
-    let o = Command::new(env!("CARGO_BIN_EXE_limits"))
+    let o = common::limits()
         .args(["run", "t.lim", "--", "link"])
         .current_dir(&dir)
         .output()
@@ -1321,7 +1323,7 @@ print(xs, fs)"#,
 
 /// Run `limits <args>` in `dir` and return (stdout, stderr, exit code).
 fn cmd_in(dir: &std::path::Path, args: &[&str]) -> (String, String, i32) {
-    let o = Command::new(env!("CARGO_BIN_EXE_limits"))
+    let o = common::limits()
         .args(args)
         .current_dir(dir)
         .output()
@@ -1384,7 +1386,7 @@ fn json_runtime_errors_are_valid_utf8() {
     let src = "uses fs.read\nlet p = env.fs.read(\"bin\")\nprint(env.fs.read(\"../\" + p))\n";
     let (_, dir) = in_dir(src, &[], &[], "");
     std::fs::write(dir.join("bin"), b"a\xffb\xe2\x82\xac").unwrap();
-    let o = Command::new(env!("CARGO_BIN_EXE_limits"))
+    let o = common::limits()
         .args(["run", "t.lim", "--json"])
         .current_dir(&dir)
         .output()
@@ -1404,7 +1406,7 @@ fn non_utf8_source_is_a_located_lex_error() {
     assert_eq!(code, 1);
     assert_eq!(
         e.trim_end(),
-        r#"{"kind":"lex","code":"E0005","file":"u.lim","line":2,"col":12,"msg":"invalid UTF-8 in source file","hint":""}"#
+        "{\"kind\":\"lex\",\"code\":\"E0005\",\"file\":\"u.lim\",\"line\":2,\"col\":12,\"end_line\":2,\"end_col\":13,\"msg\":\"invalid UTF-8 in source file\",\"hint\":\"\",\"source_line\":\"    print(\\\"\u{fffd}\\\")\",\"expected\":null,\"found\":null,\"alternatives\":[],\"fixes\":[]}"
     );
 }
 
@@ -1452,7 +1454,7 @@ fn test_runner_survives_closed_stdout_and_timeouts() {
     // A test that never ends (no step budget under --unchecked).
     let t2 = "fn r() -> int:\n    while true: print(1)\n    0\ntest \"rec\": print(r())\ntest \"after\": pass\n";
     std::fs::write(dir.join("t2.lim"), t2).unwrap();
-    let mut ch = Command::new(env!("CARGO_BIN_EXE_limits"))
+    let mut ch = common::limits()
         .args(["test", "t1.lim"])
         .current_dir(&dir)
         .stdout(std::process::Stdio::piped())
@@ -1489,7 +1491,7 @@ fn read_line_on_empty_input_is_free_of_undefined_behaviour() {
         "uses stdin\nprint(env.stdin.read_line())\nprint(env.stdin.read_line())\n",
     )
     .unwrap();
-    let st = Command::new(env!("CARGO_BIN_EXE_limits"))
+    let st = common::limits()
         .args(["build", "t.lim", "--emit-c", "--leak-check", "-o", "t.c"])
         .current_dir(&dir)
         .status()

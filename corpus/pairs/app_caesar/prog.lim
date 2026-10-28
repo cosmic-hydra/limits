@@ -1,0 +1,27 @@
+# Caesar-shift stdin text by the amount in argv[1] (negative decodes); keeps case and non-letters.
+uses stdin, args
+
+fn shift_char(c: str, k: int) -> str:
+    let lower = split("abcdefghijklmnopqrstuvwxyz", "")
+    let upper = split("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "")
+    match find(lower, c):
+        Some(i): return lower[((i + k) % 26 + 26) % 26]
+        None: pass
+    match find(upper, c):
+        Some(i): upper[((i + k) % 26 + 26) % 26]
+        None: c
+
+test "round trip":
+    let s = "Hello, World!"
+    let enc = join([shift_char(c, 3) for c in split(s, "")], "")
+    assert(enc == "Khoor, Zruog!")
+    assert(join([shift_char(c, -3) for c in split(enc, "")], "") == s)
+
+fn main(env: Env):
+    let k = match get(env.args.list(), 0):
+        Some(a): int(a)
+        None: 13
+    var line = env.stdin.read_line()
+    while line != "":
+        print(join([shift_char(c, k) for c in split(line, "")], ""))
+        line = env.stdin.read_line()

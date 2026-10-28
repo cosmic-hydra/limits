@@ -1,0 +1,3 @@
+[{"name": "t01", "stdin": "card 1000\ncash 250\nrefund 300\nvoucher V123\nvoucher X9\n"},
+ {"name": "t02", "stdin": "cheque 50\ncard 99\n"},
+ {"name": "t03", "stdin": "refund 1\n"}]

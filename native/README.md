@@ -74,8 +74,19 @@ target/release/limits build examples/primes.lim -o primes && ./primes
 target/release/limits test examples/fib.lim   # inline `test "name":` blocks
 target/release/limits check examples/fib.lim --json   # one JSON diagnostic per line
 target/release/limits run examples/structs.lim --leak-check  # fail if memory is left at exit
-cargo test
+printf 'fn f(a: int) -> int:\n    return ' | target/release/limits check --stdin --expect --json  # next tokens, expected type, names
+target/release/limits fix prog.lim   # apply machine-applicable fixes in place
+cargo test   # also builds ../sandbox (limits-sandbox) and runs programs in it
 ```
+
+`limits run`/`limits test` run the program under the OS sandbox
+[`limits-sandbox`](../sandbox/README.md) with grants that mirror its `uses`
+line and `--allow` flags (see SPEC.md, capabilities). Build it with
+`cargo build --release` in `../sandbox`; it is found next to `limits`, via
+`$LIMITS_SANDBOX`, on `PATH`, or in the repository layout. `--timeout SEC`
+(default 60) bounds wall and CPU time, `--pass-env NAME` passes a variable to a
+`uses env` program, and `--no-sandbox` opts out (with a warning; the
+`--timeout` wall limit still applies).
 
 Layout: `src/lexer.rs` → `src/parser.rs` (AST in `src/ast.rs`) →
 `src/check.rs` (names + types + mutability, all errors at once; codes and
@@ -83,3 +94,5 @@ hints in `src/diag.rs`) → `src/cgen.rs` (C emission with reference-count
 insertion, with `src/runtime.h` (allocator, counts, strings, lists) embedded)
 → `cc`. The lexer emits `Newline`/`Indent`/`Dedent`
 tokens; the checker turns top-level statements into the implicit `main`.
+`src/assist.rs` implements `check --partial` / `--expect` (unfinished
+programs) on top of the same lexer, parser and checker.

@@ -1,0 +1,3 @@
+[{"name": "t01", "args": ["app.log"], "files": {"app.log": "10:00 INFO start\n10:01 DEBUG cfg loaded\n10:02 ERROR db down now\n10:03 WARN slow\n10:04 ERROR retry failed\n"}},
+ {"name": "t02", "args": ["x.log"], "files": {"x.log": "garbage\n12:00 TRACE x\n12:01 INFO ok\n"}},
+ {"name": "t03", "args": ["e.log"], "files": {"e.log": ""}}]

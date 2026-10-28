@@ -1,0 +1,3 @@
+[{"name": "t01", "stdin": "apple 3 45\nwatermelon 1 399\npen 12 105\n"},
+ {"name": "t02", "stdin": "x 1 1\n"},
+ {"name": "t03", "stdin": "tea 2 250\ncoffee 10 1000\n"}]

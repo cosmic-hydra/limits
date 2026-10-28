@@ -1,0 +1,19 @@
+uses stdin
+
+fn read_list(stdin: Stdin) -> [str]:
+    let n = int(stdin.read_line())
+    [stdin.read_line() for i in 0..n]
+
+# Same pattern: equal letters in `patterns` exactly where `colors` are equal.
+fn same_pattern(colors: [str], patterns: [str]) -> bool:
+    if len(colors) != len(patterns):
+        return false
+    for i in 0..len(colors):
+        for j in i + 1..len(colors):
+            if (colors[i] == colors[j]) != (patterns[i] == patterns[j]):
+                return false
+    true
+
+let colors = read_list(env.stdin)
+let patterns = read_list(env.stdin)
+print(same_pattern(colors, patterns))

@@ -1,0 +1,8 @@
+uses stdin
+
+fn count(xs: [int], v: int) -> int:
+    len([x for x in xs if x == v])
+
+let xs = [int(p) for p in split(env.stdin.read_line(), " ") if p != ""]
+let kept = [x for x in xs if count(xs, x) == 1]
+print(join([str(x) for x in kept], " "))

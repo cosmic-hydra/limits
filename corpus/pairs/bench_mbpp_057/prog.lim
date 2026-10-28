@@ -1,0 +1,10 @@
+uses stdin
+
+var xs = [int(p) for p in split(env.stdin.read_line(), " ") if p != ""]
+sort(xs)
+var num = 0
+var i = len(xs) - 1
+while i >= 0:
+    num = num * 10 + xs[i]
+    i -= 1
+print(num)

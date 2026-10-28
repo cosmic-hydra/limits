@@ -1,0 +1,5 @@
+c0 arrives 0 starts 0 leaves 5 waited 0
+c1 arrives 1 starts 5 leaves 8 waited 4
+c2 arrives 2 starts 8 leaves 9 waited 6
+c3 arrives 10 starts 10 leaves 12 waited 0
+max wait 6 total wait 10 busy until 12

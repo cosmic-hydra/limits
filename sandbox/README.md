@@ -12,7 +12,7 @@ x86_64 only.
 ```
 limits-sandbox [--read DIR]... [--write DIR]... [--net none] [--cpu-sec N]
                [--mem-mb N] [--fsize-mb N] [--nproc N] [--wall-sec N]
-               [--env NAME[=VALUE]]... [--allow-degraded] -- PROGRAM ARGS...
+               [--env NAME[=VALUE]]... [--allow-degraded] [--quiet] -- PROGRAM ARGS...
 ```
 
 Defaults: `--cpu-sec 10 --mem-mb 512 --fsize-mb 64 --nproc 1 --wall-sec 30`,
@@ -27,6 +27,15 @@ On exit it prints one line to stderr and exits with the matching code:
 | `limits-sandbox: timeout (wall limit Ns)` | 137 |
 | setup errors (`limits-sandbox: ...`) | 125 |
 | child setup failed before exec | 127 |
+
+With `--quiet` the `exit N` line is not printed, and a child killed by a
+signal makes the launcher die of the same signal (no line either), so a
+caller sees the program's own exit status. `limits run`/`limits test` use it.
+
+The program never outlives the launcher: the child sets `PR_SET_PDEATHSIG`
+(SIGKILL) before exec, so if the launcher is killed (for example by a
+caller's own timeout) the kernel kills the program too, instead of leaving it
+running with no wall limit.
 
 ## Threat model
 

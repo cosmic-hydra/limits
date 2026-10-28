@@ -1,21 +1,15 @@
-uses stdin;
+uses stdin
 
-fn main() {
-    let n = int(input_line());
-    let xs: [str] = [];
-    for i in 0..n {
-        push(xs, input_line());
-    }
-    let sub = input_line();
-    let kept: [str] = [];
-    for s in xs {
-        # s contains sub exactly when splitting on it yields more than one piece
-        if sub == "" or len(split(s, sub)) > 1 {
-            push(kept, s);
-        }
-    }
-    print(len(kept));
-    for s in kept {
-        print(s);
-    }
-}
+let n = int(env.stdin.read_line())
+var xs: [str] = []
+for i in 0..n:
+    push(xs, env.stdin.read_line())
+let sub = env.stdin.read_line()
+var kept: [str] = []
+for s in xs:
+    # s contains sub exactly when splitting on it yields more than one piece
+    if sub == "" or len(split(s, sub)) > 1:
+        push(kept, s)
+print(len(kept))
+for s in kept:
+    print(s)

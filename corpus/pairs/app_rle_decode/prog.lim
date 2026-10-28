@@ -1,0 +1,30 @@
+# Decode run-length strings like "3a2b1c" from stdin; report malformed input.
+uses stdin
+
+fn decode(s: str) -> Result[str, str]:
+    var out = ""
+    var num = ""
+    for c in split(s, ""):
+        if is_some(parse_int(c)):
+            num += c
+            continue
+        if num == "":
+            return Err("missing count before '" + c + "'")
+        for i in 0..int(num):
+            out += c
+        num = ""
+    if num != "":
+        return Err("dangling count " + num)
+    Ok(out)
+
+test "decode":
+    assert(unwrap(decode("3a1b")) == "aaab")
+    assert(is_err(decode("a")))
+    assert(is_err(decode("2a3")))
+
+var line = env.stdin.read_line()
+while line != "":
+    match decode(line):
+        Ok(d): print(line, "->", d, len(d))
+        Err(e): print(line, "-> error:", e)
+    line = env.stdin.read_line()

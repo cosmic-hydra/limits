@@ -1,0 +1,58 @@
+# Convert each stdin line between Roman numerals and integers (1..3999).
+uses stdin
+
+fn to_roman(n: int) -> Result[str, str]:
+    if n < 1 or n > 3999:
+        return Err("out of range: " + str(n))
+    let vals = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1]
+    let syms = ["M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"]
+    var n = n
+    var out = ""
+    for i in 0..len(vals):
+        while n >= vals[i]:
+            out += syms[i]
+            n -= vals[i]
+    Ok(out)
+
+fn digit(c: str) -> Result[int, str]:
+    match c:
+        "I": Ok(1)
+        "V": Ok(5)
+        "X": Ok(10)
+        "L": Ok(50)
+        "C": Ok(100)
+        "D": Ok(500)
+        "M": Ok(1000)
+        _: Err("bad digit: " + c)
+
+fn from_roman(s: str) -> Result[int, str]:
+    let vs = [digit(c)? for c in split(s, "")]
+    var total = 0
+    for i in 0..len(vs):
+        if i + 1 < len(vs) and vs[i + 1] > vs[i]:
+            total -= vs[i]
+        else:
+            total += vs[i]
+    if to_roman(total)? != s:
+        return Err("not canonical: " + s)
+    Ok(total)
+
+test "round trip":
+    for n in 1..4000:
+        assert(unwrap(from_roman(unwrap(to_roman(n)))) == n)
+test "errors":
+    assert(is_err(from_roman("IIII")))
+    assert(is_err(to_roman(0)))
+
+var line = env.stdin.read_line()
+while line != "":
+    match parse_int(line):
+        Some(n):
+            match to_roman(n):
+                Ok(r): print(line, "->", r)
+                Err(e): print(line, "->", "error: " + e)
+        None:
+            match from_roman(line):
+                Ok(v): print(line, "->", v)
+                Err(e): print(line, "->", "error: " + e)
+    line = env.stdin.read_line()

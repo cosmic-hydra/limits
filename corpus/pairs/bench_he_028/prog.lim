@@ -1,0 +1,7 @@
+uses stdin
+
+let n = int(env.stdin.read_line())
+var parts: [str] = []
+for i in 0..n:
+    push(parts, env.stdin.read_line())
+print(join(parts, ""))

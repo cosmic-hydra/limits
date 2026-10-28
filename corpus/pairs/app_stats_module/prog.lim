@@ -1,0 +1,30 @@
+# Summary statistics of the integers on stdin, using a helper module.
+uses stdin
+import util.stats
+
+fn two(n: int) -> str:
+    if n < 10: return "0" + str(n)
+    str(n)
+
+var xs: [int] = []
+var line = env.stdin.read_line()
+while line != "":
+    for w in split(line, " "):
+        if w != "": push(xs, int(w))
+    line = env.stdin.read_line()
+if len(xs) == 0:
+    print("no data")
+else:
+    let m = stats.mean100(xs)
+    let md = stats.median2(xs)
+    print("n", len(xs))
+    if m >= 0:
+        print("mean", str(m / 100) + "." + two(m % 100))
+    else:
+        print("mean", "negative")
+    if md % 2 == 0:
+        print("median", md / 2)
+    else:
+        print("median", str(md / 2) + ".5")
+    print("mode", stats.mode(xs))
+    print("range", min(xs), max(xs))

@@ -1,0 +1,13 @@
+# Dedupe and sort a list of ints.
+fn rnd(s: inout [int]) -> int:
+    s[0] = (s[0] * 1103515245 + 12345) % 2147483648
+    s[0] / 65536
+
+var seed = [3]
+var xs = [rnd(&seed) % 100000 for i in 0..300000]
+sort(xs)
+var u: [int] = []
+for x in xs:
+    if len(u) == 0 or u[len(u) - 1] != x:
+        push(u, x)
+print(len(u), u[0], u[1], u[2], u[len(u) - 1], sum(u))

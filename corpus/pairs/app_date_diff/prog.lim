@@ -1,0 +1,38 @@
+# Days between pairs of ISO dates "YYYY-MM-DD YYYY-MM-DD" on stdin, plus the weekday of each start.
+uses stdin
+
+fn leap(y: int) -> bool:
+    y % 4 == 0 and (y % 100 != 0 or y % 400 == 0)
+
+fn days_in(y: int, m: int) -> int:
+    requires m >= 1 and m <= 12
+    ensures result >= 28 and result <= 31
+    if m == 2:
+        if leap(y): return 29
+        return 28
+    [31, 0, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1]
+
+# days since 1970-01-01
+fn ordinal(s: str) -> int:
+    let p = [int(x) for x in split(s, "-")]
+    let y = p[0]
+    let m = p[1]
+    let d = p[2]
+    assert(y >= 1970 and d >= 1 and d <= days_in(y, m), "bad date " + s)
+    var n = 0
+    for yy in 1970..y:
+        n += 365
+        if leap(yy): n += 1
+    for mm in 1..m:
+        n += days_in(y, mm)
+    n + d - 1
+
+test "epoch": assert(ordinal("1970-01-01") == 0)
+test "leap years": assert(ordinal("2001-01-01") - ordinal("2000-01-01") == 366)
+
+let days = ["Thu", "Fri", "Sat", "Sun", "Mon", "Tue", "Wed"]
+var line = env.stdin.read_line()
+while line != "":
+    let ab = split(line, " ")
+    print(ab[0], days[ordinal(ab[0]) % 7], "->", ab[1], ordinal(ab[1]) - ordinal(ab[0]), "days")
+    line = env.stdin.read_line()

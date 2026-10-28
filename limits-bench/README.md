@@ -99,8 +99,8 @@ Result: HumanEval/1–46 (30 kept) and MBPP/3–89 (30 kept); the full trace wit
 the reason for every skip is `data/selection_log.txt`. Rebuild with
 `python3 -I tools/build_tasks.py`.
 
-Fit with current Limits: stdin is available (`uses stdin;` + `input_line()`),
-and `split`, `join`, `sort`, `int(str)` exist, so every task can be written.
+Fit with current Limits: stdin is available (`uses stdin` + `env.stdin.read_line()`),
+and `split`, `join`, `sort`, `int(str)`, `parse_int` exist, so every task can be written.
 Some tasks need characters or ASCII codes (case flipping, digit sums); Limits
 has no `ord`/`chr` or string indexing, so they need `split(s, "")` and lookup
 strings. That is a real cost of the language and is deliberately kept.
@@ -135,7 +135,7 @@ every attempt with status, tokens, diagnostics, per-test status and time),
 Run each task in a fresh agent context, once with Limits and once with Python.
 
 1. The agent receives ONLY: the task `description` from `tasks/<id>.json` and
-   the language reference text (for Limits: `native/SPEC.md` verbatim at the
+   the language reference text (for Limits: `native/LLM.md` verbatim at the
    commit being measured; for Python: nothing extra). No other files, no
    repository access, no tools that execute code, no web.
 2. It writes one complete solution file (`<id>.attempt1.lim` / `.py`). It may
@@ -160,5 +160,7 @@ Run each task in a fresh agent context, once with Limits and once with Python.
   E0219 (he_023), runtime error E0501 (he_024), wrong answer (mbpp_017),
   runtime error E0507 step limit (mbpp_059, an infinite loop) and lex error
   E0002 (mbpp_086), all as intended.
+  (Migrated to v0.4 syntax; he_013 is now an unexpected-indent parse error,
+  since a missing semicolon is no longer an error.)
 - `selftest/repair/` with `--repair-log --only he_007,he_009,he_013,mbpp_003`:
   round 2 success 1/3, round 3 success 1/2, final 3/4, as constructed.

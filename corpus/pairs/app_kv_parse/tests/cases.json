@@ -1,0 +1,3 @@
+[{"name": "t01", "stdin": "b=2;a=40\nx=1;x=2\ncpu=-3\n"},
+ {"name": "t02", "stdin": "a=1;b\nq=one\n=5\n"},
+ {"name": "t03", "stdin": "z=10;y=20;x=30\n"}]

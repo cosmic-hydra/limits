@@ -1,4 +1,2 @@
-uses stdin;
-fn main() {
-    print(false);
-}
+uses stdin
+print(false)

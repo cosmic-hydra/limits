@@ -1,0 +1,20 @@
+uses stdin
+
+fn comb_sort(xs: inout [int]):
+    var gap = len(xs)
+    var swapped = true
+    while gap > 1 or swapped:
+        gap = int(float(gap) / 1.3)
+        swapped = false
+        var i = 0
+        while gap + i < len(xs):
+            if xs[i] > xs[i + gap]:
+                let t = xs[i]
+                xs[i] = xs[i + gap]
+                xs[i + gap] = t
+                swapped = true
+            i += 1
+
+var xs = [int(p) for p in split(env.stdin.read_line(), " ") if p != ""]
+comb_sort(&xs)
+print(join([str(x) for x in xs], " "))

@@ -1,0 +1,45 @@
+# Join users.csv (id,name) with orders.csv (id,user_id,cents); print spend per user.
+uses fs.read, args
+
+struct User:
+    id: str
+    name: str
+    orders: int
+    spend: int
+
+fn rows(text: str) -> [[str]]:
+    let lines = split(text, "\n")
+    [split(lines[i], ",") for i in 1..len(lines) if lines[i] != ""]
+
+fn pad(s: str, w: int, left: bool) -> str:
+    var fill = ""
+    for i in len(s)..w:
+        fill += " "
+    if left: return s + fill
+    fill + s
+
+fn main(env: Env):
+    let a = env.args.list()
+    var users = [User { id: r[0], name: r[1], orders: 0, spend: 0 } for r in rows(env.fs.read(a[0]))]
+    var orphans = 0
+    for o in rows(env.fs.read(a[1])):
+        let ids = [u.id for u in users]
+        match find(ids, o[1]):
+            Some(i):
+                users[i].spend += int(o[2])
+                users[i].orders += 1
+            None: orphans += 1
+    # selection sort: highest spend first, then by name
+    for i in 0..len(users):
+        var best = i
+        for j in i + 1..len(users):
+            let u = users[j]
+            let b = users[best]
+            if u.spend > b.spend or (u.spend == b.spend and u.name < b.name):
+                best = j
+        let t = users[i]
+        users[i] = users[best]
+        users[best] = t
+    for u in users:
+        print(pad(u.name, 8, true) + pad(str(u.orders), 3, false) + pad(str(u.spend), 8, false))
+    print("orphan orders:", orphans)

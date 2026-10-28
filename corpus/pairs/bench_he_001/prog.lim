@@ -1,0 +1,22 @@
+uses stdin
+
+fn separate_groups(s: str) -> [str]:
+    var groups: [str] = []
+    var cur: [str] = []
+    var depth = 0
+    for c in split(s, ""):
+        if c == "(":
+            depth += 1
+            push(cur, c)
+        elif c == ")":
+            depth -= 1
+            push(cur, c)
+            if depth == 0:
+                push(groups, join(cur, ""))
+                cur = []
+    groups
+
+let groups = separate_groups(env.stdin.read_line())
+print(len(groups))
+for g in groups:
+    print(g)

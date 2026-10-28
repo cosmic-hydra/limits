@@ -1,0 +1,3 @@
+[{"name": "t01", "env": {"GREET_NAME": "Ada", "GREET_LANG": "fr"}},
+ {"name": "t02", "env": {"GREET_NAME": "", "GREET_LANG": ""}},
+ {"name": "t03", "env": {"GREET_NAME": "Lin", "GREET_LANG": "jp"}}]
