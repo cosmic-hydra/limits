@@ -1,0 +1,15 @@
+uses stdin
+fn strs(stdin: Stdin) -> [str]:
+    let n = unwrap(parse_int(stdin.read_line()))
+    var out: [str] = []
+    for i in 0..n:
+        push(out, stdin.read_line())
+    out
+let c = strs(env.stdin)
+let p = strs(env.stdin)
+var ok = len(c) == len(p)
+if ok:
+    for i in 0..len(c):
+        for j in 0..len(c):
+            if (c[i] == c[j]) != (p[i] == p[j]): ok = false
+print(ok)

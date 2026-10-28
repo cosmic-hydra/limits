@@ -1,0 +1,11 @@
+uses stdin
+let lo = split("abcdefghijklmnopqrstuvwxyz", "")
+let up = split("ABCDEFGHIJKLMNOPQRSTUVWXYZ", "")
+var out: [str] = []
+for c in split(env.stdin.read_line(), ""):
+    let a = find(lo, c)
+    let b = find(up, c)
+    if is_some(a): push(out, up[unwrap(a)])
+    elif is_some(b): push(out, lo[unwrap(b)])
+    else: push(out, c)
+print(join(out, ""))

@@ -1,6 +1,4 @@
 # Hello world in Limits native.
-fn main() {
-    print("hello, world");
-    let name = "limits";
-    print("compiled by", name, 1, 2.5, true);
-}
+print("hello, world")
+let name = "limits"
+print("compiled by", name, 1, 2.5, true)

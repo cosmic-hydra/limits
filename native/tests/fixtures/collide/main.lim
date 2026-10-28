@@ -1,13 +1,15 @@
-import a;
-import b;
-struct P { v: int }
-fn helper() -> str { return "root"; }
-fn M1a6helper() -> str { return "tricky"; }   # looks like a mangled name
-fn main() {
-  print(helper(), a.helper(), b.helper(), M1a6helper());
-  let p = P { v: 1 };
-  let q = a.P { v: "two" };
-  let r: b.P = b.make(3);
-  print(p.v, q.v, r.v, a.wrap(p.v).v);
-  print(q);
-}
+import a
+import b
+struct P:
+    v: int
+fn helper() -> str:
+    "root"
+fn M1a6helper() -> str:
+    "tricky"
+# looks like a mangled name
+print(helper(), a.helper(), b.helper(), M1a6helper())
+let p = P { v: 1 }
+let q = a.P { v: "two" }
+let r: b.P = b.make(3)
+print(p.v, q.v, r.v, a.wrap(p.v).v)
+print(q)

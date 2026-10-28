@@ -1,0 +1,13 @@
+uses stdin
+let cs = split(env.stdin.read_line(), "")
+let ch = env.stdin.read_line()
+var first = -1
+var last = -1
+for i in 0..len(cs):
+    if cs[i] == ch:
+        if first == -1: first = i
+        last = i
+var out: [str] = []
+for i in 0..len(cs):
+    if i != first and i != last: push(out, cs[i])
+print(join(out, ""))

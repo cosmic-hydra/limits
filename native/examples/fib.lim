@@ -1,14 +1,9 @@
 # Naive recursive Fibonacci: exercises calls and integer arithmetic.
-fn fib(n: int) -> int {
-    if n < 2 {
-        return n;
-    }
-    return fib(n - 1) + fib(n - 2);
-}
+fn fib(n: int) -> int:
+    if n < 2:
+        return n
+    fib(n - 1) + fib(n - 2)
 
-fn main() {
-    for i in 0..10 {
-        print(i, fib(i));
-    }
-    print("fib(30) =", fib(30));
-}
+for i in 0..10:
+    print(i, fib(i))
+print("fib(30) =", fib(30))

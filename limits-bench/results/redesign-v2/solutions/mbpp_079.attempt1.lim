@@ -1,0 +1,2 @@
+uses stdin
+print(len(env.stdin.read_line()) % 2 == 1)

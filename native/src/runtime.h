@@ -14,10 +14,19 @@
 #include <time.h>
 #include <unistd.h>
 
-typedef struct { int64_t len; const char *d; } LmStr;
+/* Every heap value (str, list, struct, enum) starts with a reference count.
+   Values are immutable while shared: a write to a value whose count is above
+   1 copies it first (copy-on-write). Literals and unit variants are static
+   and immortal (count LM_IMM, never reaches 0). A str's bytes follow its
+   24-byte header (cap bytes + NUL; literals have cap 0). */
+#define LM_IMM ((int64_t)1 << 60)
+typedef struct { int64_t rc, len, cap; char d[]; } LmStr;
 typedef LmStr *lm_str;
 typedef union { int64_t i; double f; void *p; } lm_val;
-typedef struct { int64_t len, cap; void *d; } lm_list;
+typedef struct { int64_t rc, len, cap; void *d; } lm_list;
+#define LM_RC(p) (((int64_t *)(p))[0])
+/* +1 reference to a heap value; yields the value. */
+#define LM_DUP(x) ({ __typeof__(x) lm_d_ = (x); LM_RC(lm_d_)++; lm_d_; })
 
 /* Large programs are split into several C files compiled in parallel
    (LM_SPLIT); then program functions and runtime globals need external linkage. */
@@ -33,7 +42,7 @@ typedef struct { int64_t len, cap; void *d; } lm_list;
 /* Not every program uses every runtime helper. */
 #define LM_U __attribute__((unused))
 #define LM_RT static LM_U
-LM_G LM_U int64_t lm_steps, lm_depth, lm_mem;
+LM_G LM_U int64_t lm_steps, lm_depth, lm_mem, lm_blocks;
 LM_G char *lm_ap, *lm_aend, *lm_stack_lo;
 
 /* Source locations: line | file index << 20 (file 0 is the root file). */
@@ -92,7 +101,7 @@ LM_RT void lm_stack_init(void) {
 }
 #define LM_STACK_OK() ((char *)__builtin_frame_address(0) >= lm_stack_lo)
 
-LM_COLD static int lm_assert_fail(int l, int c, lm_str m) {
+LM_COLD static void lm_assert_fail(int l, int c, lm_str m) {
   if (!m) lm_panic(l, c, "assertion failed");
   char *b = malloc((size_t)m->len + 32);
   snprintf(b, (size_t)m->len + 32, "assertion failed: %s", m->d);
@@ -145,29 +154,85 @@ LM_RT inline int64_t lm_mod(int64_t a, int64_t b, int l, int c) {
   return a % b;
 }
 
-/* Bump arena: memory is never freed (v0.1 limitation). Every heap byte is
-   charged against the --max-mem budget (all modes). */
-LM_RT void lm_mem_charge(size_t n, int l, int c) {
-  if (n > (size_t)INT64_MAX || (lm_mem += (int64_t)n) > LM_MAX_MEM) lm_panic(l, c, "memory limit exceeded");
+/* Allocator. Blocks up to LM_SMALL bytes come from per-size-class free
+   lists (16-byte classes) refilled from 1 MiB chunks; larger blocks use
+   malloc. lm_mem counts LIVE bytes (charged on allocation, credited on free)
+   against --max-mem in all modes; lm_blocks counts live blocks (--leak-check). */
+#define LM_SMALL 1024
+LM_G void *lm_fl[LM_SMALL / 16 + 1];
+LM_RT inline __attribute__((always_inline)) void lm_mem_charge(size_t n, int l, int c) {
+  if (__builtin_expect(n > (size_t)INT64_MAX || (lm_mem += (int64_t)n) > LM_MAX_MEM, 0)) lm_panic(l, c, "memory limit exceeded");
 }
-LM_RT void *lm_xmalloc(size_t n, int l, int c) {
-  lm_mem_charge(n, l, c);
+LM_RT inline size_t lm_rs(size_t n) { return n > (size_t)INT64_MAX ? n : (n + 15) & ~(size_t)15; }
+/* n already rounded and charged: a new chunk for a small block, or malloc. */
+__attribute__((noinline)) LM_RT void *lm_alloc_slow(size_t n, int l, int c) {
+  if (n <= LM_SMALL) {
+    /* Charge the bytes handed out, not the chunk, so --max-mem 1 works and
+       the error points at the allocation that crosses the budget. */
+    lm_ap = malloc(1 << 20);
+    if (!lm_ap) lm_panic(l, c, "out of memory");
+    lm_aend = lm_ap + (1 << 20);
+    void *p = lm_ap; lm_ap += n; return p;
+  }
   void *p = malloc(n);
   if (!p) lm_panic(l, c, "out of memory");
   return p;
 }
-LM_RT void *lm_alloc(size_t n, int l, int c) {
-  n = (n + 15) & ~(size_t)15;
-  if (n > 65536) return lm_xmalloc(n, l, c);
-  /* Charge the bytes handed out, not the 1 MiB chunk, so --max-mem 1 works
-     and the error points at the allocation that crosses the budget. */
+LM_RT inline __attribute__((always_inline)) void *lm_alloc(size_t n, int l, int c) {
+  n = lm_rs(n);
   lm_mem_charge(n, l, c);
-  if (n > (size_t)(lm_aend - lm_ap)) {
-    lm_ap = malloc(1 << 20);
-    if (!lm_ap) lm_panic(l, c, "out of memory");
-    lm_aend = lm_ap + (1 << 20);
+  lm_blocks++;
+  if (n <= LM_SMALL) {
+    void **h = &lm_fl[n >> 4], *p = *h;
+    if (__builtin_expect(p != 0, 1)) { *h = *(void **)p; return p; }
+    if (__builtin_expect(n <= (size_t)(lm_aend - lm_ap), 1)) { p = lm_ap; lm_ap += n; return p; }
   }
-  void *p = lm_ap; lm_ap += n; return p;
+  return lm_alloc_slow(n, l, c);
+}
+LM_RT inline void lm_free(void *p, size_t n) {
+  n = lm_rs(n);
+  lm_mem -= (int64_t)n;
+  lm_blocks--;
+  if (n <= LM_SMALL) { *(void **)p = lm_fl[n >> 4]; lm_fl[n >> 4] = p; }
+  else free(p);
+}
+LM_RT void *lm_realloc(void *p, size_t old, size_t n, int l, int c) {
+  size_t ro = lm_rs(old), rn = lm_rs(n);
+  if (ro == rn) return p;
+  if (ro > LM_SMALL && rn > LM_SMALL) {
+    if (rn > ro) lm_mem_charge(rn - ro, l, c); else lm_mem -= (int64_t)(ro - rn);
+    void *q = realloc(p, rn);
+    if (!q) lm_panic(l, c, "out of memory");
+    return q;
+  }
+  void *q = lm_alloc(n, l, c);
+  memcpy(q, p, old < n ? old : n);
+  lm_free(p, old);
+  return q;
+}
+/* Freeing: a value whose count drops to 0 is passed to lm_release with its
+   type's free function, which drops the children and frees the block. While
+   one release runs, nested ones are queued and run by the outer loop, so
+   freeing a long chain (a linked list, a deep tree) uses no C recursion. */
+typedef void (*lm_frf)(void *);
+typedef struct { void *p; lm_frf f; } lm_pend;
+LM_G lm_pend *lm_pq;
+LM_G int64_t lm_pn, lm_pcap;
+LM_G bool lm_draining;
+LM_RT void lm_release(void *p, lm_frf f) {
+  if (lm_draining) {
+    if (lm_pn == lm_pcap) {
+      lm_pcap = lm_pcap * 2 + 64;
+      lm_pq = realloc(lm_pq, sizeof(lm_pend) * (size_t)lm_pcap);
+      if (!lm_pq) lm_panic(0, 0, "out of memory");
+    }
+    lm_pq[lm_pn].p = p; lm_pq[lm_pn++].f = f;
+    return;
+  }
+  lm_draining = true;
+  f(p);
+  while (lm_pn) { lm_pn--; lm_pq[lm_pn].f(lm_pq[lm_pn].p); }
+  lm_draining = false;
 }
 
 LM_RT inline lm_val lm_vi(int64_t i) { lm_val v; v.i = i; return v; }
@@ -175,23 +240,60 @@ LM_RT inline lm_val lm_vf(double f) { lm_val v; v.f = f; return v; }
 LM_RT inline lm_val lm_vp(void *p) { lm_val v; v.p = p; return v; }
 
 /* ---- strings ---- */
-LM_RT lm_str lm_str_new(const char *s, int64_t n, int l, int c) {
+LM_RT LmStr *lm_str_alloc(int64_t n, int l, int c) { /* uninitialised bytes, rc 1 */
+  if (n < 0 || n > INT64_MAX / 2) lm_panic(l, c, "memory limit exceeded");
   LmStr *r = lm_alloc(sizeof(LmStr) + (size_t)n + 1, l, c);
-  char *d = (char *)(r + 1);
-  memcpy(d, s, (size_t)n); d[n] = 0;
-  r->len = n; r->d = d; return r;
+  r->rc = 1; r->len = n; r->cap = n; r->d[n] = 0;
+  return r;
+}
+/* A drop of an immortal literal (count LM_IMM) never reaches free at run
+   time, but once gcc inlines a free function into such a drop it warns that
+   it might: the warning is a false positive here. */
+#ifndef __TINYC__
+#pragma GCC diagnostic ignored "-Wfree-nonheap-object"
+#endif
+LM_RT void lm_fr_s(void *p) { LmStr *s = p; lm_free(s, sizeof(LmStr) + (size_t)s->cap + 1); }
+LM_RT LM_U inline void lm_drop_s(lm_str s) { if (s && --s->rc == 0) lm_fr_s(s); }
+LM_RT lm_str lm_str_new(const char *s, int64_t n, int l, int c) {
+  LmStr *r = lm_str_alloc(n, l, c);
+  memcpy(r->d, s, (size_t)n);
+  return r;
 }
 LM_RT lm_str lm_concat(int n, const lm_str *xs, int l, int c) { /* xs[0] + ... + xs[n-1] */
   int64_t len = 0;
   for (int i = 0; i < n; i++)
     if (__builtin_add_overflow(len, xs[i]->len, &len)) lm_panic(l, c, "memory limit exceeded");
   lm_charge(len, l, c);
-  LmStr *r = lm_alloc(sizeof(LmStr) + (size_t)len + 1, l, c);
-  char *d = (char *)(r + 1);
-  r->len = len; r->d = d;
+  LmStr *r = lm_str_alloc(len, l, c);
+  char *d = r->d;
+  for (int i = 0; i < n; i++) { memcpy(d, xs[i]->d, (size_t)xs[i]->len); d += xs[i]->len; }
+  return r;
+}
+/* a + xs[0] + ... + xs[n-1], consuming a (the result replaces it). A unique
+   string grows in place (capacity * 1.5), so building a string with
+   `s += x` in a loop is linear. */
+LM_RT lm_str lm_str_append(lm_str a, int n, const lm_str *xs, int l, int c) {
+  int64_t len = a->len, add = 0;
+  for (int i = 0; i < n; i++)
+    if (__builtin_add_overflow(add, xs[i]->len, &add)) lm_panic(l, c, "memory limit exceeded");
+  if (__builtin_add_overflow(len, add, &len) || len > INT64_MAX / 4) lm_panic(l, c, "memory limit exceeded");
+  lm_charge(add, l, c);
+  if (a->rc != 1) { /* shared, or an immortal literal */
+    LmStr *r = lm_str_alloc(len + (len >> 1), l, c);
+    r->len = a->len;
+    memcpy(r->d, a->d, (size_t)a->len);
+    lm_drop_s(a);
+    a = r;
+  } else if (len > a->cap) {
+    int64_t cap = len + (len >> 1);
+    a = lm_realloc(a, sizeof(LmStr) + (size_t)a->cap + 1, sizeof(LmStr) + (size_t)cap + 1, l, c);
+    a->cap = cap;
+  }
+  char *d = a->d + a->len;
   for (int i = 0; i < n; i++) { memcpy(d, xs[i]->d, (size_t)xs[i]->len); d += xs[i]->len; }
   *d = 0;
-  return r;
+  a->len = len;
+  return a;
 }
 LM_RT int lm_str_cmp(lm_str a, lm_str b, int l, int c) {
   int64_t n = a->len < b->len ? a->len : b->len;
@@ -215,6 +317,7 @@ LM_RT int64_t lm_str_len(lm_str s, int l, int c) { /* length in characters (UTF-
 typedef struct { char *d; int64_t len, cap; } lm_buf;
 LM_G int lm_rl, lm_rc; /* location of the str()/print being formatted */
 LM_RT void lm_put(lm_buf *b, const char *s, int64_t n) {
+  if (n <= 0) return; /* b->d may still be NULL; memcpy(NULL, s, 0) is UB */
   if (b->len + n > b->cap) {
     int64_t old = b->cap;
     b->cap = (b->len + n) * 2 + 16;
@@ -263,13 +366,14 @@ LM_RT lm_str lm_buf_str(lm_buf *b) {
 }
 
 LM_RT void lm_struct_repr(lm_buf *b, int idx, void *p); /* generated per program */
+LM_RT void lm_enum_repr(lm_buf *b, int idx, void *p);   /* generated per program */
 
 LM_RT const char *lm_skip_desc(const char *d) {
   while (*d == 'L') d++;
-  if (*d == 'S') { while (*d != ';') d++; }
+  if (*d == 'S' || *d == 'E') { while (*d != ';') d++; }
   return d + 1;
 }
-/* desc: i f b s, L<elem>, S<idx>; */
+/* desc: i f b s, L<elem>, S<idx>; (struct), E<idx>; (enum, Option, Result) */
 LM_RT void lm_repr(lm_buf *b, lm_val v, const char **desc, bool quote) {
   char tmp[LM_FLT_MAX];
   char k = *(*desc)++;
@@ -318,6 +422,12 @@ LM_RT void lm_repr(lm_buf *b, lm_val v, const char **desc, bool quote) {
     lm_struct_repr(b, idx, v.p);
     break;
   }
+  case 'E': {
+    int idx = (int)strtol(*desc, (char **)desc, 10);
+    (*desc)++;
+    lm_enum_repr(b, idx, v.p);
+    break;
+  }
   }
 }
 LM_RT lm_str lm_to_str(lm_val v, const char *desc, int l, int c) {
@@ -325,6 +435,15 @@ LM_RT lm_str lm_to_str(lm_val v, const char *desc, int l, int c) {
   lm_rl = l; lm_rc = c;
   lm_repr(&b, v, &desc, false);
   return lm_buf_str(&b);
+}
+LM_COLD static void lm_unwrap_err(lm_val v, const char *desc, int l, int c) {
+  lm_buf b = {0};
+  lm_rl = l; lm_rc = c;
+  lm_puts(&b, "unwrap of Err(");
+  lm_repr(&b, v, &desc, true);
+  lm_puts(&b, ")");
+  lm_put(&b, "", 1);
+  lm_panic(l, c, b.d);
 }
 LM_RT lm_str lm_str_int(int64_t i, int l, int c) {
   char t[24], *p = t + sizeof t;
@@ -390,6 +509,22 @@ LM_RT int64_t lm_int_of_str(lm_str s, int l, int c) {
   if (errno == ERANGE) lm_panic(l, c, "int literal out of range");
   return (int64_t)v;
 }
+/* parse_int / parse_float: false (None) instead of an error. */
+LM_RT bool lm_parse_int(lm_str s, int64_t *out) {
+  char *end; const char *p = s->d;
+  if (!lm_num_syntax(p, false) || (int64_t)strlen(p) != s->len) return false;
+  errno = 0;
+  long long v = strtoll(p, &end, 10);
+  if (errno == ERANGE) return false;
+  *out = (int64_t)v;
+  return true;
+}
+LM_RT bool lm_parse_float(lm_str s, double *out) {
+  char *end; const char *p = s->d;
+  if (!lm_num_syntax(p, true) || (int64_t)strlen(p) != s->len) return false;
+  *out = strtod(p, &end);
+  return !isinf(*out); /* out of range (e.g. "1e400") is None, like parse_int */
+}
 LM_RT double lm_float_of_str(lm_str s, int l, int c) {
   char *end; const char *p = s->d;
   double v = strtod(p, &end);
@@ -404,25 +539,39 @@ LM_COLD static void lm_oob(int64_t i, int64_t n, int ln, int c) {
   lm_panic(ln, c, m);
 }
 __attribute__((noinline)) LM_RT void lm_grow(lm_list *l, size_t esz, int ln, int c) {
-  lm_mem_charge(esz * (size_t)(l->cap + 4), ln, c);
-  l->cap = l->cap * 2 + 4;
-  l->d = realloc(l->d, esz * (size_t)l->cap);
-  if (!l->d) lm_panic(ln, c, "out of memory");
+  int64_t cap = l->cap * 2 + 4;
+  if (cap > INT64_MAX / 16) lm_panic(ln, c, "memory limit exceeded");
+  l->d = lm_realloc(l->d, esz * (size_t)l->cap, esz * (size_t)cap, ln, c);
+  l->cap = cap;
 }
+/* A new list owning the n items (moved in). */
 LM_RT lm_list *lm_list_new(int64_t n, const void *items, size_t esz, int ln, int c) {
   lm_list *l = lm_alloc(sizeof(lm_list), ln, c);
-  l->len = n; l->cap = n < 4 ? 4 : n;
-  l->d = lm_xmalloc(esz * (size_t)l->cap, ln, c);
+  l->rc = 1; l->len = n; l->cap = n < 4 ? 4 : n;
+  l->d = lm_alloc(esz * (size_t)l->cap, ln, c);
   if (n) memcpy(l->d, items, esz * (size_t)n);
   return l;
 }
+LM_RT void lm_list_free(lm_list *l, size_t esz) {
+  lm_free(l->d, esz * (size_t)l->cap);
+  lm_free(l, sizeof(lm_list));
+}
+/* Copy a shared list before a write (elements that are heap values get one
+   more reference); the caller stores the copy where the list was. */
+__attribute__((noinline)) LM_RT lm_list *lm_list_copy(lm_list *x, size_t esz, bool ptrs, int ln, int c) {
+  lm_list *y = lm_list_new(x->len, x->d, esz, ln, c);
+  if (ptrs) for (int64_t i = 0; i < x->len; i++) LM_RC(((void **)y->d)[i])++;
+  x->rc--; /* shared, so it stays alive */
+  return y;
+}
+/* Writes (slot, push, pop) take a list already made unique (see cgen). */
 #define LM_LIST(S, T) \
   LM_RT inline __attribute__((always_inline)) T lm_get_##S(lm_list *l, int64_t i, int ln, int c) { \
     if (__builtin_expect((uint64_t)i >= (uint64_t)l->len, 0)) lm_oob(i, l->len, ln, c); \
     return ((T *)l->d)[i]; } \
-  LM_RT inline __attribute__((always_inline)) void lm_set_##S(lm_list *l, int64_t i, T v, int ln, int c) { \
+  LM_RT inline __attribute__((always_inline)) T *lm_slot_##S(lm_list *l, int64_t i, int ln, int c) { \
     if (__builtin_expect((uint64_t)i >= (uint64_t)l->len, 0)) lm_oob(i, l->len, ln, c); \
-    ((T *)l->d)[i] = v; } \
+    return &((T *)l->d)[i]; } \
   LM_RT inline void lm_push_##S(lm_list *l, T v, int ln, int c) { \
     if (__builtin_expect(l->len == l->cap, 0)) lm_grow(l, sizeof(T), ln, c); \
     ((T *)l->d)[l->len++] = v; } \
@@ -436,6 +585,30 @@ LM_LIST(i, int64_t)
 LM_LIST(f, double)
 typedef void *lm_ptr;
 LM_LIST(p, lm_ptr)
+
+/* find(xs, v): index of the first element equal to v, or -1 (None). One
+   step per element scanned (plus string comparison cost). */
+#define LM_FIND(sx, T, EQ) \
+  LM_RT int64_t lm_find_##sx(lm_list *xs, T v, int l, int c) { \
+    int64_t i = 0; \
+    for (; i < xs->len; i++) if (EQ(((T *)xs->d)[i], v)) break; \
+    lm_charge((i + 1) << 6, l, c); \
+    return i < xs->len ? i : -1; }
+#define LM_EQ_NUM(a, b) ((a) == (b))
+#define LM_EQ_S(a, b) lm_str_eq((lm_str)(a), (lm_str)(b), l, c)
+LM_FIND(b, bool, LM_EQ_NUM)
+LM_FIND(i, int64_t, LM_EQ_NUM)
+LM_FIND(f, double, LM_EQ_NUM)
+LM_FIND(s, lm_ptr, LM_EQ_S)
+/* find(s, sub): code-point index of the first occurrence, or -1. */
+LM_RT int64_t lm_str_find(lm_str s, lm_str sub, int l, int c) {
+  lm_charge(s->len, l, c);
+  const char *p = sub->len ? memmem(s->d, (size_t)s->len, sub->d, (size_t)sub->len) : s->d;
+  if (!p) return -1;
+  int64_t n = 0;
+  for (const char *q = s->d; q < p; q++) n += ((unsigned char)*q & 0xC0) != 0x80;
+  return n;
+}
 
 /* ---- split / join / sort: one step per 64 bytes or per element pass ---- */
 LM_RT lm_list *lm_split(lm_str s, lm_str sep, int l, int c) {
@@ -463,9 +636,8 @@ LM_RT lm_str lm_join(lm_list *xs, lm_str sep, int l, int c) {
   for (int64_t i = 0; i < xs->len; i++)
     if (__builtin_add_overflow(len, p[i]->len + (i ? sep->len : 0), &len)) lm_panic(l, c, "memory limit exceeded");
   lm_charge(len + (xs->len << 6), l, c);
-  LmStr *r = lm_alloc(sizeof(LmStr) + (size_t)len + 1, l, c);
-  char *d = (char *)(r + 1);
-  r->len = len; r->d = d;
+  LmStr *r = lm_str_alloc(len, l, c);
+  char *d = r->d;
   for (int64_t i = 0; i < xs->len; i++) {
     if (i) { memcpy(d, sep->d, (size_t)sep->len); d += sep->len; }
     memcpy(d, p[i]->d, (size_t)p[i]->len); d += p[i]->len;
@@ -473,12 +645,13 @@ LM_RT lm_str lm_join(lm_list *xs, lm_str sep, int l, int c) {
   *d = 0;
   return r;
 }
-/* Stable bottom-up merge sort; the scratch buffer is charged to --max-mem. */
+/* Stable bottom-up merge sort of a (unique) list; the scratch buffer is
+   charged to --max-mem while it lives. */
 #define LM_SORT(S, T, LE) \
   LM_RT void lm_sort_##S(lm_list *xs, int l, int c) { \
     int64_t n = xs->len; \
     if (n < 2) return; \
-    T *a = xs->d, *b = lm_xmalloc(sizeof(T) * (size_t)n, l, c), *t; \
+    T *a = xs->d, *b = lm_alloc(sizeof(T) * (size_t)n, l, c), *t, *b0 = b; \
     for (int64_t w = 1; w < n; w *= 2) { \
       lm_charge(n << 6, l, c); \
       for (int64_t lo = 0; lo < n; lo += 2 * w) { \
@@ -487,8 +660,8 @@ LM_RT lm_str lm_join(lm_list *xs, lm_str sep, int l, int c) {
       } \
       t = a; a = b; b = t; \
     } \
-    if (a != xs->d) { memcpy(xs->d, a, sizeof(T) * (size_t)n); b = a; } \
-    free(b); \
+    if (a != xs->d) memcpy(xs->d, a, sizeof(T) * (size_t)n); \
+    (void)b; lm_free(b0, sizeof(T) * (size_t)n); \
   }
 #define LM_LE_NUM(x, y) ((x) <= (y))
 #define LM_LE_F(x, y) (isnan(y) || (x) <= (y)) /* NaN sorts last */
@@ -510,6 +683,11 @@ LM_COLD static void lm_io_fail(const char *op, lm_str path, int l, int c) {
   snprintf(m, (size_t)path->len + 160, "cannot %s file '%s': %s", op, path->d, why);
   lm_panic(l, c, m);
 }
+/* Is canonical path `p` the directory `dir` or inside it? */
+LM_RT bool lm_under(const char *p, const char *dir) {
+  size_t n = strlen(dir);
+  return strncmp(p, dir, n) == 0 && (p[n] == 0 || p[n] == '/' || dir[n - 1] == '/');
+}
 LM_RT bool lm_path_ok(const char *p, const char *const *allow) {
   char cwd[PATH_MAX];
   const char *here[2] = {cwd, 0};
@@ -517,22 +695,41 @@ LM_RT bool lm_path_ok(const char *p, const char *const *allow) {
     if (!realpath(".", cwd)) return false;
     allow = here;
   }
-  for (; *allow; allow++) {
-    size_t n = strlen(*allow);
-    if (strncmp(p, *allow, n) == 0 && (p[n] == 0 || p[n] == '/' || (*allow)[n - 1] == '/')) return true;
-  }
+  for (; *allow; allow++)
+    if (lm_under(p, *allow)) return true;
   return false;
 }
-/* Canonical path of `s` into `out`. A missing final component is allowed (its
-   directory is canonicalised instead), so a missing file outside the sandbox
-   is denied rather than reported as missing. */
-LM_RT void lm_resolve(lm_str s, char *out, const char *const *allow, const char *op, int l, int c) {
+/* Fs capability handles: 0 is the program's whole file system view (limited
+   by --allow); h > 0 is narrowed to the canonical directory lm_fs_roots[h-1]
+   (from fs.sub), against which its relative paths are resolved. Roots are
+   interned and never freed (one per distinct directory). */
+LM_G char **lm_fs_roots;
+LM_G int64_t lm_fs_n;
+/* The path `s` names for Fs `fs` into `out` (PATH_MAX bytes). */
+LM_RT bool lm_fs_join(int64_t fs, lm_str s, char *out) {
+  if (s->len == 0 || s->len >= PATH_MAX || (int64_t)strlen(s->d) != s->len) return false;
+  /* snprintf, not memcpy(len + 1): gcc -O2 cannot see that len > 0 here
+     and warns (-Warray-bounds) about copying from a 1-byte "" constant. */
+  if (fs == 0 || s->d[0] == '/') return snprintf(out, PATH_MAX, "%s", s->d) < PATH_MAX;
+  return snprintf(out, PATH_MAX, "%s/%s", lm_fs_roots[fs - 1], s->d) < PATH_MAX;
+}
+LM_COLD static void lm_fs_denied(lm_str s, int64_t fs, int l, int c) {
+  size_t n = (size_t)s->len + strlen(lm_fs_roots[fs - 1]) + 96;
+  char *m = malloc(n);
+  snprintf(m, n, "access denied: '%s' is outside the Fs root '%s'", s->d, lm_fs_roots[fs - 1]);
+  lm_panic(l, c, m);
+}
+/* Canonical path of `s` (for Fs `fs`) into `out`. A missing final component
+   is allowed (its directory is canonicalised instead), so a missing file
+   outside the sandbox is denied rather than reported as missing. */
+LM_RT void lm_resolve(int64_t fs, lm_str s, char *out, const char *const *allow, const char *op, int l, int c) {
+  char full[PATH_MAX];
   errno = EINVAL;
-  if (s->len == 0 || s->len >= PATH_MAX || (int64_t)strlen(s->d) != s->len) lm_io_fail(op, s, l, c);
-  if (!realpath(s->d, out)) {
+  if (!lm_fs_join(fs, s, full)) lm_io_fail(op, s, l, c);
+  if (!realpath(full, out)) {
     if (errno != ENOENT) lm_io_fail(op, s, l, c);
     char dir[PATH_MAX], rdir[PATH_MAX];
-    memcpy(dir, s->d, (size_t)s->len + 1);
+    memcpy(dir, full, strlen(full) + 1);
     char *slash = strrchr(dir, '/');
     const char *base = slash ? slash + 1 : dir, *d = ".";
     if (slash) { *slash = 0; d = slash == dir ? "/" : dir; }
@@ -542,15 +739,16 @@ LM_RT void lm_resolve(lm_str s, char *out, const char *const *allow, const char 
     errno = ENAMETOOLONG;
     if (snprintf(out, PATH_MAX, "%s/%s", strcmp(rdir, "/") ? rdir : "", base) >= PATH_MAX) lm_io_fail(op, s, l, c);
   }
+  if (fs && !lm_under(out, lm_fs_roots[fs - 1])) lm_fs_denied(s, fs, l, c);
   if (!lm_path_ok(out, allow)) {
     char *m = malloc((size_t)s->len + 160);
     snprintf(m, (size_t)s->len + 160, "access denied: '%s' is outside the allowed fs.%s paths (see --allow)", s->d, op);
     lm_panic(l, c, m);
   }
 }
-LM_RT int lm_open(lm_str path, int flags, const char *const *allow, const char *op, int l, int c) {
+LM_RT int lm_open(int64_t fs, lm_str path, int flags, const char *const *allow, const char *op, int l, int c) {
   char p[PATH_MAX];
-  lm_resolve(path, p, allow, op, l, c);
+  lm_resolve(fs, path, p, allow, op, l, c);
   /* O_NONBLOCK: opening a FIFO or device must not block (it is then
      rejected as not a regular file); regular files ignore the flag. */
   struct stat st;
@@ -560,8 +758,8 @@ LM_RT int lm_open(lm_str path, int flags, const char *const *allow, const char *
   if (fstat(fd, &st) || !S_ISREG(st.st_mode)) { errno = 0; close(fd); lm_io_fail(op, path, l, c); }
   return fd;
 }
-LM_RT lm_str lm_read_file(lm_str path, int l, int c) {
-  int fd = lm_open(path, O_RDONLY, lm_allow_read, "read", l, c);
+LM_RT lm_str lm_fs_read(int64_t fs, lm_str path, int l, int c) {
+  int fd = lm_open(fs, path, O_RDONLY, lm_allow_read, "read", l, c);
   lm_buf b = {0, 0, 0};
   char t[65536];
   ssize_t n;
@@ -571,11 +769,11 @@ LM_RT lm_str lm_read_file(lm_str path, int l, int c) {
   close(fd);
   return lm_buf_str(&b);
 }
-LM_RT void lm_write_file(lm_str path, lm_str data, int l, int c) {
+LM_RT void lm_fs_write(int64_t fs, lm_str path, lm_str data, int l, int c) {
   /* Bytes written count against the memory budget (bounds disk use too). */
   lm_mem_charge((size_t)data->len, l, c);
   lm_charge(data->len, l, c);
-  int fd = lm_open(path, O_WRONLY | O_CREAT | O_TRUNC, lm_allow_write, "write", l, c);
+  int fd = lm_open(fs, path, O_WRONLY | O_CREAT | O_TRUNC, lm_allow_write, "write", l, c);
   for (int64_t off = 0; off < data->len;) {
     ssize_t n = write(fd, data->d + off, (size_t)(data->len - off));
     if (n < 0 && errno == EINTR) continue;
@@ -583,6 +781,27 @@ LM_RT void lm_write_file(lm_str path, lm_str data, int l, int c) {
     off += n;
   }
   if (close(fd)) lm_io_fail("write", path, l, c);
+}
+/* fs.sub(dir): an Fs narrowed to an existing directory inside `fs`. */
+LM_RT int64_t lm_fs_sub(int64_t fs, lm_str path, int l, int c) {
+  char full[PATH_MAX], p[PATH_MAX];
+  struct stat st;
+  errno = EINVAL;
+  if (!lm_fs_join(fs, path, full) || !realpath(full, p) || (errno = ENOTDIR, stat(p, &st)) || !S_ISDIR(st.st_mode)) {
+    const char *why = strerror(errno);
+    char *m = malloc((size_t)path->len + 160);
+    snprintf(m, (size_t)path->len + 160, "cannot use directory '%s': %s", path->d, why);
+    lm_panic(l, c, m);
+  }
+  if (fs && !lm_under(p, lm_fs_roots[fs - 1])) lm_fs_denied(path, fs, l, c);
+  for (int64_t i = 0; i < lm_fs_n; i++)
+    if (!strcmp(lm_fs_roots[i], p)) return i + 1;
+  char **r = realloc(lm_fs_roots, sizeof *r * (size_t)(lm_fs_n + 1));
+  char *d = r ? strdup(p) : NULL;
+  if (!d) lm_panic(l, c, "out of memory");
+  lm_fs_roots = r;
+  lm_fs_roots[lm_fs_n++] = d;
+  return lm_fs_n;
 }
 LM_RT lm_str lm_env(lm_str name, int l, int c) {
   bool ok = !lm_allow_env[0];

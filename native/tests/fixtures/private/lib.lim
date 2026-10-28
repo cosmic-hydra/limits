@@ -1,3 +1,6 @@
-struct Secret { x: int }
-fn hidden() -> int { return 1; }
-pub fn shown() -> int { return hidden() + 1; }
+struct Secret:
+    x: int
+fn hidden() -> int:
+    1
+pub fn shown() -> int:
+    hidden() + 1

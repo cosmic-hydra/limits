@@ -1,0 +1,6 @@
+uses stdin
+let n = unwrap(parse_int(env.stdin.read_line()))
+var p = [0, 1, 1]
+for i in 3..(n + 1):
+    push(p, p[p[i - 1]] + p[i - p[i - 1]])
+print(p[n])

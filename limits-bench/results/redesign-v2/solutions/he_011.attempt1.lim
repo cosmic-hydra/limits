@@ -1,0 +1,8 @@
+uses stdin
+let a = split(env.stdin.read_line(), "")
+let b = split(env.stdin.read_line(), "")
+var out: [str] = []
+for i in 0..len(a):
+    if a[i] == b[i]: push(out, "0")
+    else: push(out, "1")
+print(join(out, ""))

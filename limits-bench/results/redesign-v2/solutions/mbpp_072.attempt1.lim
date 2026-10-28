@@ -1,0 +1,3 @@
+uses stdin
+let n = unwrap(parse_int(env.stdin.read_line()))
+print(n % 4 != 2 and n % 4 != -2)

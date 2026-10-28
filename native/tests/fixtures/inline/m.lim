@@ -1,2 +1,4 @@
-pub fn sq(x: int) -> int { return x * x; }
-test "sq" { assert(sq(3) == 9); }
+pub fn sq(x: int) -> int:
+    x * x
+test "sq":
+    assert(sq(3) == 9)

@@ -1,22 +1,16 @@
 # Longest Collatz chain below a limit.
-fn main() {
-    let best = 0;
-    let best_n = 0;
-    for n in 1..300000 {
-        let x = n;
-        let steps = 1;
-        while x != 1 {
-            if x % 2 == 0 {
-                x = x / 2;
-            } else {
-                x = 3 * x + 1;
-            }
-            steps = steps + 1;
-        }
-        if steps > best {
-            best = steps;
-            best_n = n;
-        }
-    }
-    print(best_n, best);
-}
+var best = 0
+var best_n = 0
+for n in 1..300000:
+    var x = n
+    var steps = 1
+    while x != 1:
+        if x % 2 == 0:
+            x /= 2
+        else:
+            x = 3 * x + 1
+        steps += 1
+    if steps > best:
+        best = steps
+        best_n = n
+print(best_n, best)

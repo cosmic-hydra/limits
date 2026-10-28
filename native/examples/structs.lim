@@ -1,31 +1,33 @@
-# Structs are heap-allocated reference types.
-struct Point { x: float, y: float }
-struct Path { name: str, points: [Point] }
+# Structs, like lists, strings and enums, are values: assigning or passing
+# one never shares it, so a change through one name is not seen through
+# another. A fn changes its caller's variable only through an `inout`
+# parameter, and the call marks that argument with `&`.
+struct Point:
+    x: float
+    y: float
+struct Path:
+    name: str
+    points: [Point]
 
-fn length(p: Path) -> float {
-    let total = 0.0;
-    for i in 1..len(p.points) {
-        let a = p.points[i - 1];
-        let b = p.points[i];
-        let dx = b.x - a.x;
-        let dy = b.y - a.y;
-        total = total + (dx * dx + dy * dy);
-    }
-    return total;
-}
+fn length(p: Path) -> float:
+    var total = 0.0
+    for i in 1..len(p.points):
+        let a = p.points[i - 1]
+        let b = p.points[i]
+        let dx = b.x - a.x
+        let dy = b.y - a.y
+        total += (dx * dx + dy * dy)
+    total
 
-fn shift(p: Point, d: float) {
-    p.x = p.x + d;
-}
+fn shift(p: inout Point, d: float):
+    p.x += d
 
-fn main() {
-    let path = Path { name: "square", points: [] };
-    push(path.points, Point { x: 0.0, y: 0.0 });
-    push(path.points, Point { x: 3.0, y: 0.0 });
-    push(path.points, Point { x: 3.0, y: 4.0 });
-    print(path.name, "squared length", length(path));
-    let p = path.points[0];
-    shift(p, 1.5);
-    print(path.points[0]);
-    print(path.points);
-}
+var path = Path { name: "square", points: [] }
+push(path.points, Point { x: 0.0, y: 0.0 })
+push(path.points, Point { x: 3.0, y: 0.0 })
+push(path.points, Point { x: 3.0, y: 4.0 })
+print(path.name, "squared length", length(path))
+let p = path.points[0]          # a copy of the point
+shift(&path.points[0], 1.5)     # changes the element in place
+print(path.points[0], p)
+print(path.points)

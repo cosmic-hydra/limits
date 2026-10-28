@@ -1,0 +1,20 @@
+uses stdin
+fn is_prime(p: int) -> bool:
+    if p < 2: return false
+    var d = 2
+    while d * d <= p:
+        if p % d == 0: return false
+        d += 1
+    true
+var n = unwrap(parse_int(env.stdin.read_line()))
+var a = 0
+var b = 1
+var res = 0
+while n > 0:
+    let t = a + b
+    a = b
+    b = t
+    if is_prime(b):
+        n -= 1
+        res = b
+print(res)

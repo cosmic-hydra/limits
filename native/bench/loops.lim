@@ -1,9 +1,5 @@
-fn main() {
-    let s = 0;
-    for i in 0..10000 {
-        for j in 0..10000 {
-            s = s + (i * j + j) % 7;
-        }
-    }
-    print(s);
-}
+var s = 0
+for i in 0..10000:
+    for j in 0..10000:
+        s += (i * j + j) % 7
+print(s)

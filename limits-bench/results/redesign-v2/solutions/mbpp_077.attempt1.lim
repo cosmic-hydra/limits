@@ -1,0 +1,2 @@
+uses stdin
+print(unwrap(parse_int(env.stdin.read_line())) % 11 == 0)

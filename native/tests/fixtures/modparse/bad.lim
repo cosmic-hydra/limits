@@ -1,3 +1,2 @@
-pub fn f() {
-  let = 3;
-}
+pub fn f():
+    let = 3

@@ -1,0 +1,15 @@
+uses stdin
+let s = env.stdin.read_line()
+var out: [str] = []
+for g in split(s, " "):
+    if g != "":
+        var d = 0
+        var m = 0
+        for c in split(g, ""):
+            if c == "(":
+                d += 1
+                m = max(m, d)
+            elif c == ")":
+                d -= 1
+        push(out, str(m))
+print(join(out, " "))

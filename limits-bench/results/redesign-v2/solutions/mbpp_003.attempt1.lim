@@ -1,0 +1,8 @@
+uses stdin
+let n = unwrap(parse_int(env.stdin.read_line()))
+var np = false
+var d = 2
+while d * d <= n:
+    if n % d == 0: np = true
+    d += 1
+print(np)

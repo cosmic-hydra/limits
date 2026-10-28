@@ -1,1 +1,2 @@
-pub struct Counter { n: int }
+pub struct Counter:
+    n: int

@@ -1,2 +1,2 @@
-import util.nothere;
-fn main() { }
+import util.nothere
+pass

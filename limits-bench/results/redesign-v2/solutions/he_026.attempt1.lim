@@ -1,0 +1,9 @@
+uses stdin
+let line = env.stdin.read_line()
+var xs: [int] = []
+if line != "":
+    xs = [unwrap(parse_int(w)) for w in split(line, " ")]
+var out: [str] = []
+for x in xs:
+    if len([y for y in xs if y == x]) == 1: push(out, str(x))
+print(join(out, " "))

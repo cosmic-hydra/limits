@@ -1,0 +1,17 @@
+uses stdin
+let s = env.stdin.read_line()
+var res: [str] = []
+var cur: [str] = []
+var depth = 0
+for c in split(s, ""):
+    if c == "(":
+        depth += 1
+        push(cur, c)
+    elif c == ")":
+        depth -= 1
+        push(cur, c)
+        if depth == 0:
+            push(res, join(cur, ""))
+            cur = []
+print(len(res))
+for r in res: print(r)

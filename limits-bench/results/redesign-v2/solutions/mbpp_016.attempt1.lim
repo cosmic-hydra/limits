@@ -1,0 +1,14 @@
+uses stdin
+fn lower(c: str) -> bool: c >= "a" and c <= "z"
+let cs = split(env.stdin.read_line(), "")
+var state = 0
+var ok = true
+for c in cs:
+    if lower(c):
+        if state == 0: state = 1
+        elif state == 2: state = 3
+    elif c == "_" and state == 1:
+        state = 2
+    else:
+        ok = false
+print(ok and state == 3)

@@ -52,7 +52,44 @@ impl std::fmt::Display for Error {
     }
 }
 
-const USAGE: &str = "usage: limits <build|run|check|test> file.lim [-o out] [--unchecked] [--max-steps N] [--max-depth N] [--max-mem MB] [--emit-c] [--release|--debug] [--time] [--json] [--allow fs.read=DIR|fs.write=DIR|env=NAME]... [-- program args]";
+const USAGE: &str = "usage: limits <build|run|check|test> file.lim [-o out] [--unchecked] [--max-steps N] [--max-depth N] [--max-mem MB] [--emit-c] [--release|--debug] [--cc tcc|cc|PATH] [--time] [--json] [--leak-check] [--show-perms] [--allow fs.read=DIR|fs.write=DIR|env=NAME]... [-- program args]";
+
+/// The C compiler to use and how to drive it.
+#[derive(Debug, Clone)]
+enum Compiler {
+    /// TinyCC (fast compiles, no optimisation): no `-O`, needs the shim.
+    Tcc(PathBuf),
+    /// A gcc-compatible compiler (`cc`, `gcc`, `clang`, `$CC`).
+    Gcc(String),
+}
+
+/// TinyCC to use by default: `$LIMITS_TCC`, else `tools/tcc/bin/tcc` in a
+/// directory above the limits executable (the repository layout).
+fn find_tcc() -> Option<PathBuf> {
+    if let Some(p) = std::env::var_os("LIMITS_TCC").filter(|p| !p.is_empty()) {
+        return Some(PathBuf::from(p));
+    }
+    let exe = std::env::current_exe().ok()?;
+    exe.ancestors()
+        .map(|d| d.join("tools/tcc/bin/tcc"))
+        .find(|p| p.is_file())
+}
+
+/// `--cc` (or `$LIMITS_CC`) if given; else tcc for `run`, `test` and
+/// `--debug` when it is available, and `$CC` (default `cc`) otherwise.
+fn pick_compiler(a: &Args) -> Compiler {
+    let sys = || Compiler::Gcc(std::env::var("CC").unwrap_or_else(|_| "cc".into()));
+    let want =
+        a.cc.clone()
+            .or_else(|| std::env::var("LIMITS_CC").ok().filter(|s| !s.is_empty()));
+    match want.as_deref() {
+        Some("tcc") => Compiler::Tcc(find_tcc().unwrap_or_else(|| PathBuf::from("tcc"))),
+        Some("cc") => sys(),
+        Some(other) => Compiler::Gcc(other.to_string()),
+        None if a.release || (a.cmd == "build" && !a.debug) => sys(),
+        None => find_tcc().map_or_else(sys, Compiler::Tcc),
+    }
+}
 
 struct Args {
     cmd: String,
@@ -61,6 +98,12 @@ struct Args {
     opts: cgen::Opts,
     emit_c: bool,
     debug: bool,
+    /// `--release` given explicitly.
+    release: bool,
+    /// `--cc NAME`.
+    cc: Option<String>,
+    /// `--show-perms`: print the capability manifest instead of running.
+    show_perms: bool,
     time: bool,
     json: bool,
     /// Arguments after `--`, passed to the program by `run`.
@@ -90,12 +133,17 @@ fn parse_args() -> Args {
             parts: std::thread::available_parallelism().map_or(1, |n| n.get()),
             json: false,
             tests: false,
+            leak_check: false,
+            tcc: false,
             allow_read: Vec::new(),
             allow_write: Vec::new(),
             allow_env: Vec::new(),
         },
         emit_c: false,
         debug: false,
+        release: false,
+        cc: None,
+        show_perms: false,
         time: false,
         json: false,
         prog_args: Vec::new(),
@@ -112,10 +160,18 @@ fn parse_args() -> Args {
             "--max-depth" => a.opts.max_depth = num(it.next(), "--max-depth"),
             "--max-mem" => a.opts.max_mem = num(it.next(), "--max-mem").saturating_mul(1 << 20),
             "--emit-c" => a.emit_c = true,
-            "--release" => a.debug = false,
-            "--debug" => a.debug = true,
+            "--release" => (a.debug, a.release) = (false, true),
+            "--debug" => (a.debug, a.release) = (true, false),
+            "--cc" => {
+                a.cc = Some(
+                    it.next()
+                        .unwrap_or_else(|| usage("--cc needs tcc, cc or a compiler path")),
+                )
+            }
+            "--show-perms" => a.show_perms = true,
             "--time" => a.time = true,
             "--json" => a.json = true,
+            "--leak-check" => a.opts.leak_check = true,
             "--allow" => {
                 let g = it.next().unwrap_or_default();
                 let (cap, v) = g.split_once('=').unwrap_or_else(|| {
@@ -148,6 +204,7 @@ fn parse_args() -> Args {
     }
     a.opts.json = a.json;
     a.opts.tests = a.cmd == "test";
+    a.opts.tcc = matches!(pick_compiler(&a), Compiler::Tcc(_));
     a
 }
 
@@ -175,6 +232,10 @@ fn frontend(a: &Args) -> (Vec<String>, Vec<String>) {
     let t = Instant::now();
     let (prog, structs) = check::check(&mut mods, a.cmd != "test").unwrap_or_else(|e| fail(e));
     let t_check = ms(t);
+    if a.show_perms {
+        show_perms(a, &mods);
+        exit(0);
+    }
     let t = Instant::now();
     let out = if a.cmd == "check" {
         Vec::new()
@@ -196,25 +257,78 @@ fn frontend(a: &Args) -> (Vec<String>, Vec<String>) {
     (out, tests)
 }
 
+/// `--show-perms`: the capabilities the program declares (the root file's
+/// `uses` line, which bounds every module's) and the runtime grants.
+fn show_perms(a: &Args, mods: &[module::Module]) {
+    let mut caps: Vec<&str> = Vec::new();
+    for (u, _, _) in &mods[0].prog.uses {
+        if !caps.contains(&u.as_str()) {
+            caps.push(u);
+        }
+    }
+    caps.sort_by_key(|c| check::CAPS.iter().position(|x| x == c));
+    let list = |xs: &[String], none: &str| {
+        if xs.is_empty() {
+            none.to_string()
+        } else {
+            xs.join(", ")
+        }
+    };
+    println!("program: {}", a.file);
+    if caps.is_empty() {
+        println!("uses: (none: compute and print only)");
+    } else {
+        println!("uses: {}", caps.join(", "));
+    }
+    let cwd = "current directory at run time";
+    for c in &caps {
+        match *c {
+            "fs.read" => println!("  fs.read: {}", list(&a.opts.allow_read, cwd)),
+            "fs.write" => println!("  fs.write: {}", list(&a.opts.allow_write, cwd)),
+            "env" => println!("  env: {}", list(&a.opts.allow_env, "all variables")),
+            _ => {}
+        }
+    }
+    for m in &mods[1..] {
+        let us: Vec<&str> = m.prog.uses.iter().map(|u| u.0.as_str()).collect();
+        if !us.is_empty() {
+            println!("module {}: uses {}", m.file, us.join(", "));
+        }
+    }
+}
+
 /// Compile the C translation units (in parallel when there are several) and
 /// link them into `out`.
-fn cc(tus: &[String], out: &Path, debug: bool) {
-    let compiler = std::env::var("CC").unwrap_or_else(|_| "cc".into());
-    let opt = if debug {
-        ["-O0", "-g"]
-    } else {
-        ["-O2", "-DNDEBUG"]
+fn cc(tus: &[String], out: &Path, debug: bool, comp: &Compiler) {
+    let (compiler, tcc) = match comp {
+        Compiler::Tcc(p) => (p.to_string_lossy().into_owned(), true),
+        Compiler::Gcc(c) => (c.clone(), false),
+    };
+    let opt: &[&str] = match (tcc, debug) {
+        // tcc does not optimise; -g would only slow it down.
+        (true, _) => &[],
+        (false, true) => &["-O0", "-g"],
+        (false, false) => &["-O2", "-DNDEBUG"],
     };
     let cmd = || {
         let mut c = Command::new(&compiler);
-        c.args([
-            "-std=gnu11",
-            "-fwrapv",
-            "-Wall",
-            "-Wextra",
-            "-Wno-infinite-recursion",
-        ])
-        .args(opt);
+        if tcc {
+            // Its diagnostics are dropped: on failure the system compiler
+            // rebuilds the program and reports (see below).
+            if std::env::var_os("LIMITS_TCC_STRICT").is_none() {
+                c.stderr(std::process::Stdio::null());
+            }
+            c.args(["-Wall"]);
+        } else {
+            c.args([
+                "-std=gnu11",
+                "-fwrapv",
+                "-Wall",
+                "-Wextra",
+                "-Wno-infinite-recursion",
+            ]);
+        }
+        c.args(opt);
         // Generated C must be warning-free; debug builds of limits (and so
         // `cargo test`) turn warnings into errors to enforce it.
         if cfg!(debug_assertions) {
@@ -268,6 +382,12 @@ fn cc(tus: &[String], out: &Path, debug: bool) {
     };
     for p in srcs.iter().chain(&objs) {
         let _ = std::fs::remove_file(p);
+    }
+    if !ok && tcc && std::env::var_os("LIMITS_TCC_STRICT").is_none() {
+        // tcc has fixed internal limits (e.g. very deeply nested
+        // expressions); fall back to the system compiler, unoptimised.
+        let sys = std::env::var("CC").unwrap_or_else(|_| "cc".into());
+        return cc(tus, out, true, &Compiler::Gcc(sys));
     }
     if !ok {
         die(&format!(
@@ -326,7 +446,7 @@ fn main() {
         }))
     };
     let t1 = Instant::now();
-    cc(&c_src, &out, a.debug);
+    cc(&c_src, &out, a.debug, &pick_compiler(&a));
     if a.time {
         eprintln!(
             "frontend: {:.2} ms, cc: {:.2} ms",

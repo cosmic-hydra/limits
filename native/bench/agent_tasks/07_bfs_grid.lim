@@ -1,41 +1,30 @@
 # BFS shortest path on a grid with walls.
-fn rnd(s: [int]) -> int {
-    s[0] = (s[0] * 1103515245 + 12345) % 2147483648;
-    return s[0] / 65536;
-}
+fn rnd(s: inout [int]) -> int:
+    s[0] = (s[0] * 1103515245 + 12345) % 2147483648
+    s[0] / 65536
 
-fn main() {
-    let n = 400;
-    let seed = [13];
-    let wall: [bool] = [];
-    let dist: [int] = [];
-    for i in 0..n * n {
-        push(wall, rnd(seed) % 100 < 25);
-        push(dist, -1);
-    }
-    wall[0] = false;
-    wall[n * n - 1] = false;
-    let dr = [1, -1, 0, 0];
-    let dc = [0, 0, 1, -1];
-    let queue = [0];
-    dist[0] = 0;
-    let head = 0;
-    while head < len(queue) {
-        let cur = queue[head];
-        head = head + 1;
-        let r = cur / n;
-        let c = cur % n;
-        for d in 0..4 {
-            let nr = r + dr[d];
-            let nc = c + dc[d];
-            if nr >= 0 and nr < n and nc >= 0 and nc < n {
-                let nx = nr * n + nc;
-                if not wall[nx] and dist[nx] < 0 {
-                    dist[nx] = dist[cur] + 1;
-                    push(queue, nx);
-                }
-            }
-        }
-    }
-    print(len(queue), dist[n * n - 1]);
-}
+let n = 400
+var seed = [13]
+var wall = [rnd(&seed) % 100 < 25 for i in 0..n * n]
+var dist = [-1 for i in 0..n * n]
+wall[0] = false
+wall[n * n - 1] = false
+let dr = [1, -1, 0, 0]
+let dc = [0, 0, 1, -1]
+var queue = [0]
+dist[0] = 0
+var head = 0
+while head < len(queue):
+    let cur = queue[head]
+    head += 1
+    let r = cur / n
+    let c = cur % n
+    for d in 0..4:
+        let nr = r + dr[d]
+        let nc = c + dc[d]
+        if nr >= 0 and nr < n and nc >= 0 and nc < n:
+            let nx = nr * n + nc
+            if not wall[nx] and dist[nx] < 0:
+                dist[nx] = dist[cur] + 1
+                push(queue, nx)
+print(len(queue), dist[n * n - 1])

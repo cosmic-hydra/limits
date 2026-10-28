@@ -1,0 +1,6 @@
+uses stdin
+let n = unwrap(parse_int(env.stdin.read_line()))
+var d = n - 1
+while d > 1 and n % d != 0:
+    d -= 1
+print(d)

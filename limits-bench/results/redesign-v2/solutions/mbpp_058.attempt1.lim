@@ -1,0 +1,4 @@
+uses stdin
+let x = unwrap(parse_int(env.stdin.read_line()))
+let y = unwrap(parse_int(env.stdin.read_line()))
+print((x < 0 and y >= 0) or (x >= 0 and y < 0))

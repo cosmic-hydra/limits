@@ -1,13 +1,13 @@
 # Modules demo: run with `limits run examples/modules/main.lim`
-import mathx;
-import geo.shapes;
+import mathx
+import geo.shapes
 
-fn area(n: int) -> int { return n * 1000; }   # same name as shapes.area: no clash
+fn area(n: int) -> int:
+    n * 1000
+# same name as shapes.area: no clash
 
-fn main() {
-  let v = mathx.Vec2 { x: 3.0, y: 4.0 };
-  print("len", mathx.length(v));
-  let sq: shapes.Rect = shapes.square(5);
-  print("area", shapes.area(sq), area(1));
-  print(shapes.describe(sq));
-}
+let v = mathx.Vec2 { x: 3.0, y: 4.0 }
+print("len", mathx.length(v))
+let sq: shapes.Rect = shapes.square(5)
+print("area", shapes.area(sq), area(1))
+print(shapes.describe(sq))

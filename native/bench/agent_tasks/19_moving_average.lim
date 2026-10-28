@@ -1,33 +1,21 @@
 # Moving average over a window of 100.
-fn rnd(s: [int]) -> int {
-    s[0] = (s[0] * 1103515245 + 12345) % 2147483648;
-    return s[0] / 65536;
-}
+fn rnd(s: inout [int]) -> int:
+    s[0] = (s[0] * 1103515245 + 12345) % 2147483648
+    s[0] / 65536
 
-fn main() {
-    let seed = [47];
-    let xs: [int] = [];
-    for i in 0..500000 {
-        push(xs, rnd(seed) % 1000);
-    }
-    let w = 100;
-    let sum = 0;
-    let best = 0;
-    let above = 0;
-    for i in 0..len(xs) {
-        sum = sum + xs[i];
-        if i >= w {
-            sum = sum - xs[i - w];
-        }
-        if i >= w - 1 {
-            let avg = sum / w;
-            if avg > best {
-                best = avg;
-            }
-            if avg > 540 {
-                above = above + 1;
-            }
-        }
-    }
-    print(best, above);
-}
+var seed = [47]
+let xs = [rnd(&seed) % 1000 for i in 0..500000]
+let w = 100
+var sum = 0
+var best = 0
+var above = 0
+for i in 0..len(xs):
+    sum += xs[i]
+    if i >= w:
+        sum -= xs[i - w]
+    if i >= w - 1:
+        let avg = sum / w
+        best = max(best, avg)
+        if avg > 540:
+            above += 1
+print(best, above)

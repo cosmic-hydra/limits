@@ -1,0 +1,7 @@
+uses stdin
+fn ints(line: str) -> [int]:
+    var out: [int] = []
+    for w in split(line, " "):
+        if w != "": push(out, unwrap(parse_int(w)))
+    out
+print(min(ints(env.stdin.read_line())))

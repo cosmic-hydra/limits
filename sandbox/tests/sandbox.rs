@@ -253,7 +253,7 @@ fn real_limits_programs_run_inside() {
     }
     let d = dir("lim");
     let hello = format!("{d}/hello.lim");
-    std::fs::write(&hello, "fn main() {\n    print(\"hello, world\");\n}\n").unwrap();
+    std::fs::write(&hello, "print(\"hello, world\")\n").unwrap();
     let st = Command::new(&limits)
         .args(["build", &hello, "-o", &format!("{d}/hello")])
         .status()
@@ -265,7 +265,7 @@ fn real_limits_programs_run_inside() {
     let src = format!("{d}/rd.lim");
     std::fs::write(
         &src,
-        "uses fs.read, args;\nfn main() { print(read_file(args()[0])); }\n",
+        "uses fs.read, args\nprint(env.fs.read(env.args.list()[0]))\n",
     )
     .unwrap();
     std::fs::write(format!("{d}/in.txt"), "file contents").unwrap();

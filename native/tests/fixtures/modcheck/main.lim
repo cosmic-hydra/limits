@@ -1,2 +1,2 @@
-import m;
-fn main() { m.f(1); }
+import m
+m.f(1)

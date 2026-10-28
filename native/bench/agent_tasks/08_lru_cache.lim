@@ -1,36 +1,25 @@
 # LRU cache simulation with a list (most recent last).
-fn rnd(s: [int]) -> int {
-    s[0] = (s[0] * 1103515245 + 12345) % 2147483648;
-    return s[0] / 65536;
-}
+fn rnd(s: inout [int]) -> int:
+    s[0] = (s[0] * 1103515245 + 12345) % 2147483648
+    s[0] / 65536
 
-fn remove_at(xs: [int], i: int) {
-    for j in i..len(xs) - 1 {
-        xs[j] = xs[j + 1];
-    }
-    pop(xs);
-}
+fn remove_at(xs: inout [int], i: int):
+    for j in i..len(xs) - 1:
+        xs[j] = xs[j + 1]
+    pop(xs)
 
-fn main() {
-    let cap = 50;
-    let seed = [17];
-    let cache: [int] = [];
-    let hits = 0;
-    for i in 0..200000 {
-        let k = rnd(seed) % 120;
-        let at = -1;
-        for j in 0..len(cache) {
-            if cache[j] == k {
-                at = j;
-            }
-        }
-        if at >= 0 {
-            hits = hits + 1;
-            remove_at(cache, at);
-        } else if len(cache) == cap {
-            remove_at(cache, 0);
-        }
-        push(cache, k);
-    }
-    print(hits, 200000 - hits, cache[0], cache[len(cache) - 1]);
-}
+let cap = 50
+var seed = [17]
+var cache: [int] = []
+var hits = 0
+for i in 0..200000:
+    let k = rnd(&seed) % 120
+    match find(cache, k):
+        Some(at):
+            hits += 1
+            remove_at(&cache, at)
+        None:
+            if len(cache) == cap:
+                remove_at(&cache, 0)
+    push(cache, k)
+print(hits, 200000 - hits, cache[0], cache[len(cache) - 1])

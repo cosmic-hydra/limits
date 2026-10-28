@@ -27,7 +27,60 @@ the short Limits times; a second run gave totals of 0.71 s to 0.88 s.
   worked here) with `o200k_base` and `cl100k_base`. The two encodings
   differ by at most a few tokens per file, so the analysis uses o200k.
 
-## Results (after this stage's `split` / `join` / `sort` builtins)
+## v0.2 syntax redesign (indentation, script mode, comprehensions)
+
+The task files are now in the v0.2 syntax (SPEC.md). They were converted with
+`tools/migrate.py` and then hand-edited where a comprehension or one of the new
+`sum`/`min`/`max` builtins is the natural way to write the code
+(02, 03, 04, 05, 07, 10-15, 18, 19). Same machine, same session; "v0.1" is the
+previous file built with the previous compiler, "migrated" is the converter's
+output before the hand edits, "v0.2" is the committed file. Both versions
+print byte-identical output. Run time is best of 5 (s), checked mode.
+
+| task | v0.1 lines | v0.2 lines | v0.1 tok | migrated tok | v0.2 tok | Python tok | v0.1 s | v0.2 s |
+|---|---|---|---|---|---|---|---|---|
+| 01_csv_aggregate | 33 | 27 | 383 | 347 | 347 | 243 | 0.080 | 0.084 |
+| 02_word_freq | 39 | 25 | 339 | 296 | 278 | 169 | 0.104 | 0.094 |
+| 03_dedupe_sort | 23 | 11 | 194 | 168 | 144 | 89 | 0.035 | 0.033 |
+| 04_matmul | 36 | 18 | 267 | 231 | 194 | 141 | 0.011 | 0.011 |
+| 05_json_format | 30 | 25 | 322 | 301 | 291 | 192 | 0.039 | 0.036 |
+| 06_binary_search | 37 | 28 | 285 | 252 | 250 | 154 | 0.025 | 0.025 |
+| 07_bfs_grid | 39 | 28 | 351 | 317 | 307 | 255 | 0.008 | 0.008 |
+| 08_lru_cache | 33 | 24 | 259 | 229 | 229 | 148 | 0.018 | 0.019 |
+| 09_tokenizer | 70 | 55 | 579 | 493 | 493 | 281 | 0.053 | 0.053 |
+| 10_top_k | 18 | 10 | 146 | 128 | 115 | 77 | 0.037 | 0.038 |
+| 11_rle | 31 | 20 | 268 | 237 | 224 | 137 | 0.022 | 0.023 |
+| 12_prime_sieve | 23 | 15 | 145 | 117 | 108 | 84 | 0.012 | 0.012 |
+| 13_levenshtein | 49 | 26 | 402 | 368 | 299 | 198 | 0.018 | 0.018 |
+| 14_interval_merge | 43 | 30 | 308 | 268 | 255 | 156 | 0.023 | 0.023 |
+| 15_histogram | 26 | 15 | 283 | 251 | 186 | 138 | 0.008 | 0.007 |
+| 16_collatz_max | 21 | 15 | 123 | 101 | 101 | 88 | 0.086 | 0.088 |
+| 17_fizzbuzz | 23 | 16 | 146 | 117 | 117 | 85 | 0.031 | 0.032 |
+| 18_bank_ledger | 34 | 23 | 293 | 255 | 230 | 210 | 0.009 | 0.009 |
+| 19_moving_average | 31 | 19 | 218 | 183 | 171 | 125 | 0.008 | 0.008 |
+| 20_expr_eval | 76 | 57 | 575 | 521 | 521 | 371 | 0.062 | 0.060 |
+| **total** | 715 | 487 | 5886 | 5180 | 4860 | 3341 | 0.690 | 0.682 |
+
+o200k tokens: 5886 -> 5180 after mechanical migration (-12.0%) -> 4860 after
+the hand edits (-17.4%); cl100k: 5888 -> 4861 (-17.4%). Lines: 715 -> 487
+(-31.9%). Limits is now 1.45x Python's tokens on these tasks (was 1.76x).
+Total run time did not change (0.690 s vs 0.682 s, within noise); a
+reduction over a comprehension (`sum([... for k in 0..n])`) compiles to one
+fused loop, which kept 04_matmul at 11 ms (it was 44 ms when the
+comprehension built a list per element).
+
+The same converter applied to the 60 first-attempt agent solutions of
+Limits-Bench baseline-v1 (copies, outside this tree): all 60 still pass the
+benchmark tests after conversion, and their mean size went from 136.0 to
+122.1 cl100k tokens (-10.2%; mechanical only, no hand edits). One solution
+defined its own `fn sum`, which the converter renamed to `sum_`.
+
+The tables below are the v0.1 measurements, kept for history.
+`features.py` estimates rewrites of the v0.1 brace syntax and no longer
+applies to the current files; the `before/` files were migrated too, so
+`measure.py` can still build them.
+
+## v0.1 results (after the `split` / `join` / `sort` builtins)
 
 | task | Limits lines | Limits chars | Limits tok o200k | Limits tok cl100k | Py lines | Py chars | Py tok o200k | Py tok cl100k | Limits tok before | Limits s | Python s | speedup |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -147,3 +200,13 @@ From the table: compound assignment (rank 6, ~20 lines) and `min`/`max`/
 `sum` builtins are each well under 150 lines; a map type and globals would
 remove the two biggest structural gaps (01/02 and the RNG threading) but are
 larger than this stage's budget.
+
+## v0.3 sum types
+
+Only one task changed: 08_lru_cache now uses `match find(cache, k):` with
+`Some(at)` / `None` arms instead of a `var at = -1` search loop and an
+`at >= 0` test. Measured with `measure.py --no-time`: 24 -> 22 lines, 229 ->
+206 o200k tokens (Python: 146); output unchanged (all 20 tasks still match
+Python). The other tasks have no absent-value sentinel where an Option is
+shorter, so they compile unchanged. The new `examples/shapes.lim` shows
+enums, `Result` and `?` together.

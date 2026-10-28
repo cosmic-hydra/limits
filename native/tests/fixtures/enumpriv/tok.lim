@@ -1,0 +1,16 @@
+pub enum Tok:
+    Num(int)
+    Op(str)
+    End
+
+enum Hidden:
+    H
+
+pub fn lex(s: str) -> [Tok]:
+    var out: [Tok] = []
+    for p in split(s, " "):
+        match parse_int(p):
+            Some(n): push(out, Num(n))
+            None: push(out, Op(p))
+    push(out, End)
+    out

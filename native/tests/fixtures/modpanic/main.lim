@@ -1,2 +1,3 @@
-import m.u;
-fn main() { let xs = [1]; print(u.bad(xs)); }
+import m.u
+let xs = [1]
+print(u.bad(xs))

@@ -1,0 +1,8 @@
+uses stdin
+let n = unwrap(parse_int(env.stdin.read_line()))
+var xs: [str] = []
+for i in 0..n: push(xs, env.stdin.read_line())
+let sub = env.stdin.read_line()
+let r = [x for x in xs if is_some(find(x, sub))]
+print(len(r))
+for x in r: print(x)

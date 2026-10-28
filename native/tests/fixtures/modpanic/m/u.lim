@@ -1,3 +1,2 @@
-pub fn bad(xs: [int]) -> int {
-  return xs[5];
-}
+pub fn bad(xs: [int]) -> int:
+    xs[5]

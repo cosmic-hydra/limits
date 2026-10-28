@@ -1,0 +1,8 @@
+uses stdin
+let n = unwrap(parse_int(env.stdin.read_line()))
+var f = [0, 0, 2, 0]
+var i = 4
+while i <= n:
+    push(f, f[i - 1] + f[i - 2] + f[i - 3] + f[i - 4])
+    i += 1
+print(f[n])
