@@ -1,0 +1,24 @@
+# Simulate retry decisions; backoff ticks do not sleep or perform network I/O.
+fn retryable(status) {
+    return status == 429 or (status >= 500 and status < 600);
+}
+let responses = [429, 503, 200];
+let policy = {"max_attempts": 3, "delays": [1, 2, 4]};
+let state = {"attempts": 0, "backoff_ticks": 0, "done": false};
+while state["attempts"] < policy["max_attempts"] {
+    let attempt = state["attempts"];
+    assert(attempt < len(responses), "missing simulated response");
+    let status = responses[attempt];
+    state["attempts"] = attempt + 1;
+    if status == 200 {
+        state["done"] = true;
+        break;
+    }
+    if not retryable(status) {
+        break;
+    }
+    state["backoff_ticks"] = state["backoff_ticks"] + policy["delays"][attempt];
+}
+assert(state["done"] and state["attempts"] == 3);
+assert(state["backoff_ticks"] == 3);
+print(state);

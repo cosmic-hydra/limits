@@ -1,0 +1,29 @@
+# Manual data handling without the optional concise data helpers.
+let job = {"attempt": nil};
+let steps = ["search", "read", "answer"];
+let costs = [3, 2, 4];
+let label = "untitled";
+for key in keys(job) {
+    if key == "title" {
+        label = job[key];
+        break;
+    }
+}
+let has_attempt = false;
+for key in keys(job) {
+    if key == "attempt" {
+        has_attempt = true;
+        break;
+    }
+}
+let route = "";
+let separator = "";
+for step in steps {
+    route = route + separator + step;
+    separator = " -> ";
+}
+let total = 0;
+for cost in costs {
+    total = total + cost;
+}
+print(label, has_attempt, route, total);

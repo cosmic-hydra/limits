@@ -3,6 +3,7 @@ use crate::ast::*;
 use crate::bytecode::*;
 use crate::error::Span;
 use crate::interp::{stmt_span, Value, BUILTINS};
+use std::collections::{HashMap, HashSet};
 use std::rc::Rc;
 struct Loop {
     start: usize,
@@ -12,26 +13,43 @@ struct Loop {
 }
 struct Compiler {
     chunk: Chunk,
-    scopes: Vec<Vec<String>>,
+    scopes: Vec<Rc<Layout>>,
     loops: Vec<Loop>,
-    parameter_scope: Option<(usize, Vec<usize>)>,
+    parameter_scope: Option<(usize, usize)>,
 }
-fn layout(body: &[Stmt], initial: &[String]) -> Vec<String> {
-    let mut names = initial.to_vec();
-    for s in body {
-        if let Stmt::Let(n, ..) | Stmt::Fn(n, ..) = s {
-            if !names.contains(n) {
-                names.push(n.clone());
+// Slot numbers follow source declaration order; hashing is lookup-only, so
+// randomized map iteration cannot affect emitted code or observable behavior.
+struct Layout {
+    slots: HashMap<String, usize>,
+    len: usize,
+}
+impl Layout {
+    fn new(body: &[Stmt], initial: &[String]) -> Rc<Self> {
+        let mut slots = HashMap::with_capacity(initial.len());
+        // Preserve duplicate parameter slots and last-argument-wins behavior:
+        // references resolve to the first slot, which each duplicate parameter
+        // subsequently writes. New declarations start after all parameter slots.
+        for (i, name) in initial.iter().enumerate() {
+            slots.entry(name.clone()).or_insert(i);
+        }
+        let mut len = initial.len();
+        for stmt in body {
+            if let Stmt::Let(name, ..) | Stmt::Fn(name, ..) = stmt {
+                if let std::collections::hash_map::Entry::Vacant(entry) = slots.entry(name.clone())
+                {
+                    entry.insert(len);
+                    len += 1;
+                }
             }
         }
+        Rc::new(Self { slots, len })
     }
-    names
 }
 pub fn compile(program: &Program) -> Result<CompiledProgram, crate::error::LimError> {
     crate::ast::validate(program)?;
     let builtins: Vec<_> = BUILTINS.iter().map(|s| s.to_string()).collect();
-    let names = layout(program, &builtins);
-    let locals = names.len();
+    let names = Layout::new(program, &builtins);
+    let locals = names.len;
     let mut c = Compiler {
         chunk: Chunk::default(),
         scopes: vec![names],
@@ -80,13 +98,16 @@ impl Compiler {
             .iter()
             .rev()
             .enumerate()
-            .filter_map(|(d, ns)| ns.iter().position(|n| n == name).map(|i| (d, i)))
+            .filter_map(|(d, scope)| scope.slots.get(name).map(|&i| (d, i)))
             .collect();
-        let frame_slot = self.parameter_scope.as_ref().and_then(|(scope, params)| {
-            slots.first().and_then(|&(d, i)| {
-                (self.scopes.len() - 1 - d == *scope && params.contains(&i)).then_some(i)
-            })
-        });
+        let frame_slot = self
+            .parameter_scope
+            .as_ref()
+            .and_then(|(scope, parameter_count)| {
+                slots.first().and_then(|&(d, i)| {
+                    (self.scopes.len() - 1 - d == *scope && i < *parameter_count).then_some(i)
+                })
+            });
         Binding {
             name: name.into(),
             slots,
@@ -94,12 +115,7 @@ impl Compiler {
         }
     }
     fn slot(&self, name: &str) -> usize {
-        self.scopes
-            .last()
-            .unwrap()
-            .iter()
-            .position(|n| n == name)
-            .unwrap()
+        self.scopes.last().unwrap().slots[name]
     }
     fn block(&mut self, body: &[Stmt]) {
         for s in body {
@@ -107,8 +123,8 @@ impl Compiler {
         }
     }
     fn enter(&mut self, body: &[Stmt], initial: &[String], s: Span) {
-        let ns = layout(body, initial);
-        self.emit(Op::Enter(ns.len()), s);
+        let ns = Layout::new(body, initial);
+        self.emit(Op::Enter(ns.len), s);
         self.scopes.push(ns);
     }
     fn exit(&mut self, s: Span) {
@@ -116,7 +132,10 @@ impl Compiler {
         self.scopes.pop();
     }
     fn scoped(&mut self, body: &[Stmt], s: Span) {
-        if layout(body, &[]).is_empty() {
+        if !body
+            .iter()
+            .any(|s| matches!(s, Stmt::Let(..) | Stmt::Fn(..)))
+        {
             self.block(body);
         } else {
             self.enter(body, &[], s);
@@ -208,16 +227,13 @@ impl Compiler {
                 self.patch(end, self.chunk.code.len());
             }
             Stmt::Fn(n, params, b, _) => {
-                let names = layout(b, params);
-                let locals = names.len();
-                let slots: Vec<usize> = params
-                    .iter()
-                    .map(|p| names.iter().position(|n| n == p).unwrap())
-                    .collect();
+                let names = Layout::new(b, params);
+                let locals = names.len;
+                let slots: Vec<usize> = params.iter().map(|p| names.slots[p]).collect();
                 let mut scopes = self.scopes.clone();
                 scopes.push(names);
                 let stack_parameters = !has_closures(b);
-                let parameter_scope = stack_parameters.then(|| (scopes.len() - 1, slots.clone()));
+                let parameter_scope = stack_parameters.then(|| (scopes.len() - 1, params.len()));
                 let mut c = Compiler {
                     chunk: Chunk::default(),
                     scopes,
@@ -401,8 +417,6 @@ fn frame_only(body: &[Stmt]) -> bool {
     })
 }
 fn slots_are_unique(params: &[String]) -> bool {
-    params
-        .iter()
-        .enumerate()
-        .all(|(i, p)| !params[..i].contains(p))
+    let mut seen = HashSet::with_capacity(params.len());
+    params.iter().all(|p| seen.insert(p))
 }

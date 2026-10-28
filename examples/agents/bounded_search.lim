@@ -1,0 +1,45 @@
+# Breadth-first planning over local data, with an explicit expansion bound.
+let graph = {
+    "start": ["docs", "issues"],
+    "docs": ["reference"],
+    "issues": ["done"],
+    "reference": [],
+    "done": [],
+};
+let frontier = ["start"];
+let seen = {"start": true};
+let parent = {};
+let head = 0;
+let found = false;
+while head < len(frontier) {
+    assert(head < 8, "expansion budget exhausted");
+    let node = frontier[head];
+    head = head + 1;
+    if node == "done" {
+        found = true;
+        break;
+    }
+    for next in graph[node] {
+        if seen[next] == true {
+            continue;
+        }
+        seen[next] = true;
+        parent[next] = node;
+        push(frontier, next);
+    }
+}
+assert(found, "no route");
+let reverse = [];
+let current = "done";
+while current != nil {
+    push(reverse, current);
+    current = parent[current];
+}
+let route = [];
+let index = len(reverse) - 1;
+while index >= 0 {
+    push(route, reverse[index]);
+    index = index - 1;
+}
+assert(route == ["start", "issues", "done"]);
+print(route);

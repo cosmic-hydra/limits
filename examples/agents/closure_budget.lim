@@ -1,0 +1,25 @@
+# A closure shares private budget state across calls.
+fn make_budget(initial) {
+    assert(initial >= 0, "initial budget must be nonnegative");
+    let remaining = initial;
+    fn take(cost) {
+        assert(cost >= 0, "cost must be nonnegative");
+        if cost > remaining {
+            return false;
+        }
+        remaining = remaining - cost;
+        return true;
+    }
+    fn left() {
+        return remaining;
+    }
+    return {"take": take, "left": left};
+}
+let budget = make_budget(10);
+let independent = make_budget(2);
+assert(budget["take"](3));
+assert(not budget["take"](8));
+assert(budget["take"](7));
+assert(budget["left"]() == 0);
+assert(independent["left"]() == 2);
+print(budget["left"](), independent["left"]());

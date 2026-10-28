@@ -52,3 +52,13 @@ pub fn run_with_engine(
         Engine::Vm => vm::Vm::with_limits(out, limits).run(codegen::compile(&program)?),
     }
 }
+
+pub mod sandbox;
+
+pub mod semantic;
+
+pub mod protocol;
+
+pub mod sealed;
+
+pub mod stdlib;

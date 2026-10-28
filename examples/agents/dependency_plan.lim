@@ -1,0 +1,33 @@
+# Stable dependency planning; a failed progress check rejects cycles.
+fn ready(dependencies, completed) {
+    for name in dependencies {
+        if completed[name] != true {
+            return false;
+        }
+    }
+    return true;
+}
+let tasks = [
+    {"id": "publish", "after": ["review"]},
+    {"id": "draft", "after": ["research"]},
+    {"id": "research", "after": []},
+    {"id": "review", "after": ["draft"]},
+];
+let completed = {};
+let plan = [];
+while len(plan) < len(tasks) {
+    let progressed = false;
+    for task in tasks {
+        let id = task["id"];
+        assert(type(id) == "string", "task id must be a string");
+        if completed[id] == true or not ready(task["after"], completed) {
+            continue;
+        }
+        push(plan, id);
+        completed[id] = true;
+        progressed = true;
+    }
+    assert(progressed, "cycle, duplicate id, or unknown dependency");
+}
+assert(plan == ["research", "draft", "review", "publish"]);
+print(plan);

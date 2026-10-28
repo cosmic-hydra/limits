@@ -74,7 +74,8 @@ fn assign(env: &Env, name: &str, value: Value) -> bool {
 }
 
 pub const BUILTINS: &[&str] = &[
-    "print", "len", "push", "pop", "str", "int", "float", "type", "keys", "assert",
+    "print", "len", "push", "pop", "str", "int", "float", "type", "keys", "assert", "get", "has",
+    "join", "sum",
 ];
 
 pub struct Interpreter<'a> {
@@ -84,6 +85,7 @@ pub struct Interpreter<'a> {
     depth: usize,
     globals: Env,
     heap: TreeHeap,
+    sandbox: crate::sandbox::State,
 }
 
 fn rt<T>(msg: impl Into<String>, span: Span) -> Result<T, LimError> {
@@ -96,6 +98,14 @@ impl<'a> Interpreter<'a> {
     }
 
     pub fn with_limits(out: &'a mut dyn Write, limits: Limits) -> Self {
+        Self::with_policy(out, limits, crate::sandbox::SandboxPolicy::default())
+    }
+
+    pub fn with_policy(
+        out: &'a mut dyn Write,
+        limits: Limits,
+        policy: crate::sandbox::SandboxPolicy,
+    ) -> Self {
         let globals: Env = Rc::new(RefCell::new(Scope::default()));
         for b in BUILTINS {
             globals
@@ -115,11 +125,13 @@ impl<'a> Interpreter<'a> {
                 next_collection: 0,
             },
             globals,
+            sandbox: crate::sandbox::State::new(policy),
         }
     }
 
     pub fn run(&mut self, prog: &Program) -> Result<(), LimError> {
         crate::ast::validate(prog)?;
+        self.sandbox.start()?;
         self.depth = 0;
         let result = self.run_tasks(prog);
         self.depth = 0;
@@ -467,7 +479,12 @@ impl<'a> Interpreter<'a> {
         self.steps = 0;
     }
 
+    pub(crate) fn reset_policy(&mut self) -> Result<(), LimError> {
+        self.sandbox.reset()
+    }
+
     pub(crate) fn tick(&mut self, span: Span) -> Result<(), LimError> {
+        self.sandbox.checkpoint(span)?;
         if self.steps >= self.limits.max_steps {
             return rt(
                 format!("step limit exceeded ({} steps)", self.limits.max_steps),
@@ -519,6 +536,7 @@ impl<'a> Interpreter<'a> {
         args: Vec<Value>,
         s: Span,
     ) -> Result<Value, LimError> {
+        self.sandbox.check_builtin(name, s)?;
         let arity = |n: usize| -> Result<(), LimError> {
             if args.len() != n {
                 rt(
@@ -530,6 +548,7 @@ impl<'a> Interpreter<'a> {
             }
         };
         match name {
+            "get" | "has" | "join" | "sum" => crate::stdlib::call(name, args, s),
             "print" => {
                 let mut line = String::new();
                 for (i, arg) in args.iter().enumerate() {
@@ -546,8 +565,8 @@ impl<'a> Interpreter<'a> {
                     }
                     line.push_str(&value);
                 }
-                writeln!(self.out, "{line}")
-                    .map_err(|e| LimError::new(Kind::Runtime, e.to_string(), s))?;
+                line.push('\n');
+                self.sandbox.write(self.out, line.as_bytes(), s)?;
                 Ok(Value::Nil)
             }
             "len" => {

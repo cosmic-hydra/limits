@@ -1,0 +1,22 @@
+# Select an affordable action by expected benefit minus risk.
+let budget = 8;
+let actions = [
+    {"name": "search", "cost": 3, "benefit": 9, "risk": 2},
+    {"name": "browse", "cost": 10, "benefit": 15, "risk": 1},
+    {"name": "summarize", "cost": 2, "benefit": 6, "risk": 0},
+];
+let best = nil;
+let best_score = nil;
+for action in actions {
+    if action["cost"] > budget {
+        continue;
+    }
+    let score = action["benefit"] - action["risk"];
+    if best == nil or score > best_score {
+        best = action;
+        best_score = score;
+    }
+}
+assert(best != nil, "no affordable action");
+assert(best["name"] == "search");
+print(best["name"], best_score);

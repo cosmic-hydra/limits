@@ -82,13 +82,21 @@ impl<'a> Vm<'a> {
         Self::with_limits(out, Limits::default())
     }
     pub fn with_limits(out: &'a mut dyn Write, limits: Limits) -> Self {
+        Self::with_policy(out, limits, crate::sandbox::SandboxPolicy::default())
+    }
+    pub fn with_policy(
+        out: &'a mut dyn Write,
+        limits: Limits,
+        policy: crate::sandbox::SandboxPolicy,
+    ) -> Self {
         Self {
-            runtime: Interpreter::with_limits(out, limits),
+            runtime: Interpreter::with_policy(out, limits, policy),
             limits,
         }
     }
     pub fn run(&mut self, program: CompiledProgram) -> Result<(), LimError> {
         self.runtime.reset_steps();
+        self.runtime.reset_policy()?;
         let function = program.0;
         let mut heap = Heap::default();
         let scope = heap.scope(function.locals, None, None);

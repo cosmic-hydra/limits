@@ -1,0 +1,2 @@
+{"workload":"wide_scope","samples":5,"source_bytes":243577,"nonblank_noncomment_loc":16001,"tokens":88008,"top_level_instructions":48008,"top_level_constants":16001,"median_ns":{"lex":2881852,"parse":5965300,"check":1970085,"compile":4274366,"tree_execute":7343000,"vm_execute":808882}}
+{"workload":"fib25","samples":5,"source_bytes":164,"nonblank_noncomment_loc":5,"tokens":40,"top_level_instructions":12,"top_level_constants":2,"median_ns":{"lex":11017,"parse":14361,"check":7481,"compile":24407,"tree_execute":331153651,"vm_execute":37916189}}
